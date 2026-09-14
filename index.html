@@ -85,6 +85,9 @@ body{
 .start:focus-visible{outline:3px solid var(--nanohana);outline-offset:2px}
 .best{font-size:12px;color:var(--ink-soft);margin:10px 0 0;text-align:center}
 .mode-note{font-size:12px;color:var(--ink-soft);margin:10px 0 0}
+.sub-label{font-size:12px;color:var(--ink-soft);margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--rule)}
+.credit{font-size:11px;line-height:1.7;color:var(--ink-soft);margin:18px 4px 0}
+.grade.adv b{font-family:var(--maru);font-size:15px;font-weight:700;letter-spacing:0}
 
 /* --- プレイ画面 --- */
 .bar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--ink-soft);margin-bottom:10px}
@@ -213,6 +216,8 @@ body{
     <div class="sheet">
       <h2>学年をえらぶ</h2>
       <div class="grades" id="grades"></div>
+      <p class="sub-label">べつの ものさし（検定・CEFR）</p>
+      <div class="grades" id="grades2"></div>
     </div>
 
     <div class="sheet">
@@ -232,6 +237,7 @@ body{
 
     <button class="start" id="btnStart">はじめる</button>
     <p class="best" id="bestLine"></p>
+    <p class="credit">英単語のCEFRレベルは『CEFR-J Wordlist Version 1.6』（東京外国語大学 投野由紀夫研究室）に準拠。日本語訳は本アプリ独自。漢字の学年は文部科学省「学年別漢字配当表」、漢検2級は日本漢字能力検定の級別配当による。</p>
   </section>
 
   <!-- ======== プレイ ======== -->
@@ -839,10 +845,100 @@ const WORDS = {
    ["楽譜","がくふ","音楽を記号で書き表したもの"],
    ["海藻","かいそう","海に育つ藻の仲間"],
    ["懸命","けんめい","力のかぎりつとめること"],
-   ["軍艦","ぐんかん","戦うために造られた船"]]
+   ["軍艦","ぐんかん","戦うために造られた船"]],
+
+10:[["挨拶","あいさつ","出会いや別れのときに交わす言葉"],
+   ["曖昧","あいまい","はっきりしないこと"],
+   ["宛先","あてさき","郵便などを送る相手先"],
+   ["椅子","いす","腰かけるための家具"],
+   ["語彙","ごい","その言語で使われる語の集まり"],
+   ["畏敬","いけい","おそれうやまうこと"],
+   ["萎縮","いしゅく","しぼんで小さくなること"],
+   ["咽喉","いんこう","のど"],
+   ["臆病","おくびょう","ちょっとしたことをこわがる性質"],
+   ["旺盛","おうせい","勢いがさかんなこと"],
+   ["断崖","だんがい","切り立ったがけ"],
+   ["象牙","ぞうげ","ゾウのきば"],
+   ["楷書","かいしょ","点画をくずさない書体"],
+   ["葛藤","かっとう","心の中で対立して悩むこと"],
+   ["韓国","かんこく","大韓民国"],
+   ["玩具","がんぐ","おもちゃ"],
+   ["亀裂","きれつ","ひび割れ"],
+   ["僅少","きんしょう","ごくわずかなこと"],
+   ["洞窟","どうくつ","岩や地中にできた深い穴"],
+   ["稽古","けいこ","芸事や武道を習い練習すること"],
+   ["憧憬","しょうけい","あこがれること"],
+   ["拳法","けんぽう","こぶしを用いる武術"],
+   ["鍵盤","けんばん","ピアノなどのキーの並び"],
+   ["禁錮","きんこ","刑務所に閉じこめる刑罰"],
+   ["勾配","こうばい","傾きの度合い"],
+   ["傲慢","ごうまん","おごり高ぶって人を見下すこと"],
+   ["痕跡","こんせき","何かがあったあと"],
+   ["挫折","ざせつ","途中で気持ちが折れること"],
+   ["采配","さいはい","指図して人を動かすこと"],
+   ["斬新","ざんしん","発想が際立って新しいこと"],
+   ["真摯","しんし","まじめでひたむきなこと"],
+   ["叱責","しっせき","しかって責めること"],
+   ["半袖","はんそで","ひじまでの短いそで"],
+   ["払拭","ふっしょく","すっかり取りのぞくこと"],
+   ["腎臓","じんぞう","血液から尿をつくる臓器"],
+   ["必須","ひっす","かならず必要なこと"],
+   ["覚醒","かくせい","目がさめること。迷いから覚めること"],
+   ["脊椎","せきつい","背骨"],
+   ["親戚","しんせき","血縁や婚姻でつながる人々"],
+   ["煎茶","せんちゃ","茶葉を湯でいれた日本茶"],
+   ["羨望","せんぼう","うらやましく思うこと"],
+   ["詮索","せんさく","細かく調べ立てること"],
+   ["便箋","びんせん","手紙を書くための紙"],
+   ["爽快","そうかい","さわやかで気持ちのよいこと"],
+   ["捕捉","ほそく","とらえること"],
+   ["謙遜","けんそん","ひかえめにふるまうこと"],
+   ["唾液","だえき","口の中に出るつば"],
+   ["堆積","たいせき","積み重なること"],
+   ["頂戴","ちょうだい","もらうことのへりくだった言い方"],
+   ["元旦","がんたん","元日の朝"],
+   ["破綻","はたん","うまくいかずやぶれること"],
+   ["緻密","ちみつ","細かくゆきとどいていること"],
+   ["貼付","ちょうふ","のりなどではりつけること"],
+   ["進捗","しんちょく","物事が進んでいく具合"],
+   ["牛丼","ぎゅうどん","牛肉をのせたどんぶり"],
+   ["整頓","せいとん","きちんと片づけること"],
+   ["土鍋","どなべ","土を焼いて作ったなべ"],
+   ["虹色","にじいろ","にじのような七色"],
+   ["捻挫","ねんざ","関節をひねって痛めること"],
+   ["汎用","はんよう","広くいろいろに使えること"],
+   ["氾濫","はんらん","水があふれ出ること"],
+   ["斑点","はんてん","まだらの点"],
+   ["眉毛","まゆげ","目の上に生えている毛"],
+   ["訃報","ふほう","人が亡くなったという知らせ"],
+   ["隠蔽","いんぺい","おおいかくすこと"],
+   ["完璧","かんぺき","欠点がまったくないこと"],
+   ["哺乳","ほにゅう","乳であたえて子を育てること"],
+   ["蜂蜜","はちみつ","ミツバチが集めた甘い蜜"],
+   ["変貌","へんぼう","すがたが大きく変わること"],
+   ["親睦","しんぼく","たがいに親しみ合うこと"],
+   ["麺類","めんるい","うどん・そばなどの総称"],
+   ["比喩","ひゆ","他のものにたとえて表すこと"],
+   ["藍色","あいいろ","濃く暗い青色"],
+   ["瑠璃","るり","青く美しい宝石。またその色"],
+   ["伴侶","はんりょ","連れ添う相手"],
+   ["明瞭","めいりょう","はっきりしていること"],
+   ["山麓","さんろく","山のふもと"],
+   ["風呂","ふろ","湯につかって体を洗う設備"],
+   ["近畿","きんき","京都・大阪を中心とする地方"],
+   ["嗅覚","きゅうかく","においを感じる感覚"],
+   ["危惧","きぐ","悪い結果をおそれ心配すること"],
+   ["歌舞伎","かぶき","日本の伝統的な演劇"],
+   ["俳諧","はいかい","連歌から生まれた文芸"],
+   ["初詣","はつもうで","年の初めに社寺へ参ること"],
+   ["隙間","すきま","物と物のあいだのあき"]]
 };
 
 /* 英単語データ：[つづり, 日本語, なかま]
+   CEFR（A1/A2/B1/B2）のレベル判定は下記に準拠：
+   『CEFR-J Wordlist Version 1.6』東京外国語大学 投野由紀夫研究室
+   http://www.cefr-j.org/download.html#cefrj_wordlist
+   （日本語訳は本アプリで独自に付与）
    小3・小4＝外国語活動（Let's Try! 1・2）／小5・小6＝外国語（NEW HORIZON Elementary 5・6）の
    単元で扱うカテゴリーに沿って配列。1語で書ける語のみ（連語・慣用表現は対象外）。 */
 const EN_WORDS = {
@@ -1149,7 +1245,261 @@ const EN_WORDS = {
  ["negative","否定的な","中3"],["positive","前向きな","中3"],["perfect","完全な","中3"],["personal","個人の","中3"],
  ["poor","貧しい","中3"],["rich","豊かな","中3"],["serious","深刻な","中3"],["similar","似ている","中3"],
  ["simple","単純な","中3"],["successful","成功した","中3"],["terrible","ひどい","中3"],["traditional","伝統的な","中3"],
- ["unique","独特の","中3"],["various","さまざまな","中3"],["wide","広い","中3"]]
+ ["unique","独特の","中3"],["various","さまざまな","中3"],["wide","広い","中3"]],
+
+11:[
+ ["about","〜について","A1"],["above","〜の上に","A1"],["action","行動","A1"],
+ ["activity","活動","A1"],["actor","俳優","A1"],["address","住所","A1"],
+ ["age","年れい","A1"],["album","アルバム","A1"],["alone","ひとりで","A1"],
+ ["anyone","だれか","A1"],["anything","何か","A1"],["awake","目がさめて","A1"],
+ ["away","はなれて","A1"],["back","背中・うしろへ","A1"],["bad","悪い","A1"],
+ ["bar","棒","A1"],["bat","バット","A1"],["bathroom","浴室","A1"],
+ ["bean","豆","A1"],["become","〜になる","A1"],["bedroom","寝室","A1"],
+ ["bell","ベル","A1"],["below","〜の下に","A1"],["beside","〜のそばに","A1"],
+ ["bicycle","自転車","A1"],["birth","誕生","A1"],["biscuit","ビスケット","A1"],
+ ["blank","空白の","A1"],["block","かたまり・区画","A1"],["blow","ふく","A1"],
+ ["board","板","A1"],["bone","骨","A1"],["boring","たいくつな","A1"],
+ ["bottle","びん","A1"],["bottom","底","A1"],["bowl","はち・どんぶり","A1"],
+ ["brain","脳","A1"],["breathe","呼吸する","A1"],["bridge","橋","A1"],
+ ["bright","明るい","A1"],["broken","こわれた","A1"],["bucket","バケツ","A1"],
+ ["building","建物","A1"],["burger","ハンバーガー","A1"],["button","ボタン","A1"],
+ ["buy","買う","A1"],["cafe","カフェ","A1"],["care","世話・気にかける","A1"],
+ ["cartoon","アニメ・まんが","A1"],["case","場合・入れ物","A1"],["celebrate","祝う","A1"],
+ ["character","性格・登場人物","A1"],["check","確認する","A1"],["child","子ども","A1"],
+ ["church","教会","A1"],["cinema","映画館","A1"],["classmate","同級生","A1"],
+ ["clever","りこうな","A1"],["closed","閉まった","A1"],["cloth","布","A1"],
+ ["clothes","衣服","A1"],["coach","指導者","A1"],["coat","コート","A1"],
+ ["code","記号・暗号","A1"],["collection","収集","A1"],["conversation","会話","A1"],
+ ["copy","写し","A1"],["couch","ソファ","A1"],["course","進路・課程","A1"],
+ ["cousin","いとこ","A1"],["cover","おおう・報道する","A1"],["cream","クリーム","A1"],
+ ["cry","泣く","A1"],["dad","お父さん","A1"],["dancing","ダンス","A1"],
+ ["dark","暗い","A1"],["date","日付","A1"],["daughter","むすめ","A1"],
+ ["day","日","A1"],["dear","親愛なる","A1"],["design","設計する","A1"],
+ ["dictionary","辞書","A1"],["difference","ちがい","A1"],["dig","ほる","A1"],
+ ["doll","人形","A1"],["dollar","ドル","A1"],["down","下へ","A1"],
+ ["drum","たいこ","A1"],["dry","かわいた","A1"],["due","予定されて・期限の","A1"],
+ ["eighty","80","A1"],["elementary","初等の","A1"],["else","ほかに","A1"],
+ ["end","終わり","A1"],["enjoy","楽しむ","A1"],["everybody","みんな","A1"],
+ ["everyday","毎日の","A1"],["everyone","だれもが","A1"],["fair","公平な","A1"],
+ ["fever","熱","A1"],["focus","焦点を合わせる","A1"],["grade","学年・等級","A1"],
+ ["guess","推測する","A1"],["habit","習慣","A1"],["interview","面接","A1"],
+ ["judge","判断する","A1"],["mind","心・気にする","A1"],["order","注文・命令・順序","A1"],
+ ["owner","所有者","A1"],["period","期間","A1"],["price","価格","A1"],
+ ["role","役割","A1"],["rule","規則","A1"],["skill","技能","A1"],
+ ["social","社会の","A1"],["strange","奇妙な","A1"],["subject","科目・主題","A1"],
+ ["surprise","おどろかせる","A1"],["tool","道具","A1"],["topic","話題","A1"]],
+
+12:[
+ ["ability","能力","A2"],["abroad","海外へ","A2"],["advantage","利点","A2"],
+ ["advice","助言","A2"],["ancestor","祖先","A2"],["apologize","あやまる","A2"],
+ ["appreciate","感謝する・よさがわかる","A2"],["appropriate","適切な","A2"],["argue","議論する","A2"],
+ ["attempt","試みる","A2"],["attention","注意","A2"],["attitude","態度","A2"],
+ ["audience","観客","A2"],["author","著者","A2"],["behavior","ふるまい","A2"],
+ ["belong","所属する","A2"],["blame","責める","A2"],["branch","枝・支店","A2"],
+ ["budget","予算","A2"],["capital","首都・資本","A2"],["century","世紀","A2"],
+ ["certain","確かな","A2"],["challenge","課題・挑む","A2"],["cheap","安い","A2"],
+ ["chemical","化学の","A2"],["citizen","市民","A2"],["claim","主張する","A2"],
+ ["comfortable","心地よい","A2"],["complain","不平を言う","A2"],["concern","関心・心配","A2"],
+ ["confident","自信のある","A2"],["confuse","混乱させる","A2"],["consequence","結果","A2"],
+ ["contact","連絡する","A2"],["context","文脈","A2"],["contrast","対比","A2"],
+ ["convenient","便利な","A2"],["cost","費用","A2"],["count","数える","A2"],
+ ["crime","犯罪","A2"],["crowd","群衆","A2"],["deal","扱う・取引","A2"],
+ ["debate","討論","A2"],["degree","程度・学位","A2"],["delay","遅らせる","A2"],
+ ["depend","たよる","A2"],["destroy","破壊する","A2"],["detail","細部","A2"],
+ ["direct","直接の・指揮する","A2"],["disappear","消える","A2"],["divide","分ける","A2"],
+ ["doubt","疑う","A2"],["effect","効果","A2"],["encourage","はげます","A2"],
+ ["enormous","巨大な","A2"],["escape","逃げる","A2"],["establish","設立する","A2"],
+ ["evidence","証拠","A2"],["exchange","交換する","A2"],["exist","存在する","A2"],
+ ["expect","予期する","A2"],["expert","専門家","A2"],["explore","探検する","A2"],
+ ["extra","余分の","A2"],["fail","失敗する","A2"],["familiar","なじみのある","A2"],
+ ["fault","欠点・過失","A2"],["favor","好意","A2"],["feature","特徴","A2"],
+ ["figure","数字・人物像","A2"],["force","力・強制する","A2"],["fortune","幸運・財産","A2"],
+ ["freedom","自由","A2"],["gather","集める","A2"],["gender","性別","A2"],
+ ["guard","守る","A2"],["handle","扱う","A2"],["harm","害","A2"],
+ ["human","人間の","A2"],["impress","感心させる","A2"],["indicate","示す","A2"],
+ ["influence","影響","A2"],["injure","けがをさせる","A2"],["instead","その代わりに","A2"],
+ ["journey","旅","A2"],["knowledge","知識","A2"],["labor","労働","A2"],
+ ["lack","不足","A2"],["lead","導く","A2"],["level","水準","A2"],
+ ["major","主要な","A2"],["manner","やり方・作法","A2"],["mark","印をつける","A2"],
+ ["method","方法","A2"],["mistake","まちがい","A2"],["nation","国家","A2"],
+ ["native","生まれつきの・母語の","A2"],["normal","ふつうの","A2"],["operate","操作する","A2"],
+ ["opportunity","好機","A2"],["organize","組織する","A2"],["performance","上演・成績","A2"],
+ ["physical","身体の","A2"],["polite","礼儀正しい","A2"],["precise","精密な","A2"],
+ ["predict","予測する","A2"],["prefer","より好む","A2"],["pressure","圧力","A2"],
+ ["prevent","防ぐ","A2"],["private","私的な","A2"],["probably","おそらく","A2"],
+ ["professional","専門職の","A2"],["promise","約束","A2"],["proper","適切な","A2"],
+ ["public","公共の","A2"],["publish","出版する","A2"],["pursue","追求する","A2"],
+ ["quality","質","A2"],["range","範囲","A2"],["rate","割合","A2"],
+ ["recent","最近の","A2"],["reflect","反射する・反映する","A2"],["regret","後悔する","A2"],
+ ["regular","定期的な","A2"],["release","解放する・発売する","A2"],["remain","とどまる","A2"],
+ ["reveal","明らかにする","A2"],["satisfy","満足させる","A2"],["scene","場面","A2"],
+ ["schedule","予定","A2"],["search","さがす","A2"],["secret","秘密","A2"],
+ ["sense","感覚","A2"],["separate","分ける","A2"],["shape","形","A2"],
+ ["significant","重要な","A2"],["silence","沈黙","A2"],["source","源","A2"],
+ ["space","空間・宇宙","A2"],["specific","特定の","A2"],["statement","声明","A2"],
+ ["strategy","戦略","A2"],["strength","強さ","A2"],["structure","構造","A2"],
+ ["style","様式","A2"],["succeed","成功する","A2"],["sudden","突然の","A2"],
+ ["suit","合う・スーツ","A2"],["survive","生きのびる","A2"],["system","体系","A2"],
+ ["target","標的","A2"],["task","仕事","A2"],["trade","貿易","A2"],
+ ["trust","信頼する","A2"],["value","価値","A2"],["view","眺め・見方","A2"],
+ ["wealth","富","A2"],["whole","全体の","A2"]],
+
+13:[
+ ["absolute","絶対の","B1"],["abstract","抽象的な","B1"],["academic","学問の","B1"],
+ ["accompany","同行する","B1"],["accurate","正確な","B1"],["acquire","獲得する","B1"],
+ ["adapt","適応させる","B1"],["adopt","採用する","B1"],["advance","進歩・前進","B1"],
+ ["affect","影響を与える","B1"],["aggressive","攻撃的な","B1"],["agriculture","農業","B1"],
+ ["aim","目的・ねらう","B1"],["alternative","代わりの","B1"],["ambitious","野心的な","B1"],
+ ["amount","量","B1"],["analyze","分析する","B1"],["announce","発表する","B1"],
+ ["apparent","明白な","B1"],["approach","近づく・取り組み方","B1"],["approve","承認する","B1"],
+ ["arise","生じる","B1"],["arrange","手配する","B1"],["assign","割り当てる","B1"],
+ ["assume","仮定する","B1"],["attain","達成する","B1"],["attend","出席する","B1"],
+ ["attract","引きつける","B1"],["authority","権威・当局","B1"],["available","利用できる","B1"],
+ ["aware","気づいている","B1"],["balance","均衡","B1"],["benefit","利益","B1"],
+ ["brief","簡潔な","B1"],["broad","幅広い","B1"],["calm","おだやかな","B1"],
+ ["capable","能力がある","B1"],["capacity","容量・能力","B1"],["career","職歴","B1"],
+ ["category","分類","B1"],["charge","料金・請求する","B1"],["civil","市民の","B1"],
+ ["classify","分類する","B1"],["collapse","崩壊する","B1"],["combine","組み合わせる","B1"],
+ ["command","命令","B1"],["comment","論評","B1"],["commercial","商業の","B1"],
+ ["commit","ゆだねる・関与する","B1"],["compete","競争する","B1"],["complex","複雑な","B1"],
+ ["conclude","結論づける","B1"],["conduct","行う","B1"],["confirm","確認する","B1"],
+ ["conflict","対立","B1"],["considerable","かなりの","B1"],["constitute","構成する","B1"],
+ ["construct","建設する","B1"],["consume","消費する","B1"],["contrary","反対の","B1"],
+ ["contribute","貢献する","B1"],["convince","納得させる","B1"],["courage","勇気","B1"],
+ ["crisis","危機","B1"],["critical","批判的な・重大な","B1"],["cultivate","育てる","B1"],
+ ["cure","治す","B1"],["damage","損害","B1"],["declare","宣言する","B1"],
+ ["dedicate","ささげる","B1"],["definite","明確な","B1"],["deliver","配達する","B1"],
+ ["demand","要求","B1"],["demonstrate","実証する","B1"],["deny","否定する","B1"],
+ ["derive","引き出す","B1"],["desire","願望","B1"],["despite","〜にもかかわらず","B1"],
+ ["determine","決定する","B1"],["distance","距離","B1"],["distribute","分配する","B1"],
+ ["diverse","多様な","B1"],["efficient","効率的な","B1"],["eliminate","除去する","B1"],
+ ["emerge","現れる","B1"],["emphasize","強調する","B1"],["enable","可能にする","B1"],
+ ["engine","エンジン","B1"],["ensure","確実にする","B1"],["entire","全体の","B1"],
+ ["equal","等しい","B1"],["essential","不可欠な","B1"],["estimate","見積もる","B1"],
+ ["eventually","結局は","B1"],["expand","拡大する","B1"],["extend","延長する","B1"],
+ ["forecast","予報","B1"],["foundation","基礎・財団","B1"],["generate","生み出す","B1"],
+ ["goods","商品","B1"],["grant","与える","B1"],["guarantee","保証する","B1"],
+ ["guide","案内する","B1"],["hire","雇う","B1"],["honest","正直な","B1"],
+ ["ignore","無視する","B1"],["incident","出来事","B1"],["independent","独立した","B1"],
+ ["inevitable","避けられない","B1"],["initial","最初の","B1"],["insight","洞察","B1"],
+ ["insist","主張する","B1"],["instance","例","B1"],["intend","意図する","B1"],
+ ["intense","激しい","B1"],["invest","投資する","B1"],["involve","巻きこむ・ふくむ","B1"],
+ ["justice","正義","B1"],["legal","法律の","B1"],["limit","限界","B1"],
+ ["link","結びつける","B1"],["maintain","維持する","B1"],["measure","測る・対策","B1"],
+ ["mental","精神の","B1"],["minimum","最小限","B1"],["minor","小さいほうの","B1"],
+ ["modify","修正する","B1"],["monitor","監視する","B1"],["moral","道徳の","B1"],
+ ["motive","動機","B1"],["mutual","相互の","B1"],["negotiate","交渉する","B1"],
+ ["network","網状組織","B1"],["neutral","中立の","B1"],["objective","目的・客観的な","B1"],
+ ["obtain","入手する","B1"],["obvious","明らかな","B1"],["occupy","占める","B1"],
+ ["occur","起こる","B1"],["origin","起源","B1"],["overcome","克服する","B1"],
+ ["overwhelm","圧倒する","B1"],["pain","痛み","B1"],["participant","参加者","B1"],
+ ["participate","参加する","B1"],["permit","許可する","B1"],["phenomenon","現象","B1"],
+ ["philosophy","哲学","B1"],["policy","方針","B1"],["potential","潜在的な","B1"],
+ ["practical","実用的な","B1"],["preserve","保存する","B1"],["previous","前の","B1"],
+ ["principle","原理","B1"],["process","過程","B1"],["progress","進歩","B1"],
+ ["prominent","著名な","B1"],["promote","促進する","B1"],["propose","提案する","B1"],
+ ["prove","証明する","B1"],["quantity","量","B1"],["recommend","すすめる","B1"],
+ ["recover","回復する","B1"],["regard","みなす","B1"],["region","地域","B1"],
+ ["relate","関連づける","B1"],["rely","たよる","B1"],["remarkable","注目すべき","B1"],
+ ["respect","尊敬する","B1"],["responsible","責任のある","B1"],["restore","回復させる","B1"],
+ ["restrict","制限する","B1"],["retain","保持する","B1"],["revise","改訂する","B1"],
+ ["reward","報酬","B1"],["risk","危険","B1"],["safety","安全","B1"],
+ ["scope","範囲","B1"],["secure","安全な・確保する","B1"],["select","選ぶ","B1"],
+ ["sequence","連続","B1"],["series","連続・シリーズ","B1"],["shift","移行","B1"],
+ ["signal","合図","B1"],["stable","安定した","B1"],["standard","基準","B1"],
+ ["stress","重圧・強調する","B1"],["struggle","もがく","B1"],["substantial","相当な","B1"],
+ ["substitute","代用する","B1"],["sufficient","十分な","B1"],["summarize","要約する","B1"],
+ ["supply","供給する","B1"],["surface","表面","B1"],["temporary","一時的な","B1"],
+ ["tendency","傾向","B1"],["theory","理論","B1"],["thorough","徹底的な","B1"],
+ ["threat","脅威","B1"],["total","合計の","B1"],["transfer","移す","B1"],
+ ["transform","変形させる","B1"],["treat","扱う・治療する","B1"],["typical","典型的な","B1"],
+ ["undergo","経験する","B1"],["variety","多様性","B1"],["vary","変化する","B1"],
+ ["vast","広大な","B1"],["via","〜経由で","B1"],["victim","犠牲者","B1"],
+ ["virtual","仮想の","B1"],["visible","目に見える","B1"],["widespread","広まった","B1"],
+ ["worth","価値がある","B1"]],
+
+14:[
+ ["abandoned","見捨てられた","B2"],["abolish","廃止する","B2"],["actively","積極的に","B2"],
+ ["additionally","さらに","B2"],["adequate","十分な","B2"],["adoption","採用・養子縁組","B2"],
+ ["alliance","同盟","B2"],["alter","変更する","B2"],["ambiguous","あいまいな","B2"],
+ ["analogy","類推","B2"],["anticipate","予期する","B2"],["arena","競技場","B2"],
+ ["assert","断言する","B2"],["assess","評価する","B2"],["assure","保証する","B2"],
+ ["attentive","注意深い","B2"],["backwards","後ろ向きに","B2"],["ballot","投票","B2"],
+ ["barrier","障壁","B2"],["beam","光線・はり","B2"],["campaign","運動","B2"],
+ ["catalogue","目録","B2"],["cease","やむ","B2"],["ceiling","天井","B2"],
+ ["chip","かけら・チップ","B2"],["circumstance","事情","B2"],["client","顧客","B2"],
+ ["clothing","衣類","B2"],["collector","収集家","B2"],["compensate","償う","B2"],
+ ["complexity","複雑さ","B2"],["component","構成要素","B2"],["comprehensive","包括的な","B2"],
+ ["condemn","非難する","B2"],["consent","同意","B2"],["consistent","一貫した","B2"],
+ ["constant","絶え間ない","B2"],["contract","契約","B2"],["conventional","従来型の","B2"],
+ ["convert","変換する","B2"],["cooperate","協力する","B2"],["cope","対処する","B2"],
+ ["corruption","腐敗","B2"],["craftsman","職人","B2"],["crucial","決定的な","B2"],
+ ["decisive","決定的な","B2"],["delegate","代表・委任する","B2"],["destiny","運命","B2"],
+ ["digest","消化する","B2"],["diploma","卒業証書","B2"],["dismiss","解雇する・退ける","B2"],
+ ["dispute","論争","B2"],["domestic","国内の・家庭の","B2"],["donation","寄付","B2"],
+ ["dose","服用量","B2"],["draft","下書き","B2"],["duplicate","複製する","B2"],
+ ["ease","容易さ・やわらげる","B2"],["elect","選挙で選ぶ","B2"],["employ","雇う","B2"],
+ ["employee","従業員","B2"],["enhance","高める","B2"],["enterprise","企業・事業","B2"],
+ ["evaluate","評価する","B2"],["evidently","明らかに","B2"],["evolve","進化する","B2"],
+ ["exceed","超える","B2"],["exclude","除外する","B2"],["exclusively","もっぱら","B2"],
+ ["exhibit","展示する","B2"],["expedition","探検隊","B2"],["exploit","活用する・搾取する","B2"],
+ ["extension","延長","B2"],["external","外部の","B2"],["fabric","布地","B2"],
+ ["facilitate","容易にする","B2"],["factor","要因","B2"],["federal","連邦の","B2"],
+ ["fierce","猛烈な","B2"],["flexibility","柔軟性","B2"],["flexible","柔軟な","B2"],
+ ["fragrance","香り","B2"],["fundamental","根本的な","B2"],["furious","激怒した","B2"],
+ ["genuine","本物の","B2"],["genuinely","心から","B2"],["gloomy","うす暗い・陰気な","B2"],
+ ["grasp","つかむ・理解する","B2"],["grin","にっと笑う","B2"],["hedge","生け垣","B2"],
+ ["hesitation","ためらい","B2"],["humble","謙虚な","B2"],["hybrid","混成の","B2"],
+ ["identical","同一の","B2"],["identify","特定する","B2"],["ideology","思想体系","B2"],
+ ["illustrate","例示する","B2"],["imagery","心に浮かぶ映像","B2"],["implement","実施する","B2"],
+ ["implication","含み・影響","B2"],["import","輸入する","B2"],["impose","課す","B2"],
+ ["incentive","誘因","B2"],["infer","推論する","B2"],["influential","影響力のある","B2"],
+ ["initiative","主導権","B2"],["injection","注射","B2"],["innovation","革新","B2"],
+ ["institution","機関","B2"],["instruct","指示する","B2"],["integrate","統合する","B2"],
+ ["interior","内部","B2"],["interpret","解釈する","B2"],["investigator","調査員","B2"],
+ ["justify","正当化する","B2"],["keen","熱心な・鋭い","B2"],["label","ラベル","B2"],
+ ["landslide","土砂くずれ","B2"],["lawmaker","立法者","B2"],["lease","賃貸契約","B2"],
+ ["legislation","法律","B2"],["legislative","立法の","B2"],["liberal","自由主義の","B2"],
+ ["likewise","同様に","B2"],["literal","文字どおりの","B2"],["manufacturer","製造業者","B2"],
+ ["master","熟達する・主人","B2"],["mature","成熟した","B2"],["melody","旋律","B2"],
+ ["messenger","使者","B2"],["microphone","マイク","B2"],["migration","移住","B2"],
+ ["minister","大臣","B2"],["modest","ひかえめな","B2"],["motion","運動・動議","B2"],
+ ["navigate","進路を決める","B2"],["neglect","怠る","B2"],["nightmare","悪夢","B2"],
+ ["nuisance","めいわく","B2"],["obey","従う","B2"],["offence","違反","B2"],
+ ["olive","オリーブ","B2"],["optimist","楽観主義者","B2"],["optimistic","楽観的な","B2"],
+ ["originality","独創性","B2"],["outcome","結果","B2"],["outlook","見通し","B2"],
+ ["outskirts","郊外","B2"],["packet","小包","B2"],["particular","特定の","B2"],
+ ["peak","頂点","B2"],["pension","年金","B2"],["perceive","知覚する","B2"],
+ ["persist","固執する","B2"],["persistence","粘り強さ","B2"],["perspective","観点","B2"],
+ ["pessimistic","悲観的な","B2"],["pitch","投げる・調子","B2"],["postpone","延期する","B2"],
+ ["prestige","名声","B2"],["priceless","値がつけられないほど貴重な","B2"],["primary","第一の","B2"],
+ ["prior","前の","B2"],["priority","優先事項","B2"],["procedure","手順","B2"],
+ ["profile","横顔・人物紹介","B2"],["profit","利益","B2"],["prohibit","禁止する","B2"],
+ ["prospect","見込み","B2"],["prosper","繁栄する","B2"],["publication","出版","B2"],
+ ["punctuality","時間厳守","B2"],["quote","引用する","B2"],["radical","急進的な","B2"],
+ ["realization","実現・認識","B2"],["reckon","見積もる","B2"],["rectangular","長方形の","B2"],
+ ["reflective","反射する・内省的な","B2"],["regardless","かまわずに","B2"],["reinforce","補強する","B2"],
+ ["relief","安心・救済","B2"],["reluctant","気が進まない","B2"],["rental","賃貸","B2"],
+ ["replica","複製品","B2"],["resignation","辞職","B2"],["respiratory","呼吸の","B2"],
+ ["retreat","退却する","B2"],["reverse","逆にする","B2"],["revive","よみがえらせる","B2"],
+ ["ridge","尾根","B2"],["roar","ほえる","B2"],["route","経路","B2"],
+ ["sanitation","公衆衛生","B2"],["scheme","計画","B2"],["senator","上院議員","B2"],
+ ["setback","つまずき","B2"],["sharply","鋭く","B2"],["shopkeeper","店主","B2"],
+ ["shrink","縮む","B2"],["skateboard","スケートボード","B2"],["slang","俗語","B2"],
+ ["soak","ひたす","B2"],["spare","予備の・さく","B2"],["specifically","具体的には","B2"],
+ ["stain","しみ","B2"],["statistics","統計","B2"],["stimulate","刺激する","B2"],
+ ["subside","おさまる","B2"],["superb","すばらしい","B2"],["suppress","抑える","B2"],
+ ["sustain","持続させる","B2"],["sympathetic","思いやりのある","B2"],["tackle","取り組む","B2"],
+ ["temptation","誘惑","B2"],["testify","証言する","B2"],["thermometer","温度計","B2"],
+ ["thoroughly","徹底的に","B2"],["thrilling","わくわくさせる","B2"],["timing","時機","B2"],
+ ["tolerate","がまんする","B2"],["toxic","有毒な","B2"],["transition","移行","B2"],
+ ["translation","翻訳","B2"],["transmit","伝送する","B2"],["treaty","条約","B2"],
+ ["trio","三人組","B2"],["trunk","幹・トランク","B2"],["ultimate","究極の","B2"],
+ ["undertake","引き受ける","B2"],["undoubtedly","疑いなく","B2"],["universal","普遍的な","B2"],
+ ["unwilling","気が進まない","B2"],["urgently","緊急に","B2"],["utilize","利用する","B2"],
+ ["vacant","空いている","B2"],["valid","妥当な","B2"],["venture","冒険的事業","B2"],
+ ["violate","違反する","B2"],["welfare","福祉","B2"],["withdraw","引き出す・撤退する","B2"],
+ ["yield","産出する・ゆずる","B2"]]
 };
 
 /* =========================================================
@@ -1225,7 +1575,7 @@ const S={
   grade:2, mode:"kanji", count:10, queue:[], qi:0, cur:null,
   units:[], ui:0, buf:"",
   startedAt:0, keysOK:0, keysNG:0, missMap:{}, results:[],
-  running:false
+  running:false, locked:false
 };
 const $=id=>document.getElementById(id);
 const bestStore={};
@@ -1247,20 +1597,23 @@ function beep(freq,dur,type){
 /* =========================================================
    4. スタート画面
 ========================================================= */
-const GRADE_LABEL={1:"小1",2:"小2",3:"小3",4:"小4",5:"小5",6:"小6",7:"中1",8:"中2",9:"中3"};
+const GRADE_LABEL={1:"小1",2:"小2",3:"小3",4:"小4",5:"小5",6:"小6",7:"中1",8:"中2",9:"中3",
+                   10:"漢検2級",11:"CEFR A1",12:"CEFR A2",13:"CEFR B1",14:"CEFR B2"};
+const BASIC_GRADES=[1,2,3,4,5,6,7,8,9], ADV_GRADES=[10,11,12,13,14];
 const MODES=[["kanji","漢字"],["en","英単語"],["mix","ミックス"]];
 const MODE_NOTE={
-  kanji:"学年別の 漢字の 熟語が 出ます。読みを ローマ字で 打ちます。",
-  en:"英語は 小3〜中3に あります。日本語を 見て つづりを 打ちます。",
+  kanji:"小1〜中3と 漢検2級。読みを ローマ字で 打ちます。",
+  en:"小3〜中3と CEFR A1〜B2。日本語を 見て つづりを 打ちます。",
   mix:"漢字と 英単語が まざって 出ます。"
 };
+function kCount(g){return (WORDS[g]||[]).length;}
 function enCount(g){return (EN_WORDS[g]||[]).length;}
 function poolSize(g,m){
-  if(m==="kanji") return WORDS[g].length;
+  if(m==="kanji") return kCount(g);
   if(m==="en") return enCount(g);
-  return WORDS[g].length+enCount(g);
+  return kCount(g)+enCount(g);
 }
-function gradeEnabled(g){ return S.mode==="kanji" || enCount(g)>0; }
+function gradeEnabled(g){ return poolSize(g,S.mode)>0; }
 
 function buildStart(){
   const md=$("modes");md.innerHTML="";
@@ -1270,20 +1623,24 @@ function buildStart(){
     b.onclick=()=>{
       S.mode=v;
       [...md.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
-      if(!gradeEnabled(S.grade)) S.grade=3;
+      if(!gradeEnabled(S.grade)){
+        S.grade=BASIC_GRADES.concat(ADV_GRADES).find(gradeEnabled)||1;
+      }
       refreshGrades();
     };
     md.appendChild(b);
   });
 
-  const g=$("grades");g.innerHTML="";
-  for(let i=1;i<=9;i++){
-    const b=document.createElement("button");
-    b.className="grade";b.type="button";b.dataset.g=i;
-    b.innerHTML=`<b>${GRADE_LABEL[i]}</b><small></small>`;
-    b.onclick=()=>{ S.grade=i; refreshGrades(); };
-    g.appendChild(b);
-  }
+  [["grades",BASIC_GRADES,""],["grades2",ADV_GRADES," adv"]].forEach(([id,list,cls])=>{
+    const g=$(id);g.innerHTML="";
+    list.forEach(i=>{
+      const b=document.createElement("button");
+      b.className="grade"+cls;b.type="button";b.dataset.g=i;
+      b.innerHTML=`<b>${GRADE_LABEL[i]}</b><small></small>`;
+      b.onclick=()=>{ S.grade=i; refreshGrades(); };
+      g.appendChild(b);
+    });
+  });
 
   const c=$("counts");c.innerHTML="";
   [5,10,20,30].forEach(n=>{
@@ -1296,7 +1653,7 @@ function buildStart(){
 }
 
 function refreshGrades(){
-  [...$("grades").children].forEach(b=>{
+  document.querySelectorAll("#grades [data-g], #grades2 [data-g]").forEach(b=>{
     const i=+b.dataset.g;
     const ok=gradeEnabled(i);
     b.disabled=!ok;
@@ -1356,7 +1713,7 @@ function hintKey(ch){
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 function buildPool(){
-  const k=WORDS[S.grade].map(a=>({t:"k",w:a[0],y:a[1],m:a[2]}));
+  const k=(WORDS[S.grade]||[]).map(a=>({t:"k",w:a[0],y:a[1],m:a[2]}));
   const e=(EN_WORDS[S.grade]||[]).map(a=>({t:"e",w:a[0],y:a[1],m:a[2]}));
   if(S.mode==="kanji") return k;
   if(S.mode==="en") return e;
@@ -1369,7 +1726,7 @@ function startGame(){
   S.queue=[];
   while(S.queue.length<S.count){ S.queue=S.queue.concat(pool); if(pool.length===0)break; }
   S.queue=S.queue.slice(0,S.count);
-  S.qi=0;S.keysOK=0;S.keysNG=0;S.missMap={};S.results=[];S.startedAt=0;S.running=true;
+  S.qi=0;S.keysOK=0;S.keysNG=0;S.missMap={};S.results=[];S.startedAt=0;S.running=true;S.locked=false;
   $("scr-start").classList.add("hidden");
   $("scr-result").classList.add("hidden");
   $("scr-play").classList.remove("hidden");
@@ -1381,7 +1738,7 @@ function startGame(){
 
 function loadWord(){
   const it=S.queue[S.qi];
-  S.cur=it;S.ui=0;S.buf="";
+  S.cur=it;S.ui=0;S.buf="";S.locked=false;
   S.results.push({t:it.t,w:it.w,y:it.y,m:it.m,miss:0});
   $("qCount").textContent=`${S.qi+1} / ${S.count}`;
   $("imi").textContent = it.t==="e" ? "" : it.m;
@@ -1454,7 +1811,7 @@ function updateLive(){
 }
 
 function handleKey(chRaw){
-  if(!S.running) return false;
+  if(!S.running||S.locked) return false;
   const ch=chRaw.toLowerCase();
   if(!/^[a-z\-]$/.test(ch)) return false;
   if(!S.startedAt) S.startedAt=Date.now();
@@ -1501,6 +1858,8 @@ function handleKey(chRaw){
 function advance(){S.ui++;S.buf="";}
 
 function wordDone(){
+  if(S.locked) return;
+  S.locked=true;
   const h=$("hanko");h.classList.remove("on");void h.offsetWidth;h.classList.add("on");
   beep(980,.09);setTimeout(()=>beep(1320,.12),90);
   [...$("boxes").children].forEach(b=>{b.classList.add("done");b.classList.remove("ghost");});
@@ -1511,7 +1870,8 @@ function wordDone(){
 }
 
 function passWord(){
-  if(!S.running) return;
+  if(!S.running||S.locked) return;
+  S.locked=true;
   const r=S.results[S.results.length-1];
   if(r) r.passed=true;
   hintKey(null);
@@ -1524,7 +1884,7 @@ function passWord(){
    7. けっか
 ========================================================= */
 function finish(){
-  S.running=false;
+  S.running=false;S.locked=false;
   hintKey(null);
   const min=S.startedAt?(Date.now()-S.startedAt)/60000:0;
   const spd=min>0?Math.round(S.keysOK/min):0;
@@ -1573,8 +1933,10 @@ window.addEventListener("keydown",e=>{
   if(e.metaKey||e.ctrlKey||e.altKey) return;
   if(!S.running) return;
   if(e.key==="Escape"){ e.preventDefault(); passWord(); return; }
+  if(e.key===" "||e.key==="Enter"){ e.preventDefault(); return; }
   if(e.key&&e.key.length===1){
-    if(handleKey(e.key)){lastKd=Date.now();e.preventDefault();}
+    e.preventDefault();
+    if(handleKey(e.key)) lastKd=Date.now();
   }
 });
 catcher.addEventListener("input",()=>{
@@ -1589,10 +1951,15 @@ catcher.addEventListener("focus",()=>$("tapHint").classList.add("hidden"));
 /* =========================================================
    9. 画面のつなぎ
 ========================================================= */
-$("btnPass").onclick=passWord;
+$("btnPass").onclick=function(){ this.blur(); passWord(); };
 $("btnStart").onclick=startGame;
 $("btnAgain").onclick=startGame;
-$("btnQuit").onclick=()=>{S.running=false;hintKey(null);$("scr-play").classList.add("hidden");$("scr-start").classList.remove("hidden");};
+$("btnQuit").onclick=function(){
+  this.blur();
+  if(S.running && S.qi>0 && !window.confirm("とちゅうでやめますか？　記録はのこりません。")) { focusCatcher(); return; }
+  S.running=false;S.locked=false;hintKey(null);
+  $("scr-play").classList.add("hidden");$("scr-start").classList.remove("hidden");
+};
 $("btnHome").onclick=()=>{$("scr-result").classList.add("hidden");$("scr-start").classList.remove("hidden");window.scrollTo(0,0);};
 
 buildStart();buildKb();loadBest();
