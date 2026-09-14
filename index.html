@@ -87,6 +87,34 @@ body{
 .mode-note{font-size:12px;color:var(--ink-soft);margin:10px 0 0}
 .sub-label{font-size:12px;color:var(--ink-soft);margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--rule)}
 .credit{font-size:11px;line-height:1.7;color:var(--ink-soft);margin:18px 4px 0}
+.diffs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.diff{border:1.5px solid var(--rule);background:var(--paper-2);border-radius:8px;padding:11px 4px;
+  font-family:var(--maru);font-size:14px;cursor:pointer;color:var(--ink)}
+.diff[aria-pressed="true"]{border-color:var(--ai);background:var(--ai-pale);font-weight:700}
+.limit{display:flex;align-items:center;gap:10px;margin:-6px 0 14px}
+.limit-bar{flex:1;height:7px;background:var(--rule);border-radius:4px;overflow:hidden}
+.limit-bar i{display:block;height:100%;width:100%;background:var(--midori)}
+.limit-bar i.low{background:var(--shu)}
+.limit b{font-family:var(--mono);font-size:15px;min-width:1.6em;text-align:right}
+.hist-btn{width:100%;margin-top:10px;border:1.5px solid var(--rule);background:var(--paper-2);
+  border-radius:10px;font-family:var(--maru);font-size:15px;padding:13px;cursor:pointer;color:var(--ink)}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tabs button{flex:1;border:1.5px solid var(--rule);background:var(--paper-2);border-radius:8px;
+  padding:10px;font-family:var(--maru);font-size:14px;cursor:pointer}
+.tabs button[aria-pressed="true"]{border-color:var(--ai);background:var(--ai-pale)}
+.hlist{list-style:none;margin:0;padding:0}
+.hlist li{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--rule);font-size:13px}
+.hlist li:last-child{border-bottom:none}
+.hlist .when{font-family:var(--mono);font-size:12px;color:var(--ink-soft);min-width:5.4em}
+.hlist .tag{font-size:11px;color:var(--ink-soft);min-width:5.2em}
+.hlist .num{margin-left:auto;font-family:var(--mono);font-size:13px;white-space:nowrap}
+.hlist .hw{font-family:var(--mincho);font-size:21px;min-width:2.8em}
+.hlist .hw.en{font-family:var(--maru);font-size:16px;font-weight:700;min-width:6.4em}
+.hlist .hy{font-size:12px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hlist .cnt{margin-left:auto;font-family:var(--mono);font-size:13px;white-space:nowrap}
+.hlist .ngc{color:var(--shu)}
+.empty{font-size:13px;color:var(--ink-soft);text-align:center;padding:24px 0}
+.hnote{font-size:11px;color:var(--ink-soft);margin:12px 0 0}
 .grade.adv b{font-family:var(--maru);font-size:15px;font-weight:700;letter-spacing:0}
 
 /* --- プレイ画面 --- */
@@ -125,7 +153,12 @@ body{
 .romaji .typed{color:var(--midori)}
 .romaji .next{background:var(--nanohana);border-radius:3px;padding:0 2px}
 .romaji .rest{color:var(--ink-soft)}
-.romaji.off{visibility:hidden}
+.guide.off{visibility:hidden}
+.romaji .caret{
+  display:inline-block;width:2px;height:1em;background:var(--ink);
+  vertical-align:-.12em;margin:0 1px;animation:blink 1.1s step-end infinite;
+}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 .card.shake{animation:sh .22s}
 @keyframes sh{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 
@@ -226,17 +259,17 @@ body{
     </div>
 
     <div class="sheet">
-      <h2>おたすけ</h2>
-      <div class="opts">
-        <label class="opt"><input type="checkbox" id="optYomi" checked>答えを見せる</label>
-        <label class="opt"><input type="checkbox" id="optRomaji" checked>打つ文字を見せる</label>
-        <label class="opt"><input type="checkbox" id="optKb" checked>キーボードを見せる</label>
+      <h2>むずかしさ</h2>
+      <div class="diffs" id="diffs"></div>
+      <p class="mode-note" id="diffNote"></p>
+      <div class="opts" style="margin-top:14px">
         <label class="opt"><input type="checkbox" id="optSound" checked>音を鳴らす</label>
       </div>
     </div>
 
     <button class="start" id="btnStart">はじめる</button>
     <p class="best" id="bestLine"></p>
+    <button class="hist-btn" id="btnHist">これまでの きろく</button>
     <p class="credit">英単語のCEFRレベルは『CEFR-J Wordlist Version 1.6』（東京外国語大学 投野由紀夫研究室）に準拠。日本語訳は本アプリ独自。漢字の学年は文部科学省「学年別漢字配当表」、漢検2級は日本漢字能力検定の級別配当による。</p>
   </section>
 
@@ -248,6 +281,7 @@ body{
       <button class="quit" id="btnQuit">やめる</button>
     </div>
     <div class="track"><i id="trackFill"></i></div>
+    <div class="limit hidden" id="limitWrap"><span class="limit-bar"><i id="limitFill"></i></span><b id="limitNum"></b></div>
 
     <div class="sheet">
       <div class="card" id="card">
@@ -255,13 +289,39 @@ body{
         <div class="yomi" id="yomi"></div>
         <div class="boxes" id="boxes"></div>
         <p class="imi" id="imi"></p>
-        <div class="romaji" id="romaji"></div>
+        <div class="romaji" id="romaji"><span class="typed" id="rTyped"></span><i class="caret"></i><span class="guide" id="rGuide"></span></div>
       </div>
       <div class="pass-row"><button class="pass" id="btnPass">パス</button></div>
       <div class="kb" id="kb"></div>
       <p class="tap-hint hidden" id="tapHint">画面をタップしてキーボードを出す</p>
     </div>
     <input id="catcher" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="latin">
+  </section>
+
+  <!-- ======== きろく ======== -->
+  <section id="scr-hist" class="hidden">
+    <div class="sheet">
+      <div class="tabs" id="histTabs">
+        <button type="button" data-tab="score" aria-pressed="true">スコアの きろく</button>
+        <button type="button" data-tab="words" aria-pressed="false">ことばの きろく</button>
+      </div>
+
+      <div id="tab-score">
+        <ul class="hlist" id="scoreList"></ul>
+        <p class="hnote" id="scoreNote"></p>
+      </div>
+
+      <div id="tab-words" class="hidden">
+        <div class="tabs" id="wordSort">
+          <button type="button" data-sort="n" aria-pressed="true">よく出た順</button>
+          <button type="button" data-sort="ng" aria-pressed="false">まちがえた順</button>
+        </div>
+        <ul class="hlist" id="wordList"></ul>
+        <p class="hnote" id="wordNote"></p>
+      </div>
+    </div>
+    <button class="start" id="btnHistBack">もどる</button>
+    <p class="best"><button class="quit" id="btnHistClear">きろくを ぜんぶ 消す</button></p>
   </section>
 
   <!-- ======== けっか ======== -->
@@ -1572,8 +1632,8 @@ function tokenize(yomi){
    3. じょうたい
 ========================================================= */
 const S={
-  grade:2, mode:"kanji", count:10, queue:[], qi:0, cur:null,
-  units:[], ui:0, buf:"",
+  grade:2, mode:"kanji", diff:"easy", count:10, countPref:10, queue:[], qi:0, cur:null,
+  units:[], ui:0, buf:"", typed:"",
   startedAt:0, keysOK:0, keysNG:0, missMap:{}, results:[],
   running:false, locked:false
 };
@@ -1600,12 +1660,38 @@ function beep(freq,dur,type){
 const GRADE_LABEL={1:"小1",2:"小2",3:"小3",4:"小4",5:"小5",6:"小6",7:"中1",8:"中2",9:"中3",
                    10:"漢検2級",11:"CEFR A1",12:"CEFR A2",13:"CEFR B1",14:"CEFR B2"};
 const BASIC_GRADES=[1,2,3,4,5,6,7,8,9], ADV_GRADES=[10,11,12,13,14];
-const MODES=[["kanji","漢字"],["en","英単語"],["mix","ミックス"]];
+const MODES=[["kanji","漢字"],["en","英単語"],["mix","ミックス"],["review","復習"]];
+const DIFFS=[
+  ["easy","イージー",   {ans:1,guide:1,kb:1,limit:0}, "答え・打つ文字・キーボードを ぜんぶ 見せます。"],
+  ["normal","ノーマル", {ans:0,guide:0,kb:1,limit:0}, "キーボードだけ 見せます。答えは 自分で 思い出します。"],
+  ["hard","ハード",     {ans:0,guide:0,kb:0,limit:0}, "おたすけは ありません。"],
+  ["super","スーパー",  {ans:0,guide:0,kb:0,limit:10},"おたすけなし。1語 10びょう いないに 打ちます。"],
+  ["ultra","ウルトラ",  {ans:0,guide:0,kb:0,limit:3}, "おたすけなし。1語 3びょう いないに 打ちます。"]
+];
+function D(){ return (DIFFS.find(d=>d[0]===S.diff)||DIFFS[0])[2]; }
+function diffLabel(){ return (DIFFS.find(d=>d[0]===S.diff)||DIFFS[0])[1]; }
 const MODE_NOTE={
   kanji:"小1〜中3と 漢検2級。読みを ローマ字で 打ちます。",
   en:"小3〜中3と CEFR A1〜B2。日本語を 見て つづりを 打ちます。",
-  mix:"漢字と 英単語が まざって 出ます。"
+  mix:"漢字と 英単語が まざって 出ます。",
+  review:"まちがえた語・パスした語・時間切れの語だけを 出します。"
 };
+
+/* まちがえた語の見つけ方：履歴から引き当てる */
+let WORD_INDEX=null;
+function buildWordIndex(){
+  WORD_INDEX={};
+  for(const g in WORDS) WORDS[g].forEach(a=>WORD_INDEX["k:"+a[0]]={t:"k",w:a[0],y:a[1],m:a[2]});
+  for(const g in EN_WORDS) EN_WORDS[g].forEach(a=>WORD_INDEX["e:"+a[0]]={t:"e",w:a[0],y:a[1],m:a[2]});
+}
+function weakScore(v){ return (v.ng||0)+2*(v.p||0)+2*(v.to||0); }
+function reviewPool(){
+  if(!WORD_INDEX) buildWordIndex();
+  return Object.entries(hist.words)
+    .filter(([k,v])=>weakScore(v)>0&&WORD_INDEX[k])
+    .sort((a,b)=>weakScore(b[1])-weakScore(a[1]))
+    .map(([k])=>WORD_INDEX[k]);
+}
 function kCount(g){return (WORDS[g]||[]).length;}
 function enCount(g){return (EN_WORDS[g]||[]).length;}
 function poolSize(g,m){
@@ -1613,7 +1699,7 @@ function poolSize(g,m){
   if(m==="en") return enCount(g);
   return kCount(g)+enCount(g);
 }
-function gradeEnabled(g){ return poolSize(g,S.mode)>0; }
+function gradeEnabled(g){ return S.mode!=="review" && poolSize(g,S.mode)>0; }
 
 function buildStart(){
   const md=$("modes");md.innerHTML="";
@@ -1623,7 +1709,7 @@ function buildStart(){
     b.onclick=()=>{
       S.mode=v;
       [...md.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
-      if(!gradeEnabled(S.grade)){
+      if(S.mode!=="review" && !gradeEnabled(S.grade)){
         S.grade=BASIC_GRADES.concat(ADV_GRADES).find(gradeEnabled)||1;
       }
       refreshGrades();
@@ -1642,11 +1728,25 @@ function buildStart(){
     });
   });
 
+  const df=$("diffs");df.innerHTML="";
+  DIFFS.forEach(([v,label])=>{
+    const b=document.createElement("button");b.type="button";b.className="diff";
+    b.textContent=label;b.setAttribute("aria-pressed",v===S.diff);
+    b.onclick=()=>{
+      S.diff=v;
+      [...df.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+      $("diffNote").textContent=(DIFFS.find(d=>d[0]===v)||DIFFS[0])[3];
+      showBest();
+    };
+    df.appendChild(b);
+  });
+  $("diffNote").textContent=DIFFS[0][3];
+
   const c=$("counts");c.innerHTML="";
   [5,10,20,30].forEach(n=>{
     const b=document.createElement("button");b.type="button";
-    b.textContent=n+"問";b.setAttribute("aria-pressed",n===S.count);
-    b.onclick=()=>{S.count=n;[...c.children].forEach(x=>x.setAttribute("aria-pressed",x===b));};
+    b.textContent=n+"問";b.setAttribute("aria-pressed",n===S.countPref);
+    b.onclick=()=>{S.countPref=n;[...c.children].forEach(x=>x.setAttribute("aria-pressed",x===b));};
     c.appendChild(b);
   });
   refreshGrades();
@@ -1660,7 +1760,9 @@ function refreshGrades(){
     b.setAttribute("aria-pressed", ok&&i===S.grade);
     b.querySelector("small").textContent = ok ? poolSize(i,S.mode)+"語" : "—";
   });
-  $("modeNote").textContent=MODE_NOTE[S.mode];
+  $("modeNote").textContent = S.mode==="review"
+    ? `${MODE_NOTE.review}　いまは ${reviewPool().length} 語 あります。`
+    : MODE_NOTE[S.mode];
   showBest();
 }
 
@@ -1674,11 +1776,12 @@ async function loadBest(){
 async function saveBest(){
   try{ await window.storage.set("kanji-typing:best",JSON.stringify(bestStore)); }catch(e){}
 }
-function bestKey(){return S.mode+":"+S.grade;}
+function bestKey(){return S.mode==="review" ? "review::"+S.diff : S.mode+":"+S.grade+":"+S.diff;}
 function modeLabel(){return (MODES.find(m=>m[0]===S.mode)||["","" ])[1];}
+function levelLabel(){return S.mode==="review" ? "復習" : (GRADE_LABEL[S.grade]||"");}
 function showBest(){
   const b=bestStore[bestKey()];
-  $("bestLine").textContent = b ? `${GRADE_LABEL[S.grade]}・${modeLabel()}の さいこう記録：${b.speed} 打/分（正かく率 ${b.acc}%）` : "";
+  $("bestLine").textContent = b ? `${levelLabel()}・${modeLabel()}・${diffLabel()}の さいこう記録：${b.speed} 打/分（正かく率 ${b.acc}%）` : "";
 }
 
 /* =========================================================
@@ -1710,9 +1813,45 @@ function hintKey(ch){
 /* =========================================================
    6. ゲーム
 ========================================================= */
+let limitTimer=null, limitEnd=0;
+function stopLimit(){
+  if(limitTimer){clearInterval(limitTimer);limitTimer=null;}
+  $("limitWrap").classList.add("hidden");
+}
+function startLimit(){
+  if(limitTimer){clearInterval(limitTimer);limitTimer=null;}
+  const sec=D().limit;
+  if(!sec){ $("limitWrap").classList.add("hidden"); return; }
+  $("limitWrap").classList.remove("hidden");
+  limitEnd=Date.now()+sec*1000;
+  tickLimit();
+  limitTimer=setInterval(tickLimit,80);
+}
+function tickLimit(){
+  const total=D().limit*1000;
+  const left=limitEnd-Date.now();
+  const r=Math.max(0,Math.min(1,left/total));
+  $("limitFill").style.width=(r*100).toFixed(1)+"%";
+  $("limitFill").classList.toggle("low",r<.34);
+  $("limitNum").textContent=Math.max(0,Math.ceil(left/1000));
+  if(left<=0){ stopLimit(); timeoutWord(); }
+}
+function timeoutWord(){
+  if(!S.running||S.locked) return;
+  S.locked=true;
+  const r=S.results[S.results.length-1];
+  if(r) r.timeout=true;
+  hintKey(null);
+  beep(200,.18,"square");
+  const card=$("card");card.classList.remove("shake");void card.offsetWidth;card.classList.add("shake");
+  S.qi++;
+  setTimeout(()=>{ if(S.qi>=S.count) finish(); else loadWord(); },420);
+}
+
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 function buildPool(){
+  if(S.mode==="review") return reviewPool();
   const k=(WORDS[S.grade]||[]).map(a=>({t:"k",w:a[0],y:a[1],m:a[2]}));
   const e=(EN_WORDS[S.grade]||[]).map(a=>({t:"e",w:a[0],y:a[1],m:a[2]}));
   if(S.mode==="kanji") return k;
@@ -1721,24 +1860,34 @@ function buildPool(){
 }
 function startGame(){
   const pool=buildPool();
-  if(!pool.length) return;
-  shuffle(pool);
-  S.queue=[];
-  while(S.queue.length<S.count){ S.queue=S.queue.concat(pool); if(pool.length===0)break; }
-  S.queue=S.queue.slice(0,S.count);
+  if(!pool.length){
+    if(S.mode==="review") $("modeNote").textContent="まちがえた語が まだ ありません。ほかのモードで 何回か 練習してから ひらいてください。";
+    return;
+  }
+  S.count=S.countPref;
+  if(S.mode==="review"){
+    // 苦手な順に上位を取り出してから、出る順番をまぜる
+    S.queue=shuffle(pool.slice(0,S.count));
+  }else{
+    shuffle(pool);
+    S.queue=[];
+    while(S.queue.length<S.count){ S.queue=S.queue.concat(pool); }
+    S.queue=S.queue.slice(0,S.count);
+  }
+  S.count=S.queue.length;
   S.qi=0;S.keysOK=0;S.keysNG=0;S.missMap={};S.results=[];S.startedAt=0;S.running=true;S.locked=false;
   $("scr-start").classList.add("hidden");
   $("scr-result").classList.add("hidden");
   $("scr-play").classList.remove("hidden");
-  $("romaji").classList.toggle("off",!$("optRomaji").checked);
-  $("kb").classList.toggle("off",!$("optKb").checked);
+  $("rGuide").classList.toggle("off",!D().guide);
+  $("kb").classList.toggle("off",!D().kb);
   focusCatcher();
   loadWord();
 }
 
 function loadWord(){
   const it=S.queue[S.qi];
-  S.cur=it;S.ui=0;S.buf="";S.locked=false;
+  S.cur=it;S.ui=0;S.buf="";S.typed="";S.locked=false;
   S.results.push({t:it.t,w:it.w,y:it.y,m:it.m,miss:0});
   $("qCount").textContent=`${S.qi+1} / ${S.count}`;
   $("imi").textContent = it.t==="e" ? "" : it.m;
@@ -1754,39 +1903,39 @@ function loadWord(){
   }else{
     S.units=tokenize(it.y);
     yo.classList.remove("prompt");
-    yo.classList.toggle("off",!$("optYomi").checked);
+    yo.classList.toggle("off",!D().ans);
     yo.textContent=it.y;
     [...it.w].forEach(ch=>{
       const d=document.createElement("div");d.className="box";d.textContent=ch;bx.appendChild(d);
     });
   }
   render();
+  startLimit();
 }
 
 function render(){
-  let typed="",next="",rest="",p=0;
+  let next="",rest="",p=0;
   if(S.cur&&S.cur.t==="e"){
     const w=S.cur.w;
-    typed=w.slice(0,S.ui);next=w.slice(S.ui,S.ui+1);rest=w.slice(S.ui+1);
+    next=w.slice(S.ui,S.ui+1);rest=w.slice(S.ui+1);
     p=w.length?S.ui/w.length:0;
   }else{
     const cur=S.units[S.ui];
     if(cur){
       const cand=cur.cands.find(c=>c.startsWith(S.buf))||cur.cands[0];
-      typed=S.buf;
       next=cand.slice(S.buf.length,S.buf.length+1);
       rest=cand.slice(S.buf.length+1);
     }
     for(let i=S.ui+1;i<S.units.length;i++) rest+=S.units[i].cands[0];
     p=S.units.length?S.ui/S.units.length:0;
   }
-  $("romaji").innerHTML=
-    `<span class="typed">${esc(typed)}</span><span class="next">${esc(next)}</span><span class="rest">${esc(rest)}</span>`;
+  $("rTyped").textContent=S.typed;
+  $("rGuide").innerHTML=`<span class="next">${esc(next)}</span><span class="rest">${esc(rest)}</span>`;
   hintKey(next.toLowerCase());
 
   const boxes=$("boxes").children;
   if(S.cur&&S.cur.t==="e"){
-    const showAns=$("optYomi").checked;
+    const showAns=D().ans;
     [...boxes].forEach((b,i)=>{
       b.classList.toggle("done",i<S.ui);
       b.classList.toggle("ghost",!showAns&&i>=S.ui);
@@ -1821,6 +1970,7 @@ function handleKey(chRaw){
 
   if(cur.cands.some(c=>c.startsWith(test))){
     S.buf=test;
+    S.typed+=ch;
     S.keysOK++;
     const exact=cur.cands.includes(test);
     const longer=cur.cands.some(c=>c.length>test.length&&c.startsWith(test));
@@ -1835,7 +1985,7 @@ function handleKey(chRaw){
     advance();
     const nx=S.units[S.ui];
     if(nx&&nx.cands.some(c=>c.startsWith(ch))){
-      S.buf=ch;S.keysOK++;
+      S.buf=ch;S.typed+=ch;S.keysOK++;
       const exact=nx.cands.includes(ch);
       const longer=nx.cands.some(c=>c.length>1&&c.startsWith(ch));
       if(exact&&!longer) advance();
@@ -1860,6 +2010,7 @@ function advance(){S.ui++;S.buf="";}
 function wordDone(){
   if(S.locked) return;
   S.locked=true;
+  stopLimit();
   const h=$("hanko");h.classList.remove("on");void h.offsetWidth;h.classList.add("on");
   beep(980,.09);setTimeout(()=>beep(1320,.12),90);
   [...$("boxes").children].forEach(b=>{b.classList.add("done");b.classList.remove("ghost");});
@@ -1872,6 +2023,7 @@ function wordDone(){
 function passWord(){
   if(!S.running||S.locked) return;
   S.locked=true;
+  stopLimit();
   const r=S.results[S.results.length-1];
   if(r) r.passed=true;
   hintKey(null);
@@ -1885,6 +2037,7 @@ function passWord(){
 ========================================================= */
 function finish(){
   S.running=false;S.locked=false;
+  stopLimit();
   hintKey(null);
   const min=S.startedAt?(Date.now()-S.startedAt)/60000:0;
   const spd=min>0?Math.round(S.keysOK/min):0;
@@ -1892,14 +2045,15 @@ function finish(){
   const acc=tot?Math.round(S.keysOK/tot*100):100;
   $("rSpeed").textContent=spd;
   $("rAcc").textContent=acc+"%";
-  $("rClear").textContent=S.results.filter(r=>r.miss===0&&!r.passed).length;
+  $("rClear").textContent=S.results.filter(r=>r.miss===0&&!r.passed&&!r.timeout).length;
   $("resultTitle").textContent = acc>=95 ? "すばらしい！" : acc>=85 ? "いいちょうし！" : "おつかれさま";
+  recordSession(spd,acc,S.results.filter(r=>r.miss===0&&!r.passed&&!r.timeout).length);
 
   const b=bestStore[bestKey()];
   if(!b||spd>b.speed){ bestStore[bestKey()]={speed:spd,acc};saveBest();
-    $("rBest").textContent=`${GRADE_LABEL[S.grade]}・${modeLabel()}の さいこう記録を こうしん！`;
+    $("rBest").textContent=`${levelLabel()}・${modeLabel()}・${diffLabel()}の さいこう記録を こうしん！`;
   }else{
-    $("rBest").textContent=`${GRADE_LABEL[S.grade]}・${modeLabel()}の さいこう記録：${b.speed} 打/分`;
+    $("rBest").textContent=`${levelLabel()}・${modeLabel()}・${diffLabel()}の さいこう記録：${b.speed} 打/分`;
   }
 
   const ul=$("review");ul.innerHTML="";
@@ -1907,7 +2061,7 @@ function finish(){
     const li=document.createElement("li");
     li.innerHTML=`<span class="kw${r.t==="e"?" en":""}">${esc(r.w)}</span>
       <span class="kd"><b>${esc(r.y)}</b><span>${r.t==="e"?"":esc(r.m)}</span></span>
-      <span class="mark ${r.passed?"pass":(r.miss===0?"ok":"ng")}">${r.passed?"パス":(r.miss===0?"◎":"△")}</span>`;
+      <span class="mark ${(r.passed||r.timeout)?"pass":(r.miss===0?"ok":"ng")}">${r.timeout?"時間切れ":r.passed?"パス":(r.miss===0?"◎":"△")}</span>`;
     ul.appendChild(li);
   });
 
@@ -1921,6 +2075,76 @@ function finish(){
   $("scr-play").classList.add("hidden");
   $("scr-result").classList.remove("hidden");
   window.scrollTo(0,0);
+}
+
+/* =========================================================
+   7.5 きろく
+========================================================= */
+const hist={sessions:[],words:{}};
+async function loadHist(){
+  try{
+    const r=await window.storage.get("kanji-typing:hist");
+    if(r&&r.value){const o=JSON.parse(r.value);hist.sessions=o.sessions||[];hist.words=o.words||{};}
+  }catch(e){}
+}
+async function saveHist(){
+  try{ await window.storage.set("kanji-typing:hist",JSON.stringify(hist)); }catch(e){}
+}
+function recordSession(spd,acc,clear){
+  hist.sessions.unshift({d:Date.now(),g:S.grade,m:S.mode,f:S.diff,n:S.count,s:spd,a:acc,c:clear});
+  if(hist.sessions.length>200) hist.sessions.length=200;
+  S.results.forEach(r=>{
+    const k=(r.t==="e"?"e:":"k:")+r.w;
+    const e=hist.words[k]||(hist.words[k]={n:0,ng:0,p:0,to:0,t:r.t,y:r.y,g:S.grade});
+    e.n++; e.ng+=r.miss; if(r.passed) e.p++; if(r.timeout) e.to=(e.to||0)+1;
+    e.y=r.y; e.g=S.grade; e.t=r.t;
+  });
+  saveHist();
+}
+function fmtDate(t){
+  const d=new Date(t),z=n=>String(n).padStart(2,"0");
+  return `${d.getMonth()+1}/${d.getDate()} ${z(d.getHours())}:${z(d.getMinutes())}`;
+}
+function renderScoreHist(){
+  const ul=$("scoreList");ul.innerHTML="";
+  if(!hist.sessions.length){
+    ul.innerHTML='<li><span class="empty">まだ きろくが ありません</span></li>';
+    $("scoreNote").textContent="";return;
+  }
+  hist.sessions.slice(0,60).forEach(v=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<span class="when">${fmtDate(v.d)}</span>
+      <span class="tag">${GRADE_LABEL[v.g]||""}・${(MODES.find(m=>m[0]===v.m)||["",""])[1]}${v.f?"・"+((DIFFS.find(d=>d[0]===v.f)||["",""])[1]):""}</span>
+      <span class="num">${v.s} 打/分 ・ ${v.a}% ・ ${v.c}/${v.n}</span>`;
+    ul.appendChild(li);
+  });
+  const t=hist.sessions.length;
+  const best=hist.sessions.reduce((a,b)=>b.s>a.s?b:a);
+  $("scoreNote").textContent=`ぜんぶで ${t} 回。いちばん速かったのは ${best.s} 打/分（${GRADE_LABEL[best.g]||""}・${fmtDate(best.d)}）`;
+}
+let wordSortKey="n";
+function renderWordHist(){
+  const ul=$("wordList");ul.innerHTML="";
+  const arr=Object.entries(hist.words).map(([k,v])=>({w:k.slice(2),...v}));
+  if(!arr.length){
+    ul.innerHTML='<li><span class="empty">まだ きろくが ありません</span></li>';
+    $("wordNote").textContent="";return;
+  }
+  arr.sort((a,b)=> wordSortKey==="ng" ? (b.ng-a.ng)||(b.n-a.n) : (b.n-a.n)||(b.ng-a.ng));
+  arr.slice(0,100).forEach(v=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<span class="hw${v.t==="e"?" en":""}">${esc(v.w)}</span>
+      <span class="hy">${esc(v.y||"")}</span>
+      <span class="cnt">${v.n}回${v.ng?` <span class="ngc">ミス${v.ng}</span>`:""}${v.p?` パス${v.p}`:""}${v.to?` 時間切れ${v.to}`:""}</span>`;
+    ul.appendChild(li);
+  });
+  const total=arr.reduce((a,b)=>a+b.n,0);
+  $("wordNote").textContent=`${arr.length} 語を のべ ${total} 回 練習。${arr.length>100?"上位100語を表示しています。":""}`;
+}
+function openHist(){
+  $("scr-start").classList.add("hidden");
+  $("scr-hist").classList.remove("hidden");
+  renderScoreHist();renderWordHist();window.scrollTo(0,0);
 }
 
 /* =========================================================
@@ -1957,12 +2181,31 @@ $("btnAgain").onclick=startGame;
 $("btnQuit").onclick=function(){
   this.blur();
   if(S.running && S.qi>0 && !window.confirm("とちゅうでやめますか？　記録はのこりません。")) { focusCatcher(); return; }
-  S.running=false;S.locked=false;hintKey(null);
+  S.running=false;S.locked=false;stopLimit();hintKey(null);
   $("scr-play").classList.add("hidden");$("scr-start").classList.remove("hidden");
 };
 $("btnHome").onclick=()=>{$("scr-result").classList.add("hidden");$("scr-start").classList.remove("hidden");window.scrollTo(0,0);};
 
-buildStart();buildKb();loadBest();
+$("btnHist").onclick=openHist;
+$("btnHistBack").onclick=()=>{$("scr-hist").classList.add("hidden");$("scr-start").classList.remove("hidden");window.scrollTo(0,0);};
+$("btnHistClear").onclick=function(){
+  this.blur();
+  if(!window.confirm("きろくを ぜんぶ 消しますか？　もとにもどせません。")) return;
+  hist.sessions=[];hist.words={};saveHist();renderScoreHist();renderWordHist();
+};
+$("histTabs").onclick=e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  [...$("histTabs").children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+  $("tab-score").classList.toggle("hidden",b.dataset.tab!=="score");
+  $("tab-words").classList.toggle("hidden",b.dataset.tab!=="words");
+};
+$("wordSort").onclick=e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  [...$("wordSort").children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+  wordSortKey=b.dataset.sort; renderWordHist();
+};
+
+buildStart();buildKb();loadBest();loadHist().then(refreshGrades);
 </script>
 </body>
 </html>
