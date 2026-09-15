@@ -193,6 +193,15 @@ body{
 .key.hit{background:var(--nanohana);border-color:#D9A800;color:var(--ink);font-weight:700}
 .kb.off{display:none}
 
+.spk-row{display:flex;justify-content:center;margin-top:14px}
+.spk{border:1.5px solid var(--rule);background:var(--paper-2);border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ai);
+  width:44px;height:44px;padding:0}
+.spk:active{transform:translateY(1px)}
+.spk:focus-visible{outline:3px solid var(--nanohana);outline-offset:2px}
+.spk svg{width:21px;height:21px}
+.spk.sm{width:30px;height:30px;margin-left:8px;flex:none}
+.spk.sm svg{width:15px;height:15px}
 .pass-row{display:flex;justify-content:center;margin-top:16px}
 .pass{
   border:1.5px solid var(--rule);background:var(--paper-2);border-radius:999px;
@@ -240,41 +249,41 @@ body{
 <div id="stage">
   <header class="masthead">
     <h1>ことばタイピング</h1>
-    <p>漢字と英単語を、打ちながらおぼえる</p>
+    <p data-t="sub"></p>
   </header>
 
   <!-- ======== スタート ======== -->
   <section id="scr-start">
     <div class="sheet">
-      <h2>なにを 練習する？</h2>
+      <h2 data-t="h_mode"></h2>
       <div class="count-pick" id="modes"></div>
       <p class="mode-note" id="modeNote"></p>
     </div>
 
     <div class="sheet">
-      <h2>学年をえらぶ</h2>
+      <h2 data-t="h_grade"></h2>
       <div class="grades" id="grades"></div>
-      <p class="sub-label">べつの ものさし（検定・CEFR）</p>
+      <p class="sub-label" data-t="h_adv"></p>
       <div class="grades" id="grades2"></div>
     </div>
 
     <div class="sheet">
-      <h2>もんだいの数</h2>
+      <h2 data-t="h_count"></h2>
       <div class="count-pick" id="counts"></div>
     </div>
 
     <div class="sheet">
-      <h2>むずかしさ</h2>
+      <h2 data-t="h_diff"></h2>
       <div class="diffs" id="diffs"></div>
       <p class="mode-note" id="diffNote"></p>
       <div class="opts" style="margin-top:14px">
-        <label class="opt"><input type="checkbox" id="optSound" checked>音を鳴らす・英語を読み上げる</label>
+        <label class="opt"><input type="checkbox" id="optSound" checked><span data-t="opt_sound"></span></label>
       </div>
     </div>
 
-    <button class="start" id="btnStart">はじめる</button>
+    <button class="start" id="btnStart" data-t="btn_start"></button>
     <p class="best" id="bestLine"></p>
-    <button class="hist-btn" id="btnHist">これまでの きろく</button>
+    <button class="hist-btn" id="btnHist" data-t="btn_hist"></button>
     <p class="credit">英単語のCEFRレベルは『CEFR-J Wordlist Version 1.6』（東京外国語大学 投野由紀夫研究室）に準拠。日本語訳は本アプリ独自。漢字の学年は文部科学省「学年別漢字配当表」、漢検2級は日本漢字能力検定の級別配当による。</p>
   </section>
 
@@ -282,8 +291,8 @@ body{
   <section id="scr-play" class="hidden">
     <div class="bar">
       <span class="q" id="qCount">1 / 10</span>
-      <span id="liveStat">0 打/分 ・ 正かく 100%</span>
-      <button class="quit" id="btnQuit">やめる</button>
+      <span id="liveStat"></span>
+      <button class="quit" id="btnQuit" data-t="btn_quit"></button>
     </div>
     <div class="track"><i id="trackFill"></i></div>
     <div class="limit hidden" id="limitWrap"><span class="limit-bar"><i id="limitFill"></i></span><b id="limitNum"></b></div>
@@ -294,11 +303,12 @@ body{
         <div class="yomi" id="yomi"></div>
         <div class="boxes" id="boxes"></div>
         <p class="imi" id="imi"></p>
+        <div class="spk-row hidden" id="spkRow"><button class="spk" id="btnSpeak" type="button" aria-label="発音を聞く"></button></div>
         <div class="romaji" id="romaji"><span class="typed" id="rTyped"></span><i class="caret"></i><span class="guide" id="rGuide"></span></div>
       </div>
-      <div class="pass-row"><button class="pass" id="btnPass">パス</button></div>
+      <div class="pass-row"><button class="pass" id="btnPass" data-t="btn_pass"></button></div>
       <div class="kb" id="kb"></div>
-      <p class="tap-hint hidden" id="tapHint">画面をタップしてキーボードを出す</p>
+      <p class="tap-hint hidden" id="tapHint" data-t="tap_hint"></p>
     </div>
     <input id="catcher" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="latin">
   </section>
@@ -307,8 +317,8 @@ body{
   <section id="scr-hist" class="hidden">
     <div class="sheet">
       <div class="tabs" id="histTabs">
-        <button type="button" data-tab="score" aria-pressed="true">スコアの きろく</button>
-        <button type="button" data-tab="words" aria-pressed="false">ことばの きろく</button>
+        <button type="button" data-tab="score" aria-pressed="true" data-t="tab_score"></button>
+        <button type="button" data-tab="words" aria-pressed="false" data-t="tab_words"></button>
       </div>
 
       <div id="tab-score">
@@ -318,38 +328,38 @@ body{
 
       <div id="tab-words" class="hidden">
         <div class="tabs" id="wordSort">
-          <button type="button" data-sort="n" aria-pressed="true">よく出た順</button>
-          <button type="button" data-sort="ng" aria-pressed="false">まちがえた順</button>
+          <button type="button" data-sort="n" aria-pressed="true" data-t="sort_n"></button>
+          <button type="button" data-sort="ng" aria-pressed="false" data-t="sort_ng"></button>
         </div>
         <ul class="hlist" id="wordList"></ul>
         <p class="hnote" id="wordNote"></p>
       </div>
     </div>
-    <button class="start" id="btnHistBack">もどる</button>
-    <p class="best"><button class="quit" id="btnHistClear">きろくを ぜんぶ 消す</button></p>
+    <button class="start" id="btnHistBack" data-t="btn_back"></button>
+    <p class="best"><button class="quit" id="btnHistClear" data-t="btn_clear"></button></p>
   </section>
 
   <!-- ======== けっか ======== -->
   <section id="scr-result" class="hidden">
     <div class="sheet">
-      <h2 id="resultTitle">おつかれさま</h2>
+      <h2 id="resultTitle"></h2>
       <div class="score">
-        <div><b id="rSpeed">0</b><span>打/分</span></div>
-        <div><b id="rAcc">0%</b><span>正かく率</span></div>
-        <div><b id="rClear">0</b><span>クリアした語</span></div>
+        <div><b id="rSpeed">0</b><span data-t="u_speed"></span></div>
+        <div><b id="rAcc">0%</b><span data-t="u_acc"></span></div>
+        <div><b id="rClear">0</b><span data-t="u_clear"></span></div>
       </div>
       <p class="best" id="rBest"></p>
     </div>
     <div class="sheet">
-      <h2>出てきた ことば</h2>
+      <h2 data-t="h_review"></h2>
       <ul class="review" id="review"></ul>
     </div>
     <div class="sheet" id="missSheet">
-      <h2>まちがえやすかったキー</h2>
+      <h2 data-t="h_miss"></h2>
       <p class="misskeys" id="missKeys"></p>
     </div>
-    <button class="start" id="btnAgain">もう一回</button>
-    <p class="best"><button class="quit" id="btnHome">学年をえらびなおす</button></p>
+    <button class="start" id="btnAgain" data-t="btn_again"></button>
+    <p class="best"><button class="quit" id="btnHome" data-t="btn_home"></button></p>
   </section>
 </div>
 
@@ -1737,8 +1747,9 @@ if(window.speechSynthesis){
   pickVoice();
   speechSynthesis.addEventListener("voiceschanged",pickVoice);
 }
-function speakEn(text){
-  if(!$("optSound").checked) return;
+const SPK_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+function speakEn(text,force){
+  if(!force && !$("optSound").checked) return;
   if(!window.speechSynthesis) return;
   try{
     speechSynthesis.cancel();
@@ -1779,22 +1790,92 @@ function beep(freq,dur,type){
 const GRADE_LABEL={1:"小1",2:"小2",3:"小3",4:"小4",5:"小5",6:"小6",7:"中1",8:"中2",9:"中3",
                    10:"漢検2級",11:"CEFR A1",12:"CEFR A2",13:"CEFR B1",14:"CEFR B2"};
 const BASIC_GRADES=[1,2,3,4,5,6,7,8,9], ADV_GRADES=[10,11,12,13,14];
+/* 文言：[漢字づかい（小3以上）, ひらがな中心（小1・小2）] */
+const TXT={
+ sub:["漢字と英単語を、打ちながら覚える","かん字と えい単語を、うちながら おぼえる"],
+ h_mode:["何を練習する？","なにを れんしゅうする？"],
+ h_grade:["学年を選ぶ","がくねんを えらぶ"],
+ h_adv:["別のものさし（検定・CEFR）","べつの ものさし（けんてい・CEFR）"],
+ h_count:["問題の数","もんだいの かず"],
+ h_diff:["難しさ","むずかしさ"],
+ opt_sound:["音を鳴らす・英語を読み上げる","音を ならす・えい語を 読み上げる"],
+ btn_start:["はじめる","はじめる"],
+ btn_hist:["これまでの記録","これまでの きろく"],
+ btn_quit:["やめる","やめる"],
+ btn_pass:["パス","パス"],
+ tap_hint:["画面をタップしてキーボードを出す","がめんを タップして キーボードを 出す"],
+ tab_score:["スコアの記録","スコアの きろく"],
+ tab_words:["ことばの記録","ことばの きろく"],
+ sort_n:["よく出た順","よく出た じゅん"],
+ sort_ng:["まちがえた順","まちがえた じゅん"],
+ btn_back:["もどる","もどる"],
+ btn_clear:["記録を全部消す","きろくを ぜんぶ 消す"],
+ btn_again:["もう一回","もう一かい"],
+ btn_home:["学年を選び直す","がくねんを えらびなおす"],
+ h_review:["出てきたことば","出てきた ことば"],
+ h_miss:["まちがえやすかったキー","まちがえやすかった キー"],
+ u_speed:["打/分","打/分"],
+ u_acc:["正確率","正かくりつ"],
+ u_clear:["クリアした語","クリアした ことば"],
+ acc:["正確","正かく"],
+ ken:["問","もん"],
+ mode_kanji:["漢字","かん字"],
+ mode_en:["英単語","えい単語"],
+ mode_mix:["ミックス","ミックス"],
+ mode_review:["復習","ふくしゅう"],
+ note_kanji:["小1〜中3と漢検2級。読みをローマ字で打ちます。","小1〜中3と かんけん2きゅう。読みを ローマ字で うちます。"],
+ note_en:["小3〜中3とCEFR A1〜B2。日本語を見てつづりを打ちます。","小3〜中3と CEFR A1〜B2。日本語を 見て つづりを うちます。"],
+ note_mix:["漢字と英単語が混ざって出ます。","かん字と えい単語が まざって 出ます。"],
+ note_review:["まちがえた語・パスした語・時間切れの語だけを出します。","まちがえた ことば・パスした ことば・時間ぎれの ことばだけ 出ます。"],
+ review_now:["　いまは{n}語あります。","　いまは {n}こ あります。"],
+ review_none:["まちがえた語がまだありません。ほかのモードで何回か練習してから開いてください。","まちがえた ことばが まだ ありません。ほかの モードで なんかい か れんしゅう してから ひらいてください。"],
+ dnote_easy:["答え・打つ文字・キーボードを全部見せます。英単語は出たときに読み上げます。","答え・うつ文字・キーボードを ぜんぶ 見せます。えい単語は 出たときに 読み上げます。"],
+ dnote_normal:["キーボードだけ見せます。英単語は出たときに読み上げます。","キーボードだけ 見せます。えい単語は 出たときに 読み上げます。"],
+ dnote_hard:["表示の助けはなし。英単語は出たときに読み上げます。","見せる おたすけは なし。えい単語は 出たときに 読み上げます。"],
+ dnote_super:["助けなし。1語10秒以内に打ちます。","おたすけなし。1つ 10びょう いないに うちます。"],
+ dnote_ultra:["助けなし。1語3秒以内に打ちます。","おたすけなし。1つ 3びょう いないに うちます。"],
+ m_pass:["パス","パス"],
+ m_timeout:["時間切れ","時間ぎれ"],
+ best_of:["の最高記録：","の さいこう記録："],
+ best_new:["の最高記録を更新！","の さいこう記録を こうしん！"],
+ t_great:["すばらしい！","すばらしい！"],
+ t_good:["いい調子！","いい ちょうし！"],
+ t_ok:["おつかれさま","おつかれさま"],
+ h_empty:["まだ記録がありません","まだ きろくが ありません"],
+ s_sum:["全部で{t}回。いちばん速かったのは{s}打/分（{g}・{d}）","ぜんぶで {t}かい。いちばん はやかったのは {s}打/分（{g}・{d}）"],
+ w_sum:["{a}語を のべ{t}回練習。","{a}こを のべ {t}かい れんしゅう。"],
+ w_top:["上位100語を表示しています。","上から 100こを 出しています。"],
+ c_quit:["途中でやめますか？　記録は残りません。","とちゅうで やめますか？　きろくは のこりません。"],
+ c_clear:["記録を全部消しますか？　もとに戻せません。","きろくを ぜんぶ 消しますか？　もとに もどせません。"],
+ w_miss:["ミス","ミス"]
+};
+function kanaUI(){ return S.mode!=="review" && (S.grade===1||S.grade===2); }
+function T(k,vars){
+  const v=TXT[k]; if(!v) return k;
+  let t = kanaUI()? v[1] : v[0];
+  if(vars) for(const key in vars) t=t.split("{"+key+"}").join(vars[key]);
+  return t;
+}
+function applyTexts(){
+  document.querySelectorAll("[data-t]").forEach(e=>{ e.textContent=T(e.dataset.t); });
+  document.querySelectorAll("#modes [data-mv]").forEach(b=>{ b.textContent=T("mode_"+b.dataset.mv); });
+  document.querySelectorAll("#counts [data-n]").forEach(b=>{ b.textContent=b.dataset.n+T("ken"); });
+  $("diffNote").textContent=T("dnote_"+S.diff);
+  $("modeNote").textContent = S.mode==="review"
+    ? T("note_review")+T("review_now",{n:reviewPool().length})
+    : T("note_"+S.mode);
+}
+
 const MODES=[["kanji","漢字"],["en","英単語"],["mix","ミックス"],["review","復習"]];
 const DIFFS=[
   ["easy","イージー",   {ans:1,guide:1,kb:1,limit:0,say:"ask"}, "答え・打つ文字・キーボードを ぜんぶ 見せます。英単語は 出たときに 読み上げます。"],
   ["normal","ノーマル", {ans:0,guide:0,kb:1,limit:0,say:"ask"}, "キーボードだけ 見せます。英単語は 出たときに 読み上げます。"],
-  ["hard","ハード",     {ans:"first",guide:0,kb:0,limit:0,say:"done"}, "おたすけは 最初の1文字だけ。英単語は 打ち終えてから 読み上げます。"],
+  ["hard","ハード",     {ans:0,guide:0,kb:0,limit:0,say:"ask"}, "表示のおたすけはなし。英単語は出たときに読み上げます。"],
   ["super","スーパー",  {ans:0,guide:0,kb:0,limit:10,say:"done"},"おたすけなし。1語 10びょう いないに 打ちます。"],
   ["ultra","ウルトラ",  {ans:0,guide:0,kb:0,limit:3,say:"done"}, "おたすけなし。1語 3びょう いないに 打ちます。"]
 ];
 function D(){ return (DIFFS.find(d=>d[0]===S.diff)||DIFFS[0])[2]; }
 function diffLabel(){ return (DIFFS.find(d=>d[0]===S.diff)||DIFFS[0])[1]; }
-const MODE_NOTE={
-  kanji:"小1〜中3と 漢検2級。読みを ローマ字で 打ちます。",
-  en:"小3〜中3と CEFR A1〜B2。日本語を 見て つづりを 打ちます。",
-  mix:"漢字と 英単語が まざって 出ます。",
-  review:"まちがえた語・パスした語・時間切れの語だけを 出します。"
-};
 
 /* まちがえた語の見つけ方：履歴から引き当てる */
 let WORD_INDEX=null;
@@ -1823,11 +1904,13 @@ function gradeEnabled(g){ return S.mode!=="review" && poolSize(g,S.mode)>0; }
 function buildStart(){
   const md=$("modes");md.innerHTML="";
   MODES.forEach(([v,label])=>{
-    const b=document.createElement("button");b.type="button";b.textContent=label;
+    const b=document.createElement("button");b.type="button";b.dataset.mv=v;
+    b.textContent=T("mode_"+v);
     b.setAttribute("aria-pressed",v===S.mode);
     b.onclick=()=>{
       S.mode=v;
       [...md.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+      applyTexts();
       if(S.mode!=="review" && !gradeEnabled(S.grade)){
         S.grade=BASIC_GRADES.concat(ADV_GRADES).find(gradeEnabled)||1;
       }
@@ -1854,17 +1937,16 @@ function buildStart(){
     b.onclick=()=>{
       S.diff=v;
       [...df.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
-      $("diffNote").textContent=(DIFFS.find(d=>d[0]===v)||DIFFS[0])[3];
+      applyTexts();
       showBest();
     };
     df.appendChild(b);
   });
-  $("diffNote").textContent=DIFFS[0][3];
 
   const c=$("counts");c.innerHTML="";
   [5,10,20,30].forEach(n=>{
     const b=document.createElement("button");b.type="button";
-    b.textContent=n+"問";b.setAttribute("aria-pressed",n===S.countPref);
+    b.dataset.n=n;b.textContent=n+T("ken");b.setAttribute("aria-pressed",n===S.countPref);
     b.onclick=()=>{S.countPref=n;[...c.children].forEach(x=>x.setAttribute("aria-pressed",x===b));};
     c.appendChild(b);
   });
@@ -1879,9 +1961,7 @@ function refreshGrades(){
     b.setAttribute("aria-pressed", ok&&i===S.grade);
     b.querySelector("small").textContent = ok ? poolSize(i,S.mode)+"語" : "—";
   });
-  $("modeNote").textContent = S.mode==="review"
-    ? `${MODE_NOTE.review}　いまは ${reviewPool().length} 語 あります。`
-    : MODE_NOTE[S.mode];
+  applyTexts();
   showBest();
 }
 
@@ -1900,7 +1980,7 @@ function modeLabel(){return (MODES.find(m=>m[0]===S.mode)||["","" ])[1];}
 function levelLabel(){return S.mode==="review" ? "復習" : (GRADE_LABEL[S.grade]||"");}
 function showBest(){
   const b=bestStore[bestKey()];
-  $("bestLine").textContent = b ? `${levelLabel()}・${modeLabel()}・${diffLabel()}の さいこう記録：${b.speed} 打/分（正かく率 ${b.acc}%）` : "";
+  $("bestLine").textContent = b ? `${levelLabel()}・${modeLabel()}・${diffLabel()}${T("best_of")}${b.speed} ${T("u_speed")}（${T("u_acc")} ${b.acc}%）` : "";
 }
 
 /* =========================================================
@@ -1982,7 +2062,7 @@ function buildPool(){
 function startGame(){
   const pool=buildPool();
   if(!pool.length){
-    if(S.mode==="review") $("modeNote").textContent="まちがえた語が まだ ありません。ほかのモードで 何回か 練習してから ひらいてください。";
+    if(S.mode==="review") $("modeNote").textContent=T("review_none");
     return;
   }
   S.count=S.countPref;
@@ -2038,6 +2118,8 @@ function loadWord(){
   }
   render();
   startLimit();
+  const canSpk = !!window.speechSynthesis;
+  $("spkRow").classList.toggle("hidden", !(canSpk && it.t==="e" && D().say==="ask"));
   if(it.t==="e" && D().say==="ask") speakEn(it.w);
 }
 
@@ -2085,7 +2167,7 @@ function updateLive(){
   const spd=min>0?Math.round(S.keysOK/min):0;
   const tot=S.keysOK+S.keysNG;
   const acc=tot?Math.round(S.keysOK/tot*100):100;
-  $("liveStat").textContent=`${spd} 打/分 ・ 正かく ${acc}%`;
+  $("liveStat").textContent=`${spd} ${T("u_speed")} ・ ${T("acc")} ${acc}%`;
 }
 
 function handleKey(chRaw){
@@ -2176,14 +2258,14 @@ function finish(){
   $("rSpeed").textContent=spd;
   $("rAcc").textContent=acc+"%";
   $("rClear").textContent=S.results.filter(r=>r.miss===0&&!r.passed&&!r.timeout).length;
-  $("resultTitle").textContent = acc>=95 ? "すばらしい！" : acc>=85 ? "いいちょうし！" : "おつかれさま";
+  $("resultTitle").textContent = acc>=95 ? T("t_great") : acc>=85 ? T("t_good") : T("t_ok");
   recordSession(spd,acc,S.results.filter(r=>r.miss===0&&!r.passed&&!r.timeout).length);
 
   const b=bestStore[bestKey()];
   if(!b||spd>b.speed){ bestStore[bestKey()]={speed:spd,acc};saveBest();
-    $("rBest").textContent=`${levelLabel()}・${modeLabel()}・${diffLabel()}の さいこう記録を こうしん！`;
+    $("rBest").textContent=`${levelLabel()}・${modeLabel()}・${diffLabel()}${T("best_new")}`;
   }else{
-    $("rBest").textContent=`${levelLabel()}・${modeLabel()}・${diffLabel()}の さいこう記録：${b.speed} 打/分`;
+    $("rBest").textContent=`${levelLabel()}・${modeLabel()}・${diffLabel()}${T("best_of")}${b.speed} ${T("u_speed")}`;
   }
 
   const ul=$("review");ul.innerHTML="";
@@ -2191,7 +2273,8 @@ function finish(){
     const li=document.createElement("li");
     li.innerHTML=`<span class="kw${r.t==="e"?" en":""}">${esc(r.w)}</span>
       <span class="kd"><b>${esc(r.y)}</b><span>${r.t==="e"?"":esc(r.m)}</span></span>
-      <span class="mark ${(r.passed||r.timeout)?"pass":(r.miss===0?"ok":"ng")}">${r.timeout?"時間切れ":r.passed?"パス":(r.miss===0?"◎":"△")}</span>`;
+      ${(r.t==="e"&&window.speechSynthesis)?`<button class="spk sm" type="button" data-say="${esc(r.w)}" aria-label="発音を聞く">${SPK_ICON}</button>`:""}
+      <span class="mark ${(r.passed||r.timeout)?"pass":(r.miss===0?"ok":"ng")}">${r.timeout?T("m_timeout"):r.passed?T("m_pass"):(r.miss===0?"◎":"△")}</span>`;
     ul.appendChild(li);
   });
 
@@ -2238,7 +2321,7 @@ function fmtDate(t){
 function renderScoreHist(){
   const ul=$("scoreList");ul.innerHTML="";
   if(!hist.sessions.length){
-    ul.innerHTML='<li><span class="empty">まだ きろくが ありません</span></li>';
+    ul.innerHTML=`<li><span class="empty">${T("h_empty")}</span></li>`;
     $("scoreNote").textContent="";return;
   }
   hist.sessions.slice(0,60).forEach(v=>{
@@ -2250,14 +2333,14 @@ function renderScoreHist(){
   });
   const t=hist.sessions.length;
   const best=hist.sessions.reduce((a,b)=>b.s>a.s?b:a);
-  $("scoreNote").textContent=`ぜんぶで ${t} 回。いちばん速かったのは ${best.s} 打/分（${GRADE_LABEL[best.g]||""}・${fmtDate(best.d)}）`;
+  $("scoreNote").textContent=T("s_sum",{t:t,s:best.s,g:GRADE_LABEL[best.g]||"",d:fmtDate(best.d)});
 }
 let wordSortKey="n";
 function renderWordHist(){
   const ul=$("wordList");ul.innerHTML="";
   const arr=Object.entries(hist.words).map(([k,v])=>({w:k.slice(2),...v}));
   if(!arr.length){
-    ul.innerHTML='<li><span class="empty">まだ きろくが ありません</span></li>';
+    ul.innerHTML=`<li><span class="empty">${T("h_empty")}</span></li>`;
     $("wordNote").textContent="";return;
   }
   arr.sort((a,b)=> wordSortKey==="ng" ? (b.ng-a.ng)||(b.n-a.n) : (b.n-a.n)||(b.ng-a.ng));
@@ -2265,11 +2348,11 @@ function renderWordHist(){
     const li=document.createElement("li");
     li.innerHTML=`<span class="hw${v.t==="e"?" en":""}">${esc(v.w)}</span>
       <span class="hy">${esc(v.y||"")}</span>
-      <span class="cnt">${v.n}回${v.ng?` <span class="ngc">ミス${v.ng}</span>`:""}${v.p?` パス${v.p}`:""}${v.to?` 時間切れ${v.to}`:""}</span>`;
+      <span class="cnt">${v.n}回${v.ng?` <span class="ngc">${T("w_miss")}${v.ng}</span>`:""}${v.p?` ${T("m_pass")}${v.p}`:""}${v.to?` ${T("m_timeout")}${v.to}`:""}</span>`;
     ul.appendChild(li);
   });
   const total=arr.reduce((a,b)=>a+b.n,0);
-  $("wordNote").textContent=`${arr.length} 語を のべ ${total} 回 練習。${arr.length>100?"上位100語を表示しています。":""}`;
+  $("wordNote").textContent=T("w_sum",{a:arr.length,t:total})+(arr.length>100?T("w_top"):"");
 }
 function openHist(){
   $("scr-start").classList.add("hidden");
@@ -2306,11 +2389,17 @@ catcher.addEventListener("focus",()=>$("tapHint").classList.add("hidden"));
    9. 画面のつなぎ
 ========================================================= */
 $("btnPass").onclick=function(){ this.blur(); passWord(); };
+$("btnSpeak").innerHTML=SPK_ICON;
+$("btnSpeak").onclick=function(){ this.blur(); if(S.cur&&S.cur.t==="e") speakEn(S.cur.w,true); };
+$("review").addEventListener("click",e=>{
+  const b=e.target.closest("[data-say]"); if(!b) return;
+  b.blur(); speakEn(b.dataset.say,true);
+});
 $("btnStart").onclick=()=>{primeSpeech();startGame();};
 $("btnAgain").onclick=()=>{primeSpeech();startGame();};
 $("btnQuit").onclick=function(){
   this.blur();
-  if(S.running && S.qi>0 && !window.confirm("とちゅうでやめますか？　記録はのこりません。")) { focusCatcher(); return; }
+  if(S.running && S.qi>0 && !window.confirm(T("c_quit"))) { focusCatcher(); return; }
   S.running=false;S.locked=false;stopLimit();stopSpeak();hintKey(null);
   $("scr-play").classList.add("hidden");$("scr-start").classList.remove("hidden");
 };
@@ -2320,7 +2409,7 @@ $("btnHist").onclick=openHist;
 $("btnHistBack").onclick=()=>{$("scr-hist").classList.add("hidden");$("scr-start").classList.remove("hidden");window.scrollTo(0,0);};
 $("btnHistClear").onclick=function(){
   this.blur();
-  if(!window.confirm("きろくを ぜんぶ 消しますか？　もとにもどせません。")) return;
+  if(!window.confirm(T("c_clear"))) return;
   hist.sessions=[];hist.words={};saveHist();renderScoreHist();renderWordHist();
 };
 $("histTabs").onclick=e=>{
@@ -2335,7 +2424,7 @@ $("wordSort").onclick=e=>{
   wordSortKey=b.dataset.sort; renderWordHist();
 };
 
-buildStart();buildKb();loadBest();loadHist().then(refreshGrades);
+buildStart();buildKb();applyTexts();loadBest();loadHist().then(refreshGrades);
 </script>
 </body>
 </html>
