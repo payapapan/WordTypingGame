@@ -98,6 +98,26 @@ body{
 .limit b{font-family:var(--mono);font-size:15px;min-width:1.6em;text-align:right}
 .hist-btn{width:100%;margin-top:10px;border:1.5px solid var(--rule);background:var(--paper-2);
   border-radius:10px;font-family:var(--maru);font-size:15px;padding:13px;cursor:pointer;color:var(--ink)}
+.userbar{display:flex;align-items:center;gap:8px;margin:0 2px 14px;font-size:13px}
+.userbar .ub-label{color:var(--ink-soft)}
+.userbar b{font-size:15px}
+.userbar button{margin-left:auto}
+.tin{width:100%;border:1.5px solid var(--rule);border-radius:8px;padding:10px 12px;
+  font-family:var(--maru);font-size:14px;background:var(--paper-2);color:var(--ink);margin-bottom:10px}
+.ta{font-family:var(--mono);font-size:13px;line-height:1.6;resize:vertical}
+.sample{font-family:var(--mono);font-size:11px;line-height:1.7;color:var(--ink-soft);
+  background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:10px;
+  margin:10px 0 0;white-space:pre-wrap;word-break:break-all}
+.adduser{display:flex;gap:8px;margin-top:14px}
+.adduser input{flex:1;border:1.5px solid var(--rule);border-radius:8px;padding:9px 12px;
+  font-family:var(--maru);font-size:14px;background:var(--paper-2);color:var(--ink)}
+.hlist .uname{font-size:15px;font-weight:700}
+.hlist .uname.now{color:var(--ai)}
+.hlist .ubtns{margin-left:auto;display:flex;gap:6px}
+.hlist .ubtns button{border:1px solid var(--rule);background:var(--paper-2);border-radius:7px;
+  padding:5px 10px;font-size:12px;font-family:var(--maru);cursor:pointer;color:var(--ink-soft)}
+.hlist .rk{font-family:var(--mono);font-size:13px;color:var(--ink-soft);min-width:2.2em}
+.hlist .rk.top{color:var(--nanohana);font-weight:700}
 .tabs{display:flex;gap:6px;margin-bottom:14px}
 .tabs button{flex:1;border:1.5px solid var(--rule);background:var(--paper-2);border-radius:8px;
   padding:10px;font-family:var(--maru);font-size:14px;cursor:pointer}
@@ -113,6 +133,7 @@ body{
 .hlist .hy{font-size:12px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hlist .cnt{margin-left:auto;font-family:var(--mono);font-size:13px;white-space:nowrap}
 .hlist .ngc{color:var(--shu)}
+.hlist .due{color:var(--ai)}
 .empty{font-size:13px;color:var(--ink-soft);text-align:center;padding:24px 0}
 .hnote{font-size:11px;color:var(--ink-soft);margin:12px 0 0}
 .grade.adv b{font-family:var(--maru);font-size:15px;font-weight:700;letter-spacing:0}
@@ -130,6 +151,9 @@ body{
   min-height:26px;margin-bottom:10px;
 }
 .yomi.off{visibility:hidden}
+.phase{display:inline-block;font-size:12px;font-weight:700;color:var(--ai);
+  background:var(--ai-pale);border-radius:999px;padding:4px 14px;margin-bottom:12px}
+.phase.recall{color:var(--shu);background:#FBECEB}
 .yomi.prompt{font-size:30px;letter-spacing:.06em;color:var(--ink);min-height:38px;margin-bottom:16px}
 .boxes{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
 .box{
@@ -143,7 +167,7 @@ body{
 }
 .box.done{color:var(--ai);border-color:var(--ai);background-color:#F5F8FD}
 .box.en{width:46px;height:62px;font-family:var(--maru);font-size:30px;font-weight:700;background-image:none}
-.box.en.ghost{color:transparent}
+.box.ghost{color:transparent}
 .box.en.gap{width:16px;border:none;background:none}
 .typed{white-space:pre}
 .imi{margin:16px 0 4px;font-size:14px;color:var(--ink-soft)}
@@ -189,6 +213,7 @@ body{
 .key.left{background:#F4F7FB}
 .key.right{background:#FBF7F1}
 .key.space{width:190px;font-size:11px;color:var(--ink-soft)}
+.key.num{background:#F7F7F4}
 .key.home::after{content:"";position:absolute;bottom:5px;width:11px;height:2px;background:var(--rule);border-radius:2px}
 .key.hit{background:var(--nanohana);border-color:#D9A800;color:var(--ink);font-weight:700}
 .kb.off{display:none}
@@ -202,7 +227,7 @@ body{
 .spk svg{width:21px;height:21px}
 .spk.sm{width:30px;height:30px;margin-left:8px;flex:none}
 .spk.sm svg{width:15px;height:15px}
-.pass-row{display:flex;justify-content:center;margin-top:16px}
+.pass-row{display:flex;justify-content:center;gap:10px;margin-top:16px}
 .pass{
   border:1.5px solid var(--rule);background:var(--paper-2);border-radius:999px;
   padding:9px 26px;font-family:var(--maru);font-size:14px;color:var(--ink-soft);cursor:pointer;
@@ -227,6 +252,7 @@ body{
 .mark.ok{color:var(--midori)}
 .mark.ng{color:var(--shu)}
 .mark.pass{color:var(--ink-soft);font-size:12px}
+.mark.hint{color:var(--ai);font-size:12px}
 .misskeys{font-family:var(--mono);font-size:14px;color:var(--ink)}
 
 @media (max-width:560px){
@@ -254,6 +280,11 @@ body{
 
   <!-- ======== スタート ======== -->
   <section id="scr-start">
+    <div class="userbar">
+      <span class="ub-label" data-t="lbl_user"></span>
+      <b id="userName"></b>
+      <button class="quit" id="btnUsers" data-t="btn_users"></button>
+    </div>
     <div class="sheet">
       <h2 data-t="h_mode"></h2>
       <div class="count-pick" id="modes"></div>
@@ -265,6 +296,10 @@ body{
       <div class="grades" id="grades"></div>
       <p class="sub-label" data-t="h_adv"></p>
       <div class="grades" id="grades2"></div>
+      <p class="sub-label" data-t="h_subject"></p>
+      <div class="grades" id="grades4"></div>
+      <p class="sub-label hidden" id="customLabel" data-t="h_custom"></p>
+      <div class="grades" id="grades3"></div>
     </div>
 
     <div class="sheet">
@@ -273,6 +308,12 @@ body{
     </div>
 
     <div class="sheet">
+      <h2 data-t="h_learn"></h2>
+      <div class="count-pick" id="learns"></div>
+      <p class="mode-note" id="learnNote"></p>
+    </div>
+
+    <div class="sheet" id="diffSheet">
       <h2 data-t="h_diff"></h2>
       <div class="diffs" id="diffs"></div>
       <p class="mode-note" id="diffNote"></p>
@@ -284,6 +325,7 @@ body{
     <button class="start" id="btnStart" data-t="btn_start"></button>
     <p class="best" id="bestLine"></p>
     <button class="hist-btn" id="btnHist" data-t="btn_hist"></button>
+    <button class="hist-btn" id="btnImport" data-t="btn_import"></button>
     <p class="credit">英単語のCEFRレベルは『CEFR-J Wordlist Version 1.6』（東京外国語大学 投野由紀夫研究室）に準拠。日本語訳は本アプリ独自。漢字の学年は文部科学省「学年別漢字配当表」、漢検2級は日本漢字能力検定の級別配当による。</p>
   </section>
 
@@ -300,17 +342,50 @@ body{
     <div class="sheet">
       <div class="card" id="card">
         <div class="hanko" id="hanko">合格</div>
+        <div class="phase hidden" id="phaseBadge"></div>
         <div class="yomi" id="yomi"></div>
         <div class="boxes" id="boxes"></div>
         <p class="imi" id="imi"></p>
         <div class="spk-row hidden" id="spkRow"><button class="spk" id="btnSpeak" type="button" aria-label="発音を聞く"></button></div>
         <div class="romaji" id="romaji"><span class="typed" id="rTyped"></span><i class="caret"></i><span class="guide" id="rGuide"></span></div>
       </div>
-      <div class="pass-row"><button class="pass" id="btnPass" data-t="btn_pass"></button></div>
+      <div class="pass-row"><button class="pass hidden" id="btnHint" data-t="btn_hint"></button><button class="pass" id="btnPass" data-t="btn_pass"></button></div>
       <div class="kb" id="kb"></div>
       <p class="tap-hint hidden" id="tapHint" data-t="tap_hint"></p>
     </div>
     <input id="catcher" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="latin">
+  </section>
+
+  <!-- ======== 問題の取り込み ======== -->
+  <section id="scr-import" class="hidden">
+    <div class="sheet">
+      <h2 data-t="h_import"></h2>
+      <input id="setName" type="text" maxlength="20" class="tin">
+      <textarea id="setData" rows="9" class="tin ta"></textarea>
+      <button class="hist-btn" id="btnSaveSet" data-t="btn_saveset"></button>
+      <p class="hnote" id="importMsg"></p>
+      <p class="hnote" data-t="import_note"></p>
+      <pre class="sample" id="importSample"></pre>
+    </div>
+    <div class="sheet">
+      <h2 data-t="h_sets"></h2>
+      <ul class="hlist" id="setList"></ul>
+    </div>
+    <button class="start" id="btnImportBack" data-t="btn_back"></button>
+  </section>
+
+  <!-- ======== ユーザー ======== -->
+  <section id="scr-users" class="hidden">
+    <div class="sheet">
+      <h2 data-t="h_user"></h2>
+      <ul class="hlist" id="userList"></ul>
+      <div class="adduser">
+        <input id="newUserName" type="text" maxlength="12" autocomplete="off">
+        <button class="quit" id="btnAddUser" data-t="btn_adduser"></button>
+      </div>
+      <p class="hnote" data-t="users_note"></p>
+    </div>
+    <button class="start" id="btnUsersBack" data-t="btn_back"></button>
   </section>
 
   <!-- ======== きろく ======== -->
@@ -319,11 +394,19 @@ body{
       <div class="tabs" id="histTabs">
         <button type="button" data-tab="score" aria-pressed="true" data-t="tab_score"></button>
         <button type="button" data-tab="words" aria-pressed="false" data-t="tab_words"></button>
+        <button type="button" data-tab="rank" aria-pressed="false" data-t="tab_rank"></button>
       </div>
 
       <div id="tab-score">
         <ul class="hlist" id="scoreList"></ul>
         <p class="hnote" id="scoreNote"></p>
+      </div>
+
+      <div id="tab-rank" class="hidden">
+        <p class="sub-label" data-t="rank_streak" style="border:none;padding:0;margin-top:0"></p>
+        <ul class="hlist" id="rankStreak"></ul>
+        <p class="sub-label" data-t="rank_total"></p>
+        <ul class="hlist" id="rankTotal"></ul>
       </div>
 
       <div id="tab-words" class="hidden">
@@ -1656,6 +1739,334 @@ const EN_WORDS = {
  ["virtual reality","仮想現実","B2"],["worn out","すり切れた","B2"]]
 };
 
+/* 教科の問題（社会）：[問題, 答え, 読み, 補足] */
+const BUILTIN_SETS={
+ rekishi:{name:"社会 歴史",items:[
+ ["打製石器を使っていた時代","旧石器時代","きゅうせっきじだい",""],
+ ["縄文時代の人々が食べ物の残りを捨てた場所","貝塚","かいづか",""],
+ ["弥生時代に米を保存した建物","高床倉庫","たかゆかそうこ",""],
+ ["魏に使いを送った邪馬台国の女王","卑弥呼","ひみこ",""],
+ ["聖徳太子が定めた役人の位の制度","冠位十二階","かんいじゅうにかい",""],
+ ["聖徳太子が定めた役人の心構え","十七条の憲法","じゅうしちじょうのけんぽう",""],
+ ["645年に中大兄皇子らが始めた政治改革","大化の改新","たいかのかいしん",""],
+ ["701年に定められた律令","大宝律令","たいほうりつりょう",""],
+ ["人々に口分田を与えた奈良時代の制度","班田収授法","はんでんしゅうじゅのほう",""],
+ ["743年に開墾地の私有を認めた法","墾田永年私財法","こんでんえいねんしざいのほう",""],
+ ["聖武天皇が奈良に建てた寺","東大寺","とうだいじ","大仏をつくった"],
+ ["794年に平安京へ都を移した天皇","桓武天皇","かんむてんのう",""],
+ ["藤原氏が天皇の外戚となって行った政治","摂関政治","せっかんせいじ",""],
+ ["白河上皇が始めた政治","院政","いんせい",""],
+ ["源頼朝が開いた幕府","鎌倉幕府","かまくらばくふ",""],
+ ["国ごとに置かれ御家人を統率した役職","守護","しゅご",""],
+ ["1232年に北条泰時が定めた武士の法","御成敗式目","ごせいばいしきもく",""],
+ ["元寇のときの鎌倉幕府の執権","北条時宗","ほうじょうときむね",""],
+ ["足利尊氏が開いた幕府","室町幕府","むろまちばくふ",""],
+ ["応仁の乱が始まった年","1467","","11年続いた"],
+ ["戦国大名が領国を治めるために定めた法","分国法","ぶんこくほう",""],
+ ["織田信長が城下町の商工業を自由にした政策","楽市楽座","らくいちらくざ",""],
+ ["豊臣秀吉が全国の田畑を測った政策","太閤検地","たいこうけんち",""],
+ ["豊臣秀吉が農民から武器を取り上げた政策","刀狩","かたながり",""],
+ ["1600年に徳川家康が勝った戦い","関ヶ原の戦い","せきがはらのたたかい",""],
+ ["大名を統制するために定めた法","武家諸法度","ぶけしょはっと",""],
+ ["大名に江戸と領地を往復させた制度","参勤交代","さんきんこうたい",""],
+ ["徳川吉宗が行った改革","享保の改革","きょうほうのかいかく",""],
+ ["松平定信が行った改革","寛政の改革","かんせいのかいかく",""],
+ ["水野忠邦が行った改革","天保の改革","てんぽうのかいかく",""],
+ ["1853年に浦賀に来航したアメリカの使節","ペリー","",""],
+ ["1858年に結ばれた不平等条約","日米修好通商条約","にちべいしゅうこうつうしょうじょうやく",""],
+ ["1867年に徳川慶喜が政権を朝廷に返した出来事","大政奉還","たいせいほうかん",""],
+ ["1871年に藩を廃止して県を置いた改革","廃藩置県","はいはんちけん",""],
+ ["1873年に始まった土地に課税する制度","地租改正","ちそかいせい",""],
+ ["板垣退助らが国会開設を求めた運動","自由民権運動","じゆうみんけんうんどう",""],
+ ["1889年に発布された憲法","大日本帝国憲法","だいにほんていこくけんぽう",""],
+ ["1894年に始まった清との戦争","日清戦争","にっしんせんそう",""],
+ ["日清戦争の講和条約","下関条約","しものせきじょうやく",""],
+ ["1904年に始まったロシアとの戦争","日露戦争","にちろせんそう",""],
+ ["日露戦争の講和条約","ポーツマス条約","ポーツマスじょうやく",""],
+ ["1910年に日本が朝鮮を植民地とした出来事","韓国併合","かんこくへいごう",""],
+ ["第一次世界大戦後にできた国際組織","国際連盟","こくさいれんめい",""],
+ ["1925年に成立した満25歳以上の男子の選挙法","普通選挙法","ふつうせんきょほう",""],
+ ["1929年にアメリカから世界に広がった不況","世界恐慌","せかいきょうこう",""],
+ ["1931年に始まった中国東北部での軍事行動","満州事変","まんしゅうじへん",""],
+ ["1941年に始まった戦争","太平洋戦争","たいへいようせんそう",""],
+ ["1945年に日本が受け入れた降伏の宣言","ポツダム宣言","ポツダムせんげん",""],
+ ["日本国憲法が公布された年","1946","","施行は1947年"],
+ ["1951年に結ばれた講和条約","サンフランシスコ平和条約","サンフランシスコへいわじょうやく",""],
+ ["1956年に日本が加盟した国際組織","国際連合","こくさいれんごう",""],
+ ["1950年代後半から続いた急速な経済成長","高度経済成長","こうどけいざいせいちょう",""],
+ ["1972年に日本に復帰した地域","沖縄","おきなわ",""],
+ ["1989年に取りこわされた東西分断の象徴","ベルリンの壁","ベルリンのかべ",""],
+ ["農地を地主から小作人に分け与えた戦後改革","農地改革","のうちかいかく",""]
+ ]},
+ chiri:{name:"社会 地理",items:[
+ ["世界でいちばん面積が大きい国","ロシア","",""],
+ ["世界でいちばん人口が多い国","インド","","2023年に中国を上回った"],
+ ["地球上の位置を示す南北の座標","緯度","いど","赤道が0度"],
+ ["地球上の位置を示す東西の座標","経度","けいど","本初子午線が0度"],
+ ["日本の標準時子午線が通る兵庫県の市","明石市","あかしし","東経135度"],
+ ["三大洋のうち最も広い海洋","太平洋","たいへいよう",""],
+ ["世界最大の大陸","ユーラシア大陸","ユーラシアたいりく",""],
+ ["雨が少なく樹木が育たない気候帯","乾燥帯","かんそうたい",""],
+ ["一年中気温が高く雨の多い気候帯","熱帯","ねったい",""],
+ ["イスラム教徒が食べてはいけない肉","豚肉","ぶたにく",""],
+ ["ヒンドゥー教で神聖とされる動物","牛","うし",""],
+ ["EUの共通通貨","ユーロ","",""],
+ ["アメリカ南部に広がる新しい工業地域","サンベルト","","北緯37度より南"],
+ ["南アメリカで最も流域面積が広い川","アマゾン川","アマゾンがわ",""],
+ ["特定の産物の輸出にたよる経済","モノカルチャー経済","モノカルチャーけいざい","アフリカに多い"],
+ ["オーストラリアの先住民","アボリジニ","",""],
+ ["日本の最南端の島","沖ノ鳥島","おきのとりしま","東京都に属する"],
+ ["日本の最東端の島","南鳥島","みなみとりしま",""],
+ ["本州の中央部を南北に走る大地溝帯","フォッサマグナ","",""],
+ ["季節によって向きが変わる風","季節風","きせつふう","モンスーンともいう"],
+ ["川が山地から平地に出るところにできる地形","扇状地","せんじょうち",""],
+ ["川の河口にできる三角形の低地","三角州","さんかくす",""],
+ ["東北地方の太平洋側に夏ふく冷たい北東風","やませ","","冷害の原因になる"],
+ ["千葉県の東京湾岸に広がる工業地域","京葉工業地域","けいようこうぎょうちいき",""],
+ ["愛知県を中心とする日本最大の工業地帯","中京工業地帯","ちゅうきょうこうぎょうちたい",""],
+ ["出荷時期を早める栽培方法","促成栽培","そくせいさいばい","高知平野や宮崎平野"],
+ ["出荷時期を遅らせる栽培方法","抑制栽培","よくせいさいばい","長野県の高原など"],
+ ["乳牛を飼って牛乳や乳製品をつくる農業","酪農","らくのう","北海道の根釧台地など"],
+ ["地図をつくる国の機関","国土地理院","こくどちりいん",""],
+ ["高さが等しい地点を結んだ線","等高線","とうこうせん",""],
+ ["人口や産業が集中しすぎること","過密","かみつ",""],
+ ["人口が減りすぎて生活が難しくなること","過疎","かそ",""],
+ ["沿岸から200海里までの水域","排他的経済水域","はいたてきけいざいすいいき",""],
+ ["日本が石油を最も多く輸入している地域","西アジア","にしアジア",""],
+ ["世界遺産を登録する国際連合の専門機関","ユネスコ","",""],
+ ["関東から九州北部まで工業が連なる地域","太平洋ベルト","たいへいようベルト",""],
+ ["輸入した原料を加工して輸出する貿易","加工貿易","かこうぼうえき",""],
+ ["海岸線が複雑に入り組んだ地形","リアス海岸","リアスかいがん","三陸海岸など"],
+ ["火山の噴火でできた大きなくぼ地","カルデラ","","阿蘇山が代表"],
+ ["夏に雨が少なく冬に雪が多い日本海側の気候","日本海側の気候","にほんかいがわのきこう",""]
+ ]},
+ koumin:{name:"社会 公民",items:[
+ ["国の政治のあり方を最終的に国民が決めるという原則","国民主権","こくみんしゅけん",""],
+ ["戦争を放棄するという日本国憲法の原則","平和主義","へいわしゅぎ","第9条に定める"],
+ ["すべての人が生まれながらに持つ権利","基本的人権","きほんてきじんけん",""],
+ ["健康で文化的な最低限度の生活を営む権利","生存権","せいぞんけん","第25条"],
+ ["だれもが学ぶことを保障される権利","教育を受ける権利","きょういくをうけるけんり",""],
+ ["労働者が団結して労働組合をつくる権利","団結権","だんけつけん",""],
+ ["政治に参加する権利","参政権","さんせいけん",""],
+ ["良好な環境で生活する新しい人権","環境権","かんきょうけん",""],
+ ["個人の私生活を守る新しい人権","プライバシーの権利","プライバシーのけんり",""],
+ ["国政について情報の公開を求める新しい人権","知る権利","しるけんり",""],
+ ["国の唯一の立法機関","国会","こっかい",""],
+ ["国会が衆議院と参議院からなるしくみ","二院制","にいんせい",""],
+ ["予算の議決などで衆議院に強い権限を認めること","衆議院の優越","しゅうぎいんのゆうえつ",""],
+ ["毎年1月に召集される国会","通常国会","つうじょうこっかい",""],
+ ["内閣が国会の信任にもとづいて成り立つしくみ","議院内閣制","ぎいんないかくせい",""],
+ ["内閣の方針を決める会議","閣議","かくぎ",""],
+ ["衆議院が内閣を信任しないと決める議決","内閣不信任決議","ないかくふしんにんけつぎ",""],
+ ["同じ事件で3回まで裁判を受けられるしくみ","三審制","さんしんせい",""],
+ ["法律などが憲法に違反していないか判断する権限","違憲審査権","いけんしんさけん",""],
+ ["最高裁判所が憲法の番人と呼ばれる理由となる権限","違憲審査権","いけんしんさけん","終審裁判所だから"],
+ ["国民が刑事裁判に参加する制度","裁判員制度","さいばんいんせいど","2009年開始"],
+ ["国の権力を三つに分けて互いに抑制させるしくみ","三権分立","さんけんぶんりつ",""],
+ ["地方公共団体が定める独自のきまり","条例","じょうれい",""],
+ ["住民が署名を集めて議会の解散などを求める権利","直接請求権","ちょくせつせいきゅうけん",""],
+ ["一票の価値に差が生じている問題","一票の格差","いっぴょうのかくさ",""],
+ ["経済を動かす三つの主体のうち消費を担うもの","家計","かけい",""],
+ ["買いたい量と売りたい量で決まる価格","均衡価格","きんこうかかく",""],
+ ["少数の企業が市場を支配する状態","寡占","かせん",""],
+ ["公正な競争を守るための法律","独占禁止法","どくせんきんしほう",""],
+ ["独占禁止法を運用する機関","公正取引委員会","こうせいとりひきいいんかい",""],
+ ["株式を発行して資金を集める会社","株式会社","かぶしきがいしゃ",""],
+ ["株主が経営方針を決める最高機関","株主総会","かぶぬしそうかい",""],
+ ["会社の利益から株主に分配されるお金","配当","はいとう",""],
+ ["労働時間や賃金の最低基準を定めた法律","労働基準法","ろうどうきじゅんほう",""],
+ ["日本の中央銀行","日本銀行","にっぽんぎんこう",""],
+ ["日本銀行が景気を調整する政策","金融政策","きんゆうせいさく",""],
+ ["物価が上がり続けお金の価値が下がる現象","インフレーション","",""],
+ ["物価が下がり続ける現象","デフレーション","",""],
+ ["円の価値が上がり輸入に有利になる状態","円高","えんだか",""],
+ ["所得が多いほど税率が高くなるしくみ","累進課税","るいしんかぜい",""],
+ ["納める人と負担する人が異なる税","間接税","かんせつぜい","消費税など"],
+ ["国が歳入不足を補うために発行する債券","国債","こくさい",""],
+ ["社会保障の四つの柱のうち年金や医療保険にあたるもの","社会保険","しゃかいほけん",""],
+ ["生活に困る人を助ける社会保障の柱","公的扶助","こうてきふじょ","生活保護など"],
+ ["国際連合で世界の平和と安全に責任を持つ機関","安全保障理事会","あんぜんほしょうりじかい",""],
+ ["安全保障理事会の常任理事国が持つ権限","拒否権","きょひけん",""],
+ ["国連が行う平和維持活動の略称","PKO","pko",""],
+ ["2015年に採択された温暖化対策の国際的な枠組み","パリ協定","パリきょうてい",""],
+ ["2015年に国連で採択された持続可能な開発目標","SDGs","sdgs",""],
+ ["先進国と発展途上国の経済格差の問題","南北問題","なんぼくもんだい",""]
+ ]},
+ butsuri:{name:"理科 物理",items:[
+ ["光が鏡ではね返るときの決まり","反射の法則","はんしゃのほうそく","入射角と反射角が等しい"],
+ ["光が種類のちがう物質へ進むとき折れ曲がる現象","屈折","くっせつ",""],
+ ["光がすべてはね返って外へ出ない現象","全反射","ぜんはんしゃ","光ファイバーに利用"],
+ ["凸レンズを通った光が集まる点","焦点","しょうてん",""],
+ ["スクリーンにうつすことができる像","実像","じつぞう",""],
+ ["レンズをのぞいたときに見える光が集まらない像","虚像","きょぞう",""],
+ ["音の高さを決めるもの","振動数","しんどうすう","単位はヘルツ"],
+ ["音の大きさを決めるもの","振幅","しんぷく",""],
+ ["音が空気中を伝わる速さは約何メートル毎秒か","340","",""],
+ ["力の大きさの単位","ニュートン","","記号はN"],
+ ["ばねののびが力の大きさに比例するという法則","フックの法則","フックのほうそく",""],
+ ["地球が物体を引く力","重力","じゅうりょく",""],
+ ["面を垂直におす力のはたらきを表す量","圧力","あつりょく","単位はパスカル"],
+ ["空気の重さによって生じる圧力","大気圧","たいきあつ",""],
+ ["水中の物体にはたらく上向きの力","浮力","ふりょく",""],
+ ["電流の単位","アンペア","","記号はA"],
+ ["電圧の単位","ボルト","","記号はV"],
+ ["電流の流れにくさを表す量","抵抗","ていこう","単位はオーム"],
+ ["電圧が電流に比例するという法則","オームの法則","オームのほうそく",""],
+ ["直列回路のどの点でも同じ大きさになるもの","電流","でんりゅう",""],
+ ["並列回路のどの区間にも同じ大きさで加わるもの","電圧","でんあつ",""],
+ ["1秒あたりに使われる電気エネルギーの量","電力","でんりょく","単位はワット"],
+ ["電流によって発生する熱の量","熱量","ねつりょう","単位はジュール"],
+ ["磁石の力がはたらいている空間","磁界","じかい",""],
+ ["コイルの中の磁界が変化して電流が流れる現象","電磁誘導","でんじゆうどう",""],
+ ["電磁誘導によって流れる電流","誘導電流","ゆうどうでんりゅう",""],
+ ["向きが周期的に変わる電流","交流","こうりゅう",""],
+ ["一方向にだけ流れる電流","直流","ちょくりゅう",""],
+ ["下じきをこすったときにたまる電気","静電気","せいでんき",""],
+ ["真空放電で見られる電子の流れ","陰極線","いんきょくせん","電子線ともいう"],
+ ["一定の速さで一直線に進む運動","等速直線運動","とうそくちょくせんうんどう",""],
+ ["力がはたらかないとき物体が運動を続けようとする性質","慣性","かんせい",""],
+ ["仕事の大きさの単位","ジュール","","記号はJ"],
+ ["道具を使っても仕事の量が変わらないこと","仕事の原理","しごとのげんり",""],
+ ["1秒あたりにする仕事の大きさ","仕事率","しごとりつ","単位はワット"],
+ ["高いところにある物体がもつエネルギー","位置エネルギー","いちエネルギー",""],
+ ["運動している物体がもつエネルギー","運動エネルギー","うんどうエネルギー",""],
+ ["位置エネルギーと運動エネルギーの和","力学的エネルギー","りきがくてきエネルギー",""],
+ ["エネルギーの総量が変化しないという法則","エネルギー保存の法則","エネルギーほぞんのほうそく",""],
+ ["物体どうしがふれ合って熱が伝わること","伝導","でんどう",""]
+ ]},
+ kagaku:{name:"理科 化学",items:[
+ ["物質をつくるもっとも小さな粒子","原子","げんし",""],
+ ["いくつかの原子が結びついてできた粒子","分子","ぶんし",""],
+ ["1種類の原子だけでできている物質","単体","たんたい",""],
+ ["2種類以上の原子からできている物質","化合物","かごうぶつ",""],
+ ["みがくと特有の光を放つ金属の性質","金属光沢","きんぞくこうたく",""],
+ ["物質1立方センチメートルあたりの質量","密度","みつど",""],
+ ["固体がとけて液体になる温度","融点","ゆうてん",""],
+ ["液体が沸騰して気体になる温度","沸点","ふってん",""],
+ ["沸点のちがいを利用して液体を分ける方法","蒸留","じょうりゅう",""],
+ ["一定量の水にとかすことができる物質の最大量","溶解度","ようかいど",""],
+ ["物質をとけるだけとかした水溶液","飽和水溶液","ほうわすいようえき",""],
+ ["水溶液の濃さを百分率で表したもの","質量パーセント濃度","しつりょうパーセントのうど",""],
+ ["石灰水を白くにごらせる気体","二酸化炭素","にさんかたんそ",""],
+ ["ものを燃やすはたらきのある気体","酸素","さんそ",""],
+ ["最も軽く音を立てて燃える気体","水素","すいそ",""],
+ ["水の化学式","H2O","h2o",""],
+ ["二酸化炭素の化学式","CO2","co2",""],
+ ["1種類の物質が2種類以上の物質に分かれる化学変化","分解","ぶんかい",""],
+ ["物質が酸素と結びつく化学変化","酸化","さんか",""],
+ ["酸化物から酸素を取り去る化学変化","還元","かんげん",""],
+ ["熱や光を出しながら激しく酸化すること","燃焼","ねんしょう",""],
+ ["化学変化の前後で全体の質量が変わらないという法則","質量保存の法則","しつりょうほぞんのほうそく",""],
+ ["まわりに熱を出す化学変化","発熱反応","はつねつはんのう",""],
+ ["まわりから熱を吸収する化学変化","吸熱反応","きゅうねつはんのう",""],
+ ["水にとかすと電流が流れる物質","電解質","でんかいしつ",""],
+ ["水にとかしても電流が流れない物質","非電解質","ひでんかいしつ",""],
+ ["原子が電気を帯びたもの","イオン","",""],
+ ["電子を失って正の電気を帯びたイオン","陽イオン","ようイオン",""],
+ ["電子を受け取って負の電気を帯びたイオン","陰イオン","いんイオン",""],
+ ["水にとけて水素イオンを生じる物質","酸","さん",""],
+ ["水にとけて水酸化物イオンを生じる物質","アルカリ","",""],
+ ["酸とアルカリがたがいの性質を打ち消し合う反応","中和","ちゅうわ",""],
+ ["中和で水とともにできる物質","塩","えん",""],
+ ["酸性やアルカリ性の強さを表す数値","pH","ph","7が中性"],
+ ["青色リトマス紙を赤色に変える性質","酸性","さんせい",""],
+ ["赤色リトマス紙を青色に変える性質","アルカリ性","アルカリせい",""],
+ ["電流を流して物質を分解すること","電気分解","でんきぶんかい",""],
+ ["化学変化を利用して電気エネルギーを取り出す装置","電池","でんち",""],
+ ["水素と酸素を反応させて電気を取り出す電池","燃料電池","ねんりょうでんち",""],
+ ["原子核のまわりにある負の電気をもつ粒子","電子","でんし",""],
+ ["原子核をつくる正の電気をもつ粒子","陽子","ようし",""],
+ ["物質が温度によって固体と液体と気体に変わること","状態変化","じょうたいへんか",""]
+ ]},
+ seibutsu:{name:"理科 生物",items:[
+ ["おしべの先にあり花粉がつくられる部分","やく","",""],
+ ["花粉がめしべの柱頭につくこと","受粉","じゅふん",""],
+ ["胚珠が子房の中にある植物","被子植物","ひししょくぶつ",""],
+ ["胚珠がむき出しになっている植物","裸子植物","らししょくぶつ",""],
+ ["子葉が2枚である植物のなかま","双子葉類","そうしよるい",""],
+ ["葉に見られる水や養分の通り道","葉脈","ようみゃく",""],
+ ["根から吸い上げた水が通る管","道管","どうかん",""],
+ ["葉でつくられた養分が通る管","師管","しかん",""],
+ ["道管と師管が集まって束になった部分","維管束","いかんそく",""],
+ ["植物が光を受けて養分をつくるはたらき","光合成","こうごうせい",""],
+ ["光合成が行われる細胞の中の緑色の粒","葉緑体","ようりょくたい",""],
+ ["葉の表面にある気体の出入り口","気孔","きこう",""],
+ ["植物の体から水が水蒸気となって出ていくこと","蒸散","じょうさん",""],
+ ["背骨をもつ動物のなかま","セキツイ動物","セキツイどうぶつ",""],
+ ["背骨をもたない動物のなかま","無セキツイ動物","むセキツイどうぶつ",""],
+ ["体が外骨格でおおわれ節がある動物","節足動物","せっそくどうぶつ",""],
+ ["内臓が外とう膜に包まれている動物","軟体動物","なんたいどうぶつ",""],
+ ["まわりの温度が変わっても体温がほぼ一定の動物","恒温動物","こうおんどうぶつ",""],
+ ["生物の体をつくっている最小の単位","細胞","さいぼう",""],
+ ["細胞の中にあり染色液でよく染まるつくり","核","かく",""],
+ ["植物の細胞だけにある細胞のまわりのじょうぶなつくり","細胞壁","さいぼうへき",""],
+ ["デンプンを分解するだ液にふくまれる消化酵素","アミラーゼ","",""],
+ ["タンパク質が消化されてできる物質","アミノ酸","アミノさん",""],
+ ["小腸の壁にあり養分を吸収する小さな突起","柔毛","じゅうもう",""],
+ ["肺の中で気体の交換を行う小さな袋","肺胞","はいほう",""],
+ ["赤血球にふくまれ酸素を運ぶ物質","ヘモグロビン","",""],
+ ["全身から心臓へもどる血液が流れる血管","静脈","じょうみゃく",""],
+ ["心臓から送り出される血液が流れる血管","動脈","どうみゃく",""],
+ ["アンモニアを尿素に変える器官","肝臓","かんぞう",""],
+ ["血液から尿素をこしとる器官","じん臓","じんぞう",""],
+ ["光や音などの刺激を受け取る器官","感覚器官","かんかくきかん",""],
+ ["意識とは関係なく起こる反応","反射","はんしゃ",""],
+ ["細胞分裂のときに見られるひも状のもの","染色体","せんしょくたい",""],
+ ["雌雄の生殖細胞が結びついて子をつくる生殖","有性生殖","ゆうせいせいしょく",""],
+ ["体細胞が分かれるだけでふえる生殖","無性生殖","むせいせいしょく",""],
+ ["受精卵が細胞分裂をくり返して成長していく過程","発生","はっせい",""],
+ ["生殖細胞ができるときに行われる特別な細胞分裂","減数分裂","げんすうぶんれつ",""],
+ ["親の形質を子に伝えるもとになるもの","遺伝子","いでんし",""],
+ ["対立形質のうち子に現れるほうの形質","顕性形質","けんせいけいしつ","優性形質ともいう"],
+ ["生物どうしの食べる食べられるというつながり","食物連鎖","しょくもつれんさ",""],
+ ["有機物を無機物に分解するはたらきをもつ生物","分解者","ぶんかいしゃ",""],
+ ["光合成で自ら養分をつくり出す生物","生産者","せいさんしゃ",""]
+ ]},
+ chigaku:{name:"理科 地学",items:[
+ ["マグマが地表に流れ出たもの","溶岩","ようがん",""],
+ ["マグマが地下深くでゆっくり冷えてできた岩石","深成岩","しんせいがん",""],
+ ["マグマが地表近くで急に冷えてできた岩石","火山岩","かざんがん",""],
+ ["深成岩に見られる大きな結晶がそろったつくり","等粒状組織","とうりゅうじょうそしき",""],
+ ["火山岩に見られる細かい粒の中に結晶があるつくり","斑状組織","はんじょうそしき",""],
+ ["地震が発生した地下の場所","震源","しんげん",""],
+ ["震源の真上にあたる地表の点","震央","しんおう",""],
+ ["地震ではじめに伝わる小さなゆれ","初期微動","しょきびどう",""],
+ ["地震であとから伝わる大きなゆれ","主要動","しゅようどう",""],
+ ["地震のゆれの大きさを表す階級","震度","しんど","0から7まで"],
+ ["地震の規模の大きさを表す値","マグニチュード","",""],
+ ["海のプレートが沈みこむ細長いくぼみ","海溝","かいこう",""],
+ ["流れる水が土砂を運ぶはたらき","運搬","うんぱん",""],
+ ["地層ができた当時の環境を示す化石","示相化石","しそうかせき",""],
+ ["地層ができた年代を示す化石","示準化石","しじゅんかせき",""],
+ ["火山灰が押し固められてできた岩石","凝灰岩","ぎょうかいがん",""],
+ ["うすい塩酸をかけると二酸化炭素が出る岩石","石灰岩","せっかいがん",""],
+ ["地層に力が加わってできたずれ","断層","だんそう",""],
+ ["地層が波打つように曲がったもの","しゅう曲","しゅうきょく",""],
+ ["空気中の水蒸気が水滴に変わり始める温度","露点","ろてん",""],
+ ["空気のしめりぐあいを百分率で表したもの","湿度","しつど",""],
+ ["あたたかい空気が冷たい空気の上にはい上がる前線","温暖前線","おんだんぜんせん",""],
+ ["冷たい空気があたたかい空気をおし上げる前線","寒冷前線","かんれいぜんせん",""],
+ ["中心に向かって風がふきこむ気圧の低いところ","低気圧","ていきあつ",""],
+ ["日本の夏にはり出すあたたかくしめった気団","小笠原気団","おがさわらきだん",""],
+ ["日本の冬に発達する冷たくかわいた気団","シベリア気団","シベリアきだん",""],
+ ["6月ごろに日本付近にできる停滞前線","梅雨前線","ばいうぜんせん",""],
+ ["地球が地軸を中心に1日1回転する運動","自転","じてん",""],
+ ["地球が太陽のまわりを1年かけて回る運動","公転","こうてん",""],
+ ["天体が真南を通り高度が最も高くなること","南中","なんちゅう",""],
+ ["星座の中を1年かけて動いて見える太陽の通り道","黄道","こうどう",""],
+ ["太陽のまわりを回る8つの天体","惑星","わくせい",""],
+ ["太陽の表面に見える黒い部分","黒点","こくてん","まわりより温度が低い"],
+ ["太陽をふくむ恒星の大集団","銀河系","ぎんがけい",""],
+ ["月が太陽をかくす現象","日食","にっしょく",""],
+ ["月が地球の影に入る現象","月食","げっしょく",""],
+ ["地球の地軸が傾いたまま公転することで生じるもの","季節","きせつ",""],
+ ["地球の自転によって天体が動いて見えること","日周運動","にっしゅううんどう",""],
+ ["地球の公転によって星座が少しずつ動いて見えること","年周運動","ねんしゅううんどう",""],
+ ["太陽のように自ら光を出す天体","恒星","こうせい",""],
+ ["夕方に西の空に見える金星","よいの明星","よいのみょうじょう",""]
+ ]}
+};
+
 /* =========================================================
    2. ローマ字入力エンジン
 ========================================================= */
@@ -1693,7 +2104,11 @@ const KANA = {
 };
 const VOWELS = "aiueo";
 
+function toHira(s){
+  return String(s).replace(/[\u30a1-\u30f6]/g, c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+}
 function tokenize(yomi){
+  yomi=toHira(yomi);
   const raw=[];
   for(let i=0;i<yomi.length;){
     const two=yomi.slice(i,i+2);
@@ -1726,13 +2141,13 @@ function tokenize(yomi){
    3. じょうたい
 ========================================================= */
 const S={
-  grade:2, mode:"kanji", diff:"easy", count:10, countPref:10, queue:[], qi:0, cur:null,
-  units:[], ui:0, buf:"", typed:"",
+  grade:2, mode:"kanji", diff:"easy", learn:false, count:10, countPref:10, qTotal:0, hinted:{}, queue:[], qi:0, cur:null,
+  units:[], ui:0, buf:"", typed:"", ansStr:"",
   startedAt:0, keysOK:0, keysNG:0, missMap:{}, results:[],
   running:false, locked:false
 };
 const $=id=>document.getElementById(id);
-const bestStore={};
+let bestStore={};
 
 /* ---- 英語の読み上げ ---- */
 let voiceEn=null;
@@ -1826,8 +2241,8 @@ const TXT={
  note_kanji:["小1〜中3と漢検2級。読みをローマ字で打ちます。","小1〜中3と かんけん2きゅう。読みを ローマ字で うちます。"],
  note_en:["小3〜中3とCEFR A1〜B2。日本語を見てつづりを打ちます。","小3〜中3と CEFR A1〜B2。日本語を 見て つづりを うちます。"],
  note_mix:["漢字と英単語が混ざって出ます。","かん字と えい単語が まざって 出ます。"],
- note_review:["まちがえた語・パスした語・時間切れの語だけを出します。","まちがえた ことば・パスした ことば・時間ぎれの ことばだけ 出ます。"],
- review_now:["　いまは{n}語あります。","　いまは {n}こ あります。"],
+ note_review:["まちがえた語と、前に覚えてから日がたった語を出します。正解を重ねた語ほど、次に出るまでの間隔が延びます。","まちがえた ことばと、まえに おぼえてから 日が たった ことばを 出します。せいかいを かさねた ことばほど、つぎに 出るまでが 長く なります。"],
+ review_now:["　いまは{n}語（うち今日が期日の語 {d}語）。","　いまは {n}こ（きょうが じゅんばんの ことば {d}こ）。"],
  review_none:["まちがえた語がまだありません。ほかのモードで何回か練習してから開いてください。","まちがえた ことばが まだ ありません。ほかの モードで なんかい か れんしゅう してから ひらいてください。"],
  dnote_easy:["答え・打つ文字・キーボードを全部見せます。英単語は出たときに読み上げます。","答え・うつ文字・キーボードを ぜんぶ 見せます。えい単語は 出たときに 読み上げます。"],
  dnote_normal:["キーボードだけ見せます。英単語は出たときに読み上げます。","キーボードだけ 見せます。えい単語は 出たときに 読み上げます。"],
@@ -1847,7 +2262,52 @@ const TXT={
  w_top:["上位100語を表示しています。","上から 100こを 出しています。"],
  c_quit:["途中でやめますか？　記録は残りません。","とちゅうで やめますか？　きろくは のこりません。"],
  c_clear:["記録を全部消しますか？　もとに戻せません。","きろくを ぜんぶ 消しますか？　もとに もどせません。"],
- w_miss:["ミス","ミス"]
+ w_miss:["ミス","ミス"],
+ lbl_user:["いまのユーザー","いまの ユーザー"],
+ btn_users:["切り替え","きりかえ"],
+ h_user:["ユーザー","ユーザー"],
+ btn_adduser:["追加","ふやす"],
+ ph_user:["名前","なまえ"],
+ btn_select:["これにする","これにする"],
+ btn_rename:["名前","なまえ"],
+ btn_deluser:["消す","消す"],
+ users_note:["ユーザーはこの端末のブラウザに保存されます。記録はユーザーごとに分かれます。","ユーザーは この きかいの ブラウザに ほぞんされます。きろくは ユーザーごとに 分かれます。"],
+ c_deluser:["{n}の記録を全部消しますか？　もとに戻せません。","{n}の きろくを ぜんぶ 消しますか？　もとに もどせません。"],
+ q_rename:["新しい名前","あたらしい なまえ"],
+ tab_rank:["ランキング","ランキング"],
+ rank_streak:["連続勉強日数","れんぞく べんきょう日すう"],
+ rank_total:["累計回答数","ぜんぶで こたえた かず"],
+ u_days:["日","日"],
+ u_times:["回","かい"],
+ r_none:["ユーザーがいません","ユーザーが いません"],
+ h_learn:["学び方","まなびかた"],
+ learn_off:["ふつう","ふつう"],
+ learn_on:["学ぶ（2回打ち）","まなぶ（2かい うつ）"],
+ lnote_off:["1つの問題を1回打ちます。難しさの設定がそのまま効きます。","1つの もんだいを 1かい うちます。むずかしさの せっていが そのまま きいてきます。"],
+ lnote_on:["同じ問題を2回続けて出します。1回目は答えを見ながら、2回目は答えを隠して思い出して打ちます。難しさの設定は使いません。","おなじ もんだいを 2かい つづけて 出します。1かいめは 答えを 見ながら、2かいめは 答えを かくして 思い出して うちます。むずかしさの せっていは つかいません。"],
+ ph_see:["① 見て打つ","① 見て うつ"],
+ ph_recall:["② 思い出して打つ","② 思い出して うつ"],
+ btn_hint:["もう一度見る","もう一かい 見る"],
+ m_hint:["ヒント","ヒント"],
+ due_today:["今日","きょう"],
+ due_late:["{n}日すぎ","{n}日 すぎ"],
+ due_in:["あと{n}日","あと{n}日"],
+ due_none:["未設定","まだ"],
+ btn_import:["問題を取り込む","もんだいを とりこむ"],
+ h_import:["問題の取り込み","もんだいの とりこみ"],
+ h_sets:["取り込んだ問題","とりこんだ もんだい"],
+ btn_saveset:["読み込む","よみこむ"],
+ ph_setname:["問題の名前（例：理科 4年）","もんだいの なまえ"],
+ ph_setdata:["1行に1問。「問題,答え,読み,補足」","1ぎょうに 1もん。「もんだい,こたえ,よみ,ほそく」"],
+ import_note:["1行に1問。カンマかタブで区切り、順に 問題／答え／読み／補足。読みと補足は省略できます。答えに漢字を使うときは3列目に読みを書いてください。打つのは読み、画面に出るのは答えです。ひらがな・カタカナ・英字・数字が打てます。","1ぎょうに 1もん。「もんだい,こたえ,よみ,ほそく」の じゅんに 書きます。よみと ほそくは なくても だいじょうぶ。"],
+ im_ok:["{n}問を取り込みました。","{n}もん とりこみました。"],
+ im_err:["{n}行は取り込めませんでした（{l}行目）。","{n}ぎょうは とりこめませんでした（{l}ぎょうめ）。"],
+ im_none:["取り込める行がありませんでした。","とりこめる ぎょうが ありませんでした。"],
+ im_noname:["名前を入れてください。","なまえを 入れてください。"],
+ c_delset:["{n}を消しますか？","{n}を 消しますか？"],
+ h_custom:["自分の問題","じぶんの もんだい"],
+ h_subject:["教科の問題","きょうかの もんだい"],
+ u_items:["問","もん"]
 };
 function kanaUI(){ return S.mode!=="review" && (S.grade===1||S.grade===2); }
 function T(k,vars){
@@ -1860,9 +2320,13 @@ function applyTexts(){
   document.querySelectorAll("[data-t]").forEach(e=>{ e.textContent=T(e.dataset.t); });
   document.querySelectorAll("#modes [data-mv]").forEach(b=>{ b.textContent=T("mode_"+b.dataset.mv); });
   document.querySelectorAll("#counts [data-n]").forEach(b=>{ b.textContent=b.dataset.n+T("ken"); });
+  document.querySelectorAll("#learns [data-lv]").forEach(b=>{ b.textContent=T(b.dataset.lv); });
+  $("learnNote").textContent=T(S.learn?"lnote_on":"lnote_off");
+  $("diffSheet").style.opacity=S.learn?".45":"";
+  const nu=$("newUserName"); if(nu) nu.placeholder=T("ph_user");
   $("diffNote").textContent=T("dnote_"+S.diff);
   $("modeNote").textContent = S.mode==="review"
-    ? T("note_review")+T("review_now",{n:reviewPool().length})
+    ? T("note_review")+T("review_now",{n:reviewPool().length,d:dueCount()})
     : T("note_"+S.mode);
 }
 
@@ -1875,7 +2339,16 @@ const DIFFS=[
   ["ultra","ウルトラ",  {ans:0,guide:0,kb:0,limit:3,say:"done"}, "おたすけなし。1語 3びょう いないに 打ちます。"]
 ];
 function D(){ return (DIFFS.find(d=>d[0]===S.diff)||DIFFS[0])[2]; }
-function diffLabel(){ return (DIFFS.find(d=>d[0]===S.diff)||DIFFS[0])[1]; }
+/* 学ぶモードでは難易度より段階の設定が優先される */
+const LEARN_VIEW={
+  1:{ans:1,guide:1,kb:1,limit:0,say:"ask"},
+  2:{ans:0,guide:0,kb:1,limit:0,say:"done"}
+};
+function V(){
+  if(S.learn && S.cur && S.cur.phase) return LEARN_VIEW[S.cur.phase];
+  return D();
+}
+function diffLabel(){ return S.learn ? T("learn_on") : (DIFFS.find(d=>d[0]===S.diff)||DIFFS[0])[1]; }
 
 /* まちがえた語の見つけ方：履歴から引き当てる */
 let WORD_INDEX=null;
@@ -1883,21 +2356,46 @@ function buildWordIndex(){
   WORD_INDEX={};
   for(const g in WORDS) WORDS[g].forEach(a=>WORD_INDEX["k:"+a[0]]={t:"k",w:a[0],y:a[1],m:a[2]});
   for(const g in EN_WORDS) EN_WORDS[g].forEach(a=>WORD_INDEX["e:"+a[0]]={t:"e",w:a[0],y:a[1],m:a[2]});
+  const addSet=(key,st)=>st.items.forEach(a=>{
+    const disp=a[1], y=a[2]||a[1], m=a[3]||"";
+    WORD_INDEX["x:"+key+":"+a[0]]={t:"c",sid:key,w:a[0],disp:disp,y:y,m:m,direct:isDirectAns(y)};
+  });
+  for(const k in BUILTIN_SETS) addSet("b:"+k,BUILTIN_SETS[k]);
+  for(const id in DB.sets) addSet("c:"+id,DB.sets[id]);
 }
-function weakScore(v){ return (v.ng||0)+2*(v.p||0)+2*(v.to||0); }
+function wordKeyOf(o){ return o.t==="c" ? ("x:"+o.sid+":"+o.w) : (o.t==="e"?"e:":"k:")+o.w; }
+function weakScore(v){ return (v.ng||0)+2*(v.p||0)+2*(v.to||0)+2*(v.h||0); }
 function reviewPool(){
   if(!WORD_INDEX) buildWordIndex();
   return Object.entries(hist.words)
-    .filter(([k,v])=>weakScore(v)>0&&WORD_INDEX[k])
-    .sort((a,b)=>weakScore(b[1])-weakScore(a[1]))
-    .map(([k])=>WORD_INDEX[k]);
+    .filter(([k,v])=>WORD_INDEX[k] && (overdue(v)>=0 || weakScore(v)>0))
+    .map(([k,v])=>({k,v,o:overdue(v),w:weakScore(v)}))
+    .sort((a,b)=>(b.o-a.o)||(b.w-a.w))
+    .map(x=>WORD_INDEX[x.k]);
+}
+function dueCount(){
+  return Object.entries(hist.words).filter(([k,v])=>{
+    if(!WORD_INDEX) buildWordIndex();
+    return WORD_INDEX[k] && overdue(v)>=0;
+  }).length;
 }
 function kCount(g){return (WORDS[g]||[]).length;}
 function enCount(g){return (EN_WORDS[g]||[]).length;}
 function poolSize(g,m){
+  if(isCustom(g)){ const st=setOf(g); return st?st.items.length:0; }
   if(m==="kanji") return kCount(g);
   if(m==="en") return enCount(g);
   return kCount(g)+enCount(g);
+}
+/* 答えが英数字だけなら、そのまま打つ。それ以外はひらがな→ローマ字で打つ */
+function isDirectAns(y){ return /^[A-Za-z0-9\-. ]+$/.test(y); }
+function customItems(g){
+  const st=setOf(g); if(!st) return [];
+  const id=String(g);
+  return st.items.map(a=>{
+    const disp=a[1], y=a[2]||a[1], m=a[3]||"";
+    return {t:"c",sid:id,w:a[0],disp:disp,y:y,m:m,direct:isDirectAns(y)};
+  });
 }
 function gradeEnabled(g){ return S.mode!=="review" && poolSize(g,S.mode)>0; }
 
@@ -1912,22 +2410,35 @@ function buildStart(){
       [...md.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
       applyTexts();
       if(S.mode!=="review" && !gradeEnabled(S.grade)){
-        S.grade=BASIC_GRADES.concat(ADV_GRADES).find(gradeEnabled)||1;
+        S.grade=BASIC_GRADES.concat(ADV_GRADES).concat(BUILTIN_GRADES).concat(customGrades()).find(gradeEnabled)||1;
       }
       refreshGrades();
     };
     md.appendChild(b);
   });
 
-  [["grades",BASIC_GRADES,""],["grades2",ADV_GRADES," adv"]].forEach(([id,list,cls])=>{
+  [["grades",BASIC_GRADES,""],["grades2",ADV_GRADES," adv"],
+   ["grades4",BUILTIN_GRADES," adv"],["grades3",customGrades()," adv"]].forEach(([id,list,cls])=>{
     const g=$(id);g.innerHTML="";
     list.forEach(i=>{
       const b=document.createElement("button");
       b.className="grade"+cls;b.type="button";b.dataset.g=i;
-      b.innerHTML=`<b>${GRADE_LABEL[i]}</b><small></small>`;
+      b.innerHTML=`<b>${esc(gradeLabel(i))}</b><small></small>`;
       b.onclick=()=>{ S.grade=i; refreshGrades(); };
       g.appendChild(b);
     });
+  });
+
+  const ln=$("learns");ln.innerHTML="";
+  [[false,"learn_off"],[true,"learn_on"]].forEach(([v,key])=>{
+    const b=document.createElement("button");b.type="button";b.dataset.lv=key;
+    b.textContent=T(key);b.setAttribute("aria-pressed",v===S.learn);
+    b.onclick=()=>{
+      S.learn=v;
+      [...ln.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+      applyTexts(); showBest();
+    };
+    ln.appendChild(b);
   });
 
   const df=$("diffs");df.innerHTML="";
@@ -1954,30 +2465,82 @@ function buildStart(){
 }
 
 function refreshGrades(){
-  document.querySelectorAll("#grades [data-g], #grades2 [data-g]").forEach(b=>{
-    const i=+b.dataset.g;
+  $("customLabel").classList.toggle("hidden", customGrades().length===0);
+  document.querySelectorAll("#grades [data-g], #grades2 [data-g], #grades3 [data-g], #grades4 [data-g]").forEach(b=>{
+    const i = isCustom(b.dataset.g) ? b.dataset.g : +b.dataset.g;
     const ok=gradeEnabled(i);
     b.disabled=!ok;
     b.setAttribute("aria-pressed", ok&&i===S.grade);
-    b.querySelector("small").textContent = ok ? poolSize(i,S.mode)+"語" : "—";
+    b.querySelector("small").textContent = ok ? poolSize(i,S.mode)+(isCustom(i)?T("u_items"):"語") : "—";
   });
   applyTexts();
   showBest();
 }
 
-async function loadBest(){
+/* ---- ユーザーごとの保存 ---- */
+const DB={active:null, users:{}, sets:{}};
+function U(){ return DB.users[DB.active]; }
+function newId(){ return "u"+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function blankUser(name){
+  return {name:name,best:{},hist:{sessions:[],words:{}},streak:{n:0,last:""},total:0,created:Date.now()};
+}
+async function saveDB(){
+  try{ await window.storage.set("kanji-typing:users",JSON.stringify(DB)); }catch(e){}
+}
+async function loadDB(){
   try{
-    const r=await window.storage.get("kanji-typing:best");
-    if(r&&r.value) Object.assign(bestStore,JSON.parse(r.value));
+    const r=await window.storage.get("kanji-typing:users");
+    if(r&&r.value){ const o=JSON.parse(r.value); DB.active=o.active||null; DB.users=o.users||{}; DB.sets=o.sets||{}; }
   }catch(e){}
-  showBest();
+  if(!DB.active || !DB.users[DB.active]){
+    const ids=Object.keys(DB.users);
+    if(ids.length){ DB.active=ids[0]; }
+    else{
+      /* 以前の保存データがあれば最初のユーザーに引き継ぐ */
+      const u=blankUser("ユーザー1");
+      try{ const a=await window.storage.get("kanji-typing:best"); if(a&&a.value) u.best=JSON.parse(a.value)||{}; }catch(e){}
+      try{
+        const b=await window.storage.get("kanji-typing:hist");
+        if(b&&b.value){ const o=JSON.parse(b.value); u.hist={sessions:o.sessions||[],words:o.words||{}}; }
+      }catch(e){}
+      u.total=(u.hist.sessions||[]).reduce((a,v)=>a+(v.n||0),0);
+      const id=newId(); DB.users[id]=u; DB.active=id;
+      await saveDB();
+    }
+  }
+  bindUser();
 }
-async function saveBest(){
-  try{ await window.storage.set("kanji-typing:best",JSON.stringify(bestStore)); }catch(e){}
+function bindUser(){
+  const u=U(); if(!u) return;
+  if(!u.streak) u.streak={n:0,last:""};
+  if(typeof u.total!=="number") u.total=0;
+  bestStore=u.best; hist.sessions=u.hist.sessions; hist.words=u.hist.words;
+  hist.ref=u.hist;
 }
-function bestKey(){return S.mode==="review" ? "review::"+S.diff : S.mode+":"+S.grade+":"+S.diff;}
+function saveBest(){ saveDB(); }
+function bestKey(){const d=S.learn?"learn":S.diff; return S.mode==="review" ? "review::"+d : S.mode+":"+S.grade+":"+d;}
 function modeLabel(){return (MODES.find(m=>m[0]===S.mode)||["","" ])[1];}
-function levelLabel(){return S.mode==="review" ? "復習" : (GRADE_LABEL[S.grade]||"");}
+function isCustom(g){
+  const k=String(g);
+  return typeof g==="string" && (k.slice(0,2)==="c:" || k.slice(0,2)==="b:");
+}
+function setOf(g){
+  const k=String(g);
+  if(k.slice(0,2)==="b:") return BUILTIN_SETS[k.slice(2)];
+  if(k.slice(0,2)==="c:") return DB.sets[k.slice(2)];
+  return null;
+}
+const BUILTIN_GRADES=Object.keys(BUILTIN_SETS).map(k=>"b:"+k);
+function gradeLabel(g){
+  if(isCustom(g)){ const st=setOf(g); return st?st.name:"?"; }
+  return GRADE_LABEL[g]||"";
+}
+function customGrades(){
+  return Object.keys(DB.sets)
+    .sort((a,b)=>(DB.sets[a].created||0)-(DB.sets[b].created||0))
+    .map(id=>"c:"+id);
+}
+function levelLabel(){return S.mode==="review" ? "復習" : gradeLabel(S.grade);}
 function showBest(){
   const b=bestStore[bestKey()];
   $("bestLine").textContent = b ? `${levelLabel()}・${modeLabel()}・${diffLabel()}${T("best_of")}${b.speed} ${T("u_speed")}（${T("u_acc")} ${b.acc}%）` : "";
@@ -1986,7 +2549,8 @@ function showBest(){
 /* =========================================================
    5. キーボード
 ========================================================= */
-const ROWS=[["q","w","e","r","t","y","u","i","o","p","-"],
+const ROWS=[["1","2","3","4","5","6","7","8","9","0"],
+            ["q","w","e","r","t","y","u","i","o","p","-"],
             ["a","s","d","f","g","h","j","k","l"],
             ["z","x","c","v","b","n","m"],
             [" "]];
@@ -1998,6 +2562,7 @@ function buildKb(){
     r.forEach(k=>{
       const e=document.createElement("div");
       if(k===" "){ e.className="key space"; e.textContent="space"; }
+      else if(/[0-9]/.test(k)){ e.className="key num"; e.textContent=k; }
       else { e.className="key "+(LEFT.has(k)?"left":"right")+((k==="f"||k==="j")?" home":""); e.textContent=k; }
       e.dataset.k=k;d.appendChild(e);
     });
@@ -2019,9 +2584,10 @@ function stopLimit(){
   if(limitTimer){clearInterval(limitTimer);limitTimer=null;}
   $("limitWrap").classList.add("hidden");
 }
+let limitSec=0;
 function startLimit(){
   if(limitTimer){clearInterval(limitTimer);limitTimer=null;}
-  const sec=D().limit;
+  const sec=V().limit; limitSec=sec;
   if(!sec){ $("limitWrap").classList.add("hidden"); return; }
   $("limitWrap").classList.remove("hidden");
   limitEnd=Date.now()+sec*1000;
@@ -2029,7 +2595,7 @@ function startLimit(){
   limitTimer=setInterval(tickLimit,80);
 }
 function tickLimit(){
-  const total=D().limit*1000;
+  const total=limitSec*1000;
   const left=limitEnd-Date.now();
   const r=Math.max(0,Math.min(1,left/total));
   $("limitFill").style.width=(r*100).toFixed(1)+"%";
@@ -2046,13 +2612,14 @@ function timeoutWord(){
   beep(200,.18,"square");
   const card=$("card");card.classList.remove("shake");void card.offsetWidth;card.classList.add("shake");
   S.qi++;
-  setTimeout(()=>{ if(S.qi>=S.count) finish(); else loadWord(); },420);
+  setTimeout(()=>{ if(S.qi>=S.qTotal) finish(); else loadWord(); },420);
 }
 
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 function buildPool(){
   if(S.mode==="review") return reviewPool();
+  if(isCustom(S.grade)) return customItems(S.grade);
   const k=(WORDS[S.grade]||[]).map(a=>({t:"k",w:a[0],y:a[1],m:a[2]}));
   const e=(EN_WORDS[S.grade]||[]).map(a=>({t:"e",w:a[0],y:a[1],m:a[2]}));
   if(S.mode==="kanji") return k;
@@ -2066,22 +2633,26 @@ function startGame(){
     return;
   }
   S.count=S.countPref;
+  let words;
   if(S.mode==="review"){
-    // 苦手な順に上位を取り出してから、出る順番をまぜる
-    S.queue=shuffle(pool.slice(0,S.count));
+    words=shuffle(pool.slice(0,S.count));
   }else{
     shuffle(pool);
-    S.queue=[];
-    while(S.queue.length<S.count){ S.queue=S.queue.concat(pool); }
-    S.queue=S.queue.slice(0,S.count);
+    words=[];
+    while(words.length<S.count){ words=words.concat(pool); }
+    words=words.slice(0,S.count);
   }
-  S.count=S.queue.length;
-  S.qi=0;S.keysOK=0;S.keysNG=0;S.missMap={};S.results=[];S.startedAt=0;S.running=true;S.locked=false;
+  S.count=words.length;
+  words.forEach((w,i)=>{ w.no=i+1; });
+  /* 学ぶモードは 1語につき「見て打つ」→「思い出して打つ」の2回 */
+  S.queue = S.learn
+    ? words.flatMap(w=>[Object.assign({},w,{phase:1}),Object.assign({},w,{phase:2})])
+    : words;
+  S.qTotal=S.queue.length;
+  S.qi=0;S.keysOK=0;S.keysNG=0;S.missMap={};S.results=[];S.startedAt=0;S.running=true;S.locked=false;S.hinted={};
   $("scr-start").classList.add("hidden");
   $("scr-result").classList.add("hidden");
   $("scr-play").classList.remove("hidden");
-  $("rGuide").classList.toggle("off",!D().guide);
-  $("kb").classList.toggle("off",!D().kb);
   focusCatcher();
   loadWord();
 }
@@ -2089,12 +2660,38 @@ function startGame(){
 function loadWord(){
   const it=S.queue[S.qi];
   S.cur=it;S.ui=0;S.buf="";S.typed="";S.locked=false;
-  S.results.push({t:it.t,w:it.w,y:it.y,m:it.m,miss:0});
-  $("qCount").textContent=`${S.qi+1} / ${S.count}`;
+  const hk=wordKeyOf(it);
+  S.results.push({t:it.t,sid:it.sid,w:it.w,y:it.y,m:it.m,miss:0,phase:it.phase||0,hinted:!!S.hinted[hk]});
+  $("qCount").textContent = S.learn
+    ? `${it.no||1} / ${S.count}`
+    : `${S.qi+1} / ${S.count}`;
   $("imi").textContent = it.t==="e" ? "" : it.m;
+  const view=V();
+  $("rGuide").classList.toggle("off",!view.guide);
+  $("kb").classList.toggle("off",!view.kb);
+  const pb=$("phaseBadge");
+  pb.classList.toggle("hidden",!(S.learn&&it.phase));
+  pb.classList.toggle("recall",it.phase===2);
+  pb.textContent = it.phase===2 ? T("ph_recall") : T("ph_see");
+  $("btnHint").classList.toggle("hidden", !(S.learn && it.phase===2));
   const yo=$("yomi"), bx=$("boxes");
   bx.innerHTML="";
-  if(it.t==="e"){
+  if(it.t==="c"){
+    S.ansStr=it.y;
+    S.units = it.direct
+      ? [...it.y.toLowerCase()].map(ch=>({kana:ch,cands:[ch]}))
+      : tokenize(it.y);
+    yo.classList.add("prompt");yo.classList.remove("off");
+    yo.textContent=it.w;
+    const cjk=/[\u4e00-\u9fff]/.test(it.disp||it.y);
+    [...(it.disp||it.y)].forEach(ch=>{
+      const d=document.createElement("div");
+      if(ch===" "){ d.className="box en gap"; }
+      else { d.className=cjk?"box":"box en"; d.textContent=ch; }
+      bx.appendChild(d);
+    });
+  }else if(it.t==="e"){
+    S.ansStr=it.w;
     S.units=[...it.w.toLowerCase()].map(ch=>({kana:ch,cands:[ch]}));
     yo.classList.add("prompt");yo.classList.remove("off");
     yo.textContent=it.y;
@@ -2105,9 +2702,10 @@ function loadWord(){
       bx.appendChild(d);
     });
   }else{
+    S.ansStr="";
     S.units=tokenize(it.y);
     yo.classList.remove("prompt");
-    const a=D().ans;
+    const a=view.ans;
     yo.classList.toggle("off",!a);
     yo.textContent = a==="first"
       ? it.y.slice(0,1)+"○".repeat(Math.max(0,it.y.length-1))
@@ -2119,14 +2717,16 @@ function loadWord(){
   render();
   startLimit();
   const canSpk = !!window.speechSynthesis;
-  $("spkRow").classList.toggle("hidden", !(canSpk && it.t==="e" && D().say==="ask"));
-  if(it.t==="e" && D().say==="ask") speakEn(it.w);
+  $("spkRow").classList.toggle("hidden", !(canSpk && it.t==="e" && view.say==="ask"));
+  if(it.t==="e" && view.say==="ask") speakEn(it.w);
 }
 
 function render(){
   let next="",rest="",p=0;
-  if(S.cur&&S.cur.t==="e"){
-    const w=S.cur.w;
+  const direct = S.cur && (S.cur.t==="e" || (S.cur.t==="c" && S.cur.direct));
+  const boxN = $("boxes").children.length;
+  if(direct){
+    const w=S.ansStr||"";
     next=w.slice(S.ui,S.ui+1);rest=w.slice(S.ui+1);
     p=w.length?S.ui/w.length:0;
   }else{
@@ -2144,19 +2744,21 @@ function render(){
   hintKey(next.toLowerCase());
 
   const boxes=$("boxes").children;
-  if(S.cur&&S.cur.t==="e"){
-    const a=D().ans;
-    [...boxes].forEach((b,i)=>{
-      const reveal = a===1 || (a==="first"&&i===0) || i<S.ui;
-      b.classList.toggle("done",i<S.ui);
-      b.classList.toggle("ghost",!reveal);
-    });
-  }else{
+  if(S.cur&&S.cur.t==="k"){
     const filled=Math.floor(p*boxes.length+1e-9);
     [...boxes].forEach((b,i)=>b.classList.toggle("done",i<filled));
+  }else{
+    const a=V().ans;
+    const sameLen = direct && S.ansStr.length===boxN;
+    const filled = sameLen ? S.ui : Math.floor(p*boxes.length+1e-9);
+    [...boxes].forEach((b,i)=>{
+      const reveal = a===1 || (a==="first"&&i===0) || i<filled;
+      b.classList.toggle("done",i<filled);
+      b.classList.toggle("ghost",!reveal);
+    });
   }
 
-  const done=(S.qi+p)/S.count;
+  const done=(S.qi+p)/(S.qTotal||S.count);
   $("trackFill").style.width=(done*100).toFixed(1)+"%";
   updateLive();
 }
@@ -2173,7 +2775,7 @@ function updateLive(){
 function handleKey(chRaw){
   if(!S.running||S.locked) return false;
   const ch=chRaw.toLowerCase();
-  if(!/^[a-z\- ]$/.test(ch)) return false;
+  if(!/^[a-z0-9\-. ]$/.test(ch)) return false;
   if(!S.startedAt) S.startedAt=Date.now();
   const cur=S.units[S.ui];
   if(!cur) return true;
@@ -2222,14 +2824,33 @@ function wordDone(){
   if(S.locked) return;
   S.locked=true;
   stopLimit();
-  if(S.cur && S.cur.t==="e" && D().say==="done") speakEn(S.cur.w);
-  const h=$("hanko");h.classList.remove("on");void h.offsetWidth;h.classList.add("on");
-  beep(980,.09);setTimeout(()=>beep(1320,.12),90);
+  if(S.cur && S.cur.t==="e" && V().say==="done") speakEn(S.cur.w);
+  const isSecond = !S.learn || (S.cur && S.cur.phase===2);
+  if(isSecond){
+    const h=$("hanko");h.classList.remove("on");void h.offsetWidth;h.classList.add("on");
+    beep(980,.09);setTimeout(()=>beep(1320,.12),90);
+  }else{
+    beep(880,.07);
+  }
   [...$("boxes").children].forEach(b=>{b.classList.add("done");b.classList.remove("ghost");});
   S.qi++;
   setTimeout(()=>{
-    if(S.qi>=S.count) finish(); else loadWord();
+    if(S.qi>=S.qTotal) finish(); else loadWord();
   },620);
+}
+
+function backToSee(){
+  if(!S.running||S.locked) return;
+  const it=S.cur;
+  if(!S.learn||!it||it.phase!==2) return;
+  stopLimit(); stopSpeak(); hintKey(null);
+  S.results.pop();                       /* 途中まで打った分の記録は捨てる */
+  S.hinted[wordKeyOf(it)]=true;
+  S.queue.splice(S.qi,1,
+    Object.assign({},it,{phase:1}),
+    Object.assign({},it,{phase:2}));
+  S.qTotal=S.queue.length;
+  loadWord();
 }
 
 function passWord(){
@@ -2241,7 +2862,7 @@ function passWord(){
   hintKey(null);
   beep(300,.1);
   S.qi++;
-  if(S.qi>=S.count) finish(); else loadWord();
+  if(S.qi>=S.qTotal) finish(); else loadWord();
 }
 
 /* =========================================================
@@ -2257,7 +2878,8 @@ function finish(){
   const acc=tot?Math.round(S.keysOK/tot*100):100;
   $("rSpeed").textContent=spd;
   $("rAcc").textContent=acc+"%";
-  $("rClear").textContent=S.results.filter(r=>r.miss===0&&!r.passed&&!r.timeout).length;
+  const scored=S.results.filter(r=>!S.learn||r.phase===2);
+  $("rClear").textContent=scored.filter(r=>r.miss===0&&!r.passed&&!r.timeout&&!r.hinted).length;
   $("resultTitle").textContent = acc>=95 ? T("t_great") : acc>=85 ? T("t_good") : T("t_ok");
   recordSession(spd,acc,S.results.filter(r=>r.miss===0&&!r.passed&&!r.timeout).length);
 
@@ -2269,12 +2891,12 @@ function finish(){
   }
 
   const ul=$("review");ul.innerHTML="";
-  S.results.forEach(r=>{
+  scored.forEach(r=>{
     const li=document.createElement("li");
     li.innerHTML=`<span class="kw${r.t==="e"?" en":""}">${esc(r.w)}</span>
       <span class="kd"><b>${esc(r.y)}</b><span>${r.t==="e"?"":esc(r.m)}</span></span>
       ${(r.t==="e"&&window.speechSynthesis)?`<button class="spk sm" type="button" data-say="${esc(r.w)}" aria-label="発音を聞く">${SPK_ICON}</button>`:""}
-      <span class="mark ${(r.passed||r.timeout)?"pass":(r.miss===0?"ok":"ng")}">${r.timeout?T("m_timeout"):r.passed?T("m_pass"):(r.miss===0?"◎":"△")}</span>`;
+      <span class="mark ${(r.passed||r.timeout)?"pass":r.hinted?"hint":(r.miss===0?"ok":"ng")}">${r.timeout?T("m_timeout"):r.passed?T("m_pass"):r.hinted?T("m_hint"):(r.miss===0?"◎":"△")}</span>`;
     ul.appendChild(li);
   });
 
@@ -2293,23 +2915,51 @@ function finish(){
 /* =========================================================
    7.5 きろく
 ========================================================= */
-const hist={sessions:[],words:{}};
-async function loadHist(){
-  try{
-    const r=await window.storage.get("kanji-typing:hist");
-    if(r&&r.value){const o=JSON.parse(r.value);hist.sessions=o.sessions||[];hist.words=o.words||{};}
-  }catch(e){}
+const hist={sessions:[],words:{},ref:null};
+function syncHist(){ const u=U(); if(u){ u.hist.sessions=hist.sessions; u.hist.words=hist.words; } }
+function saveHist(){ syncHist(); saveDB(); }
+
+/* ---- 連続勉強日数と累計回答数 ---- */
+/* 間隔をあけた再出題：正解を重ねるほど次に出るまでの日数が延びる */
+const SR_INTERVAL=[1,2,4,7,15];
+function dayNum(d){
+  d=d||new Date();
+  return Math.floor(new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime()/86400000);
 }
-async function saveHist(){
-  try{ await window.storage.set("kanji-typing:hist",JSON.stringify(hist)); }catch(e){}
+function overdue(v){
+  if(v.next==null) return weakScore(v)>0 ? 0 : -1;   /* 予定がない古い記録 */
+  return dayNum()-v.next;
+}
+function dayStr(d){ const z=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()); }
+function today(){ return dayStr(new Date()); }
+function yesterday(){ const d=new Date(); d.setDate(d.getDate()-1); return dayStr(d); }
+function currentStreak(u){
+  if(!u||!u.streak||!u.streak.last) return 0;
+  return (u.streak.last===today()||u.streak.last===yesterday()) ? (u.streak.n||0) : 0;
+}
+function bumpStreak(answers){
+  const u=U(); if(!u) return;
+  const t=today();
+  if(u.streak.last!==t){
+    u.streak.n = (u.streak.last===yesterday()) ? (u.streak.n||0)+1 : 1;
+    u.streak.last=t;
+  }
+  u.total=(u.total||0)+answers;
 }
 function recordSession(spd,acc,clear){
   hist.sessions.unshift({d:Date.now(),g:S.grade,m:S.mode,f:S.diff,n:S.count,s:spd,a:acc,c:clear});
   if(hist.sessions.length>200) hist.sessions.length=200;
-  S.results.forEach(r=>{
-    const k=(r.t==="e"?"e:":"k:")+r.w;
-    const e=hist.words[k]||(hist.words[k]={n:0,ng:0,p:0,to:0,t:r.t,y:r.y,g:S.grade});
+  bumpStreak(S.count);
+  S.results.filter(r=>!S.learn||r.phase===2).forEach(r=>{
+    const k=wordKeyOf(r);
+    const e=hist.words[k]||(hist.words[k]={n:0,ng:0,p:0,to:0,h:0,t:r.t,y:r.y,g:S.grade});
+    if(r.t==="c") e.sid=r.sid;
     e.n++; e.ng+=r.miss; if(r.passed) e.p++; if(r.timeout) e.to=(e.to||0)+1;
+    if(r.hinted) e.h=(e.h||0)+1;
+    const ok = r.miss===0 && !r.passed && !r.timeout && !r.hinted;
+    e.box = ok ? Math.min(SR_INTERVAL.length,(e.box||0)+1) : 1;
+    e.last = dayNum();
+    e.next = e.last + SR_INTERVAL[e.box-1];
     e.y=r.y; e.g=S.grade; e.t=r.t;
   });
   saveHist();
@@ -2327,13 +2977,20 @@ function renderScoreHist(){
   hist.sessions.slice(0,60).forEach(v=>{
     const li=document.createElement("li");
     li.innerHTML=`<span class="when">${fmtDate(v.d)}</span>
-      <span class="tag">${GRADE_LABEL[v.g]||""}・${(MODES.find(m=>m[0]===v.m)||["",""])[1]}${v.f?"・"+((DIFFS.find(d=>d[0]===v.f)||["",""])[1]):""}</span>
+      <span class="tag">${gradeLabel(v.g)}・${(MODES.find(m=>m[0]===v.m)||["",""])[1]}${v.f?"・"+((DIFFS.find(d=>d[0]===v.f)||["",""])[1]):""}</span>
       <span class="num">${v.s} 打/分 ・ ${v.a}% ・ ${v.c}/${v.n}</span>`;
     ul.appendChild(li);
   });
   const t=hist.sessions.length;
   const best=hist.sessions.reduce((a,b)=>b.s>a.s?b:a);
-  $("scoreNote").textContent=T("s_sum",{t:t,s:best.s,g:GRADE_LABEL[best.g]||"",d:fmtDate(best.d)});
+  $("scoreNote").textContent=T("s_sum",{t:t,s:best.s,g:gradeLabel(best.g),d:fmtDate(best.d)});
+}
+function dueLabel(v){
+  if(v.next==null) return "";
+  const o=dayNum()-v.next;
+  if(o===0) return "・"+T("due_today");
+  if(o>0)   return "・"+T("due_late",{n:o});
+  return "・"+T("due_in",{n:-o});
 }
 let wordSortKey="n";
 function renderWordHist(){
@@ -2347,17 +3004,117 @@ function renderWordHist(){
   arr.slice(0,100).forEach(v=>{
     const li=document.createElement("li");
     li.innerHTML=`<span class="hw${v.t==="e"?" en":""}">${esc(v.w)}</span>
-      <span class="hy">${esc(v.y||"")}</span>
+      <span class="hy">${esc(v.y||"")}<span class="due">${dueLabel(v)}</span></span>
       <span class="cnt">${v.n}回${v.ng?` <span class="ngc">${T("w_miss")}${v.ng}</span>`:""}${v.p?` ${T("m_pass")}${v.p}`:""}${v.to?` ${T("m_timeout")}${v.to}`:""}</span>`;
     ul.appendChild(li);
   });
   const total=arr.reduce((a,b)=>a+b.n,0);
   $("wordNote").textContent=T("w_sum",{a:arr.length,t:total})+(arr.length>100?T("w_top"):"");
 }
+/* ---- 問題の取り込み ---- */
+const SAMPLE=[
+ "# 問題,答え,読み,補足   ← 読みと補足は省略できます",
+ "参勤交代を定めた将軍,徳川家光,とくがわいえみつ,江戸幕府3代将軍",
+ "細胞の中でエネルギーをつくる器官,ミトコンドリア",
+ "水の化学式,H2O,h2o",
+ "鎌倉幕府が開かれた年,1192,,いい国つくろう"
+].join("\n");
+function typableAns(y){
+  if(!y) return false;
+  if(/^[A-Za-z0-9\-. ]+$/.test(y)) return true;
+  return [...toHira(y)].every(ch=>/[ぁ-んー0-9 ]/.test(ch));
+}
+/* 1行 = 問題, 答え, 読み（省略可）, 補足（省略可） */
+function parseSet(text){
+  const items=[], errs=[];
+  text.split(/\r?\n/).forEach((line,i)=>{
+    const t=line.trim();
+    if(!t || t.charAt(0)==="#") return;
+    const sep = t.indexOf("\t")>=0 ? "\t" : ",";
+    const c=t.split(sep).map(x=>x.trim());
+    const w=c[0]||"", disp=c[1]||"", yomi=c[2]||"", m=c[3]||"";
+    const y = yomi || disp;                       /* 読みがなければ答えをそのまま打つ */
+    if(!w || !disp || !typableAns(y)){ errs.push(i+1); return; }
+    items.push([w,disp,y,m]);
+  });
+  return {items,errs};
+}
+function renderSetList(){
+  const ul=$("setList"); ul.innerHTML="";
+  const ids=Object.keys(DB.sets).sort((a,b)=>(DB.sets[a].created||0)-(DB.sets[b].created||0));
+  if(!ids.length){ ul.innerHTML=`<li><span class="empty">${T("h_empty")}</span></li>`; return; }
+  ids.forEach(id=>{
+    const st=DB.sets[id];
+    const li=document.createElement("li");
+    li.innerHTML=`<span class="uname">${esc(st.name)}</span>
+      <span class="hy">${st.items.length}${T("u_items")}</span>
+      <span class="ubtns"><button data-sid="${id}">${T("btn_deluser")}</button></span>`;
+    ul.appendChild(li);
+  });
+}
+function openImport(){
+  $("scr-start").classList.add("hidden");
+  $("scr-import").classList.remove("hidden");
+  $("setName").placeholder=T("ph_setname");
+  $("setData").placeholder=T("ph_setdata");
+  $("importSample").textContent=SAMPLE;
+  $("importMsg").textContent="";
+  applyTexts(); renderSetList(); window.scrollTo(0,0);
+}
+
+/* ---- ユーザー ---- */
+function renderUserBar(){
+  const u=U();
+  $("userName").textContent = u ? u.name : "";
+  $("newUserName").placeholder = T("ph_user");
+}
+function renderUserList(){
+  const ul=$("userList"); ul.innerHTML="";
+  Object.entries(DB.users)
+    .sort((a,b)=>(a[1].created||0)-(b[1].created||0))
+    .forEach(([id,u])=>{
+      const li=document.createElement("li");
+      const now=id===DB.active;
+      li.innerHTML=`<span class="uname${now?" now":""}">${esc(u.name)}</span>
+        <span class="hy">${currentStreak(u)}${T("u_days")} ・ ${u.total||0}${T("u_times")}</span>
+        <span class="ubtns">
+          ${now?"":`<button data-act="sel" data-id="${id}">${T("btn_select")}</button>`}
+          <button data-act="ren" data-id="${id}">${T("btn_rename")}</button>
+          ${Object.keys(DB.users).length>1?`<button data-act="del" data-id="${id}">${T("btn_deluser")}</button>`:""}
+        </span>`;
+      ul.appendChild(li);
+    });
+}
+function openUsers(){
+  $("scr-start").classList.add("hidden");
+  $("scr-users").classList.remove("hidden");
+  applyTexts(); renderUserList(); renderUserBar(); window.scrollTo(0,0);
+}
+function rankList(key){
+  return Object.entries(DB.users).map(([id,u])=>({
+    id, name:u.name,
+    v: key==="streak" ? currentStreak(u) : (u.total||0)
+  })).sort((a,b)=>b.v-a.v||a.name.localeCompare(b.name));
+}
+function renderRank(){
+  [["rankStreak","streak",T("u_days")],["rankTotal","total",T("u_times")]].forEach(([elId,key,unit])=>{
+    const ul=$(elId); ul.innerHTML="";
+    const arr=rankList(key);
+    if(!arr.length){ ul.innerHTML=`<li><span class="empty">${T("r_none")}</span></li>`; return; }
+    arr.forEach((v,i)=>{
+      const li=document.createElement("li");
+      li.innerHTML=`<span class="rk${i===0&&v.v>0?" top":""}">${i+1}位</span>
+        <span class="uname${v.id===DB.active?" now":""}">${esc(v.name)}</span>
+        <span class="cnt">${v.v}${unit}</span>`;
+      ul.appendChild(li);
+    });
+  });
+}
+
 function openHist(){
   $("scr-start").classList.add("hidden");
   $("scr-hist").classList.remove("hidden");
-  renderScoreHist();renderWordHist();window.scrollTo(0,0);
+  renderScoreHist();renderWordHist();renderRank();window.scrollTo(0,0);
 }
 
 /* =========================================================
@@ -2389,6 +3146,7 @@ catcher.addEventListener("focus",()=>$("tapHint").classList.add("hidden"));
    9. 画面のつなぎ
 ========================================================= */
 $("btnPass").onclick=function(){ this.blur(); passWord(); };
+$("btnHint").onclick=function(){ this.blur(); backToSee(); };
 $("btnSpeak").innerHTML=SPK_ICON;
 $("btnSpeak").onclick=function(){ this.blur(); if(S.cur&&S.cur.t==="e") speakEn(S.cur.w,true); };
 $("review").addEventListener("click",e=>{
@@ -2406,6 +3164,61 @@ $("btnQuit").onclick=function(){
 $("btnHome").onclick=()=>{$("scr-result").classList.add("hidden");$("scr-start").classList.remove("hidden");window.scrollTo(0,0);};
 
 $("btnHist").onclick=openHist;
+$("btnUsers").onclick=openUsers;
+$("btnImport").onclick=openImport;
+$("btnImportBack").onclick=()=>{
+  $("scr-import").classList.add("hidden");$("scr-start").classList.remove("hidden");
+  WORD_INDEX=null; buildStart(); window.scrollTo(0,0);
+};
+$("btnSaveSet").onclick=()=>{
+  const name=($("setName").value||"").trim();
+  const msg=$("importMsg");
+  if(!name){ msg.textContent=T("im_noname"); return; }
+  const {items,errs}=parseSet($("setData").value||"");
+  if(!items.length){ msg.textContent=T("im_none"); return; }
+  const id="s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  DB.sets[id]={name:name.slice(0,20),items:items,created:Date.now()};
+  saveDB(); WORD_INDEX=null;
+  $("setName").value=""; $("setData").value="";
+  msg.textContent = T("im_ok",{n:items.length})
+    + (errs.length? T("im_err",{n:errs.length,l:errs.slice(0,5).join(",")}) : "");
+  renderSetList();
+};
+$("setList").addEventListener("click",e=>{
+  const b=e.target.closest("[data-sid]"); if(!b) return;
+  const st=DB.sets[b.dataset.sid]; if(!st) return;
+  if(!window.confirm(T("c_delset",{n:st.name}))) return;
+  if(S.grade==="c:"+b.dataset.sid) S.grade=2;
+  delete DB.sets[b.dataset.sid];
+  saveDB(); WORD_INDEX=null; renderSetList();
+});
+$("btnUsersBack").onclick=()=>{
+  $("scr-users").classList.add("hidden");$("scr-start").classList.remove("hidden");
+  renderUserBar();refreshGrades();window.scrollTo(0,0);
+};
+$("btnAddUser").onclick=()=>{
+  const name=($("newUserName").value||"").trim();
+  if(!name) return;
+  const id=newId(); DB.users[id]=blankUser(name); DB.active=id;
+  $("newUserName").value="";
+  bindUser(); saveDB(); renderUserList(); renderUserBar();
+};
+$("userList").addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]"); if(!b) return;
+  const id=b.dataset.id, u=DB.users[id]; if(!u) return;
+  if(b.dataset.act==="sel"){ DB.active=id; bindUser(); }
+  else if(b.dataset.act==="ren"){
+    const nm=window.prompt(T("q_rename"),u.name);
+    if(nm===null) return;
+    const t=nm.trim(); if(t) u.name=t.slice(0,12);
+  }
+  else if(b.dataset.act==="del"){
+    if(!window.confirm(T("c_deluser",{n:u.name}))) return;
+    delete DB.users[id];
+    if(DB.active===id){ DB.active=Object.keys(DB.users)[0]||null; bindUser(); }
+  }
+  saveDB(); renderUserList(); renderUserBar();
+});
 $("btnHistBack").onclick=()=>{$("scr-hist").classList.add("hidden");$("scr-start").classList.remove("hidden");window.scrollTo(0,0);};
 $("btnHistClear").onclick=function(){
   this.blur();
@@ -2415,8 +3228,7 @@ $("btnHistClear").onclick=function(){
 $("histTabs").onclick=e=>{
   const b=e.target.closest("button"); if(!b) return;
   [...$("histTabs").children].forEach(x=>x.setAttribute("aria-pressed",x===b));
-  $("tab-score").classList.toggle("hidden",b.dataset.tab!=="score");
-  $("tab-words").classList.toggle("hidden",b.dataset.tab!=="words");
+  ["score","words","rank"].forEach(t=>$("tab-"+t).classList.toggle("hidden",b.dataset.tab!==t));
 };
 $("wordSort").onclick=e=>{
   const b=e.target.closest("button"); if(!b) return;
@@ -2424,7 +3236,8 @@ $("wordSort").onclick=e=>{
   wordSortKey=b.dataset.sort; renderWordHist();
 };
 
-buildStart();buildKb();applyTexts();loadBest();loadHist().then(refreshGrades);
+buildStart();buildKb();applyTexts();
+loadDB().then(()=>{ renderUserBar(); refreshGrades(); });
 </script>
 </body>
 </html>
