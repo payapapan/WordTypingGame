@@ -1,0 +1,3393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ことばタイピング</title>
+<style>
+:root{
+  --paper:#F1F4EE;
+  --paper-2:#FFFFFF;
+  --ink:#1B2A2C;
+  --ink-soft:#5C6E70;
+  --rule:#C9D4CE;
+  --ai:#2B5FAE;          /* 藍 */
+  --ai-pale:#DCE6F5;
+  --nanohana:#F3C22B;    /* 菜の花 */
+  --midori:#3C8F68;
+  --shu:#CE3F34;         /* 朱 */
+  --mincho:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;
+  --maru:"Hiragino Maru Gothic ProN","Yu Gothic","YuGothic","Noto Sans JP",system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{
+  font-family:var(--maru);
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    repeating-linear-gradient(to right, rgba(43,95,174,.055) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(to bottom, rgba(43,95,174,.055) 0 1px, transparent 1px 34px);
+  -webkit-text-size-adjust:100%;
+}
+#stage{max-width:760px;margin:0 auto;padding:18px 16px 40px;min-height:100%}
+.hidden{display:none !important}
+
+/* --- 見出し --- */
+.masthead{display:flex;align-items:baseline;gap:12px;margin:6px 0 18px}
+.masthead h1{
+  font-family:var(--mincho);font-size:26px;font-weight:600;margin:0;letter-spacing:.12em;
+}
+.masthead p{margin:0;font-size:13px;color:var(--ink-soft)}
+
+/* --- カード --- */
+.sheet{
+  background:var(--paper-2);border:1px solid var(--rule);border-radius:10px;
+  padding:18px 18px 20px;margin-bottom:14px;
+}
+.sheet h2{font-size:15px;margin:0 0 12px;font-weight:700;color:var(--ink)}
+
+/* --- 学年えらび --- */
+.grades{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.grade{
+  appearance:none;border:1.5px solid var(--rule);background:var(--paper-2);
+  border-radius:8px;padding:12px 4px;cursor:pointer;font-family:var(--maru);
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+.grade b{font-family:var(--mincho);font-size:22px;font-weight:600;line-height:1}
+.grade small{font-size:11px;color:var(--ink-soft)}
+.grade[aria-pressed="true"]{border-color:var(--ai);background:var(--ai-pale)}
+.grade[disabled]{opacity:.35;cursor:not-allowed}
+.grade:focus-visible{outline:3px solid var(--nanohana);outline-offset:2px}
+
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{
+  display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--rule);
+  border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer;background:var(--paper-2);
+}
+.opt input{accent-color:var(--ai);width:16px;height:16px;margin:0}
+.opt:has(input:checked){border-color:var(--ai);background:var(--ai-pale)}
+
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.count-pick{display:flex;gap:6px}
+.count-pick button{
+  border:1.5px solid var(--rule);background:var(--paper-2);border-radius:8px;
+  padding:8px 14px;font-family:var(--maru);font-size:14px;cursor:pointer;
+}
+.count-pick button[aria-pressed="true"]{border-color:var(--ai);background:var(--ai-pale)}
+
+.start{
+  width:100%;margin-top:4px;border:none;border-radius:10px;background:var(--ai);color:#fff;
+  font-family:var(--maru);font-size:19px;font-weight:700;padding:16px;cursor:pointer;letter-spacing:.08em;
+}
+.start:active{transform:translateY(1px)}
+.start:focus-visible{outline:3px solid var(--nanohana);outline-offset:2px}
+.best{font-size:12px;color:var(--ink-soft);margin:10px 0 0;text-align:center}
+.mode-note{font-size:12px;color:var(--ink-soft);margin:10px 0 0}
+.sub-label{font-size:12px;color:var(--ink-soft);margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--rule)}
+.credit{font-size:11px;line-height:1.7;color:var(--ink-soft);margin:18px 4px 0}
+.diffs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.diff{border:1.5px solid var(--rule);background:var(--paper-2);border-radius:8px;padding:11px 4px;
+  font-family:var(--maru);font-size:14px;cursor:pointer;color:var(--ink)}
+.diff[aria-pressed="true"]{border-color:var(--ai);background:var(--ai-pale);font-weight:700}
+.limit{display:flex;align-items:center;gap:10px;margin:-6px 0 14px}
+.limit-bar{flex:1;height:7px;background:var(--rule);border-radius:4px;overflow:hidden}
+.limit-bar i{display:block;height:100%;width:100%;background:var(--midori)}
+.limit-bar i.low{background:var(--shu)}
+.limit b{font-family:var(--mono);font-size:15px;min-width:1.6em;text-align:right}
+.hist-btn{width:100%;margin-top:10px;border:1.5px solid var(--rule);background:var(--paper-2);
+  border-radius:10px;font-family:var(--maru);font-size:15px;padding:13px;cursor:pointer;color:var(--ink)}
+.userbar{display:flex;align-items:center;gap:8px;margin:0 2px 14px;font-size:13px}
+.userbar .ub-label{color:var(--ink-soft)}
+.userbar b{font-size:15px}
+.userbar button{margin-left:auto}
+.tin{width:100%;border:1.5px solid var(--rule);border-radius:8px;padding:10px 12px;
+  font-family:var(--maru);font-size:14px;background:var(--paper-2);color:var(--ink);margin-bottom:10px}
+.ta{font-family:var(--mono);font-size:13px;line-height:1.6;resize:vertical}
+.sample{font-family:var(--mono);font-size:11px;line-height:1.7;color:var(--ink-soft);
+  background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:10px;
+  margin:10px 0 0;white-space:pre-wrap;word-break:break-all}
+.adduser{display:flex;gap:8px;margin-top:14px}
+.adduser input{flex:1;border:1.5px solid var(--rule);border-radius:8px;padding:9px 12px;
+  font-family:var(--maru);font-size:14px;background:var(--paper-2);color:var(--ink)}
+.hlist .uname{font-size:15px;font-weight:700}
+.hlist .uname.now{color:var(--ai)}
+.hlist .ubtns{margin-left:auto;display:flex;gap:6px}
+.hlist .ubtns button{border:1px solid var(--rule);background:var(--paper-2);border-radius:7px;
+  padding:5px 10px;font-size:12px;font-family:var(--maru);cursor:pointer;color:var(--ink-soft)}
+.hlist .rk{font-family:var(--mono);font-size:13px;color:var(--ink-soft);min-width:2.2em}
+.hlist .rk.top{color:var(--nanohana);font-weight:700}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tabs button{flex:1;border:1.5px solid var(--rule);background:var(--paper-2);border-radius:8px;
+  padding:10px;font-family:var(--maru);font-size:14px;cursor:pointer}
+.tabs button[aria-pressed="true"]{border-color:var(--ai);background:var(--ai-pale)}
+.hlist{list-style:none;margin:0;padding:0}
+.hlist li{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--rule);font-size:13px}
+.hlist li:last-child{border-bottom:none}
+.hlist .when{font-family:var(--mono);font-size:12px;color:var(--ink-soft);min-width:5.4em}
+.hlist .tag{font-size:11px;color:var(--ink-soft);min-width:5.2em}
+.hlist .num{margin-left:auto;font-family:var(--mono);font-size:13px;white-space:nowrap}
+.hlist .hw{font-family:var(--mincho);font-size:21px;min-width:2.8em}
+.hlist .hw.en{font-family:var(--maru);font-size:16px;font-weight:700;min-width:6.4em}
+.hlist .hy{font-size:12px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hlist .cnt{margin-left:auto;font-family:var(--mono);font-size:13px;white-space:nowrap}
+.hlist .ngc{color:var(--shu)}
+.hlist .due{color:var(--ai)}
+.empty{font-size:13px;color:var(--ink-soft);text-align:center;padding:24px 0}
+.hnote{font-size:11px;color:var(--ink-soft);margin:12px 0 0}
+.grade.adv b{font-family:var(--maru);font-size:15px;font-weight:700;letter-spacing:0}
+
+/* --- プレイ画面 --- */
+.bar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--ink-soft);margin-bottom:10px}
+.bar .q{font-family:var(--mono)}
+.quit{border:1px solid var(--rule);background:var(--paper-2);border-radius:7px;padding:5px 11px;font-size:12px;cursor:pointer;font-family:var(--maru);color:var(--ink-soft)}
+.track{height:5px;background:var(--rule);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.track i{display:block;height:100%;background:var(--ai);width:0;transition:width .18s ease}
+
+.card{position:relative;text-align:center;padding:22px 10px 24px}
+.yomi{
+  font-family:var(--mincho);font-size:19px;letter-spacing:.28em;color:var(--ink-soft);
+  min-height:26px;margin-bottom:10px;
+}
+.yomi.off{visibility:hidden}
+.phase{display:inline-block;font-size:12px;font-weight:700;color:var(--ai);
+  background:var(--ai-pale);border-radius:999px;padding:4px 14px;margin-bottom:12px}
+.phase.recall{color:var(--shu);background:#FBECEB}
+.yomi.prompt{font-size:30px;letter-spacing:.06em;color:var(--ink);min-height:38px;margin-bottom:16px}
+.boxes{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.box{
+  width:82px;height:82px;border:2px solid var(--rule);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mincho);font-size:54px;line-height:1;color:var(--ink-soft);
+  background:
+    linear-gradient(to right, transparent calc(50% - .5px), rgba(43,95,174,.12) calc(50% - .5px) calc(50% + .5px), transparent calc(50% + .5px)),
+    linear-gradient(to bottom, transparent calc(50% - .5px), rgba(43,95,174,.12) calc(50% - .5px) calc(50% + .5px), transparent calc(50% + .5px));
+  transition:color .2s, border-color .2s, background-color .2s;
+}
+.box.done{color:var(--ai);border-color:var(--ai);background-color:#F5F8FD}
+.box.en{width:46px;height:62px;font-family:var(--maru);font-size:30px;font-weight:700;background-image:none}
+.box.ghost{color:transparent}
+.box.en.gap{width:16px;border:none;background:none}
+.typed{white-space:pre}
+.imi{margin:16px 0 4px;font-size:14px;color:var(--ink-soft)}
+
+.romaji{
+  font-family:var(--mono);font-size:24px;letter-spacing:.06em;margin:14px 0 4px;
+  word-break:break-all;min-height:32px;
+}
+.romaji .typed{color:var(--midori)}
+.romaji .next{background:var(--nanohana);border-radius:3px;padding:0 2px}
+.romaji .rest{color:var(--ink-soft)}
+.guide.off{visibility:hidden}
+.romaji .caret{
+  display:inline-block;width:2px;height:1em;background:var(--ink);
+  vertical-align:-.12em;margin:0 1px;animation:blink 1.1s step-end infinite;
+}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.card.shake{animation:sh .22s}
+@keyframes sh{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+.hanko{
+  position:absolute;top:14px;right:6px;width:86px;height:86px;border-radius:50%;
+  border:4px solid var(--shu);color:var(--shu);font-family:var(--mincho);font-weight:600;
+  display:flex;align-items:center;justify-content:center;font-size:30px;letter-spacing:.05em;
+  opacity:0;transform:scale(1.7) rotate(-18deg);pointer-events:none;
+}
+.hanko.on{animation:stamp .9s ease-out}
+@keyframes stamp{
+  0%{opacity:0;transform:scale(1.7) rotate(-18deg)}
+  18%{opacity:1;transform:scale(1) rotate(-11deg)}
+  70%{opacity:1;transform:scale(1) rotate(-11deg)}
+  100%{opacity:0;transform:scale(1) rotate(-11deg)}
+}
+
+/* --- キーボード --- */
+.kb{margin-top:18px;display:flex;flex-direction:column;gap:5px;align-items:center}
+.kb-row{display:flex;gap:5px;justify-content:center}
+.key{
+  width:38px;height:40px;border:1px solid var(--rule);border-radius:6px;background:var(--paper-2);
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;
+  color:var(--ink-soft);position:relative;
+}
+.key.left{background:#F4F7FB}
+.key.right{background:#FBF7F1}
+.key.space{width:190px;font-size:11px;color:var(--ink-soft)}
+.key.num{background:#F7F7F4}
+.key.sym{background:#F7F7F4;width:44px}
+.key.home::after{content:"";position:absolute;bottom:5px;width:11px;height:2px;background:var(--rule);border-radius:2px}
+.key.hit{background:var(--nanohana);border-color:#D9A800;color:var(--ink);font-weight:700}
+.kb.off{display:none}
+
+.spk-row{display:flex;justify-content:center;margin-top:14px}
+.spk{border:1.5px solid var(--rule);background:var(--paper-2);border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ai);
+  width:44px;height:44px;padding:0}
+.spk:active{transform:translateY(1px)}
+.spk:focus-visible{outline:3px solid var(--nanohana);outline-offset:2px}
+.spk svg{width:21px;height:21px}
+.spk.sm{width:30px;height:30px;margin-left:8px;flex:none}
+.spk.sm svg{width:15px;height:15px}
+.pass-row{display:flex;justify-content:center;gap:10px;margin-top:16px}
+.pass{
+  border:1.5px solid var(--rule);background:var(--paper-2);border-radius:999px;
+  padding:9px 26px;font-family:var(--maru);font-size:14px;color:var(--ink-soft);cursor:pointer;
+}
+.pass:active{transform:translateY(1px)}
+.pass:focus-visible{outline:3px solid var(--nanohana);outline-offset:2px}
+.tap-hint{text-align:center;font-size:13px;color:var(--ink-soft);margin-top:12px}
+#catcher{position:absolute;opacity:0;width:1px;height:1px;left:-9999px}
+
+/* --- けっか --- */
+.score{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;margin-bottom:6px}
+.score div b{display:block;font-family:var(--mincho);font-size:32px;font-weight:600;color:var(--ai)}
+.score div span{font-size:12px;color:var(--ink-soft)}
+.review{list-style:none;margin:0;padding:0}
+.review li{display:flex;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px solid var(--rule)}
+.review li:last-child{border-bottom:none}
+.review .kw{font-family:var(--mincho);font-size:26px;min-width:2.6em}
+.review .kw.en{font-family:var(--maru);font-size:19px;font-weight:700;min-width:5.6em}
+.review .kd b{font-size:13px;font-weight:700;display:block}
+.review .kd span{font-size:12px;color:var(--ink-soft)}
+.review .mark{margin-left:auto;font-size:18px}
+.mark.ok{color:var(--midori)}
+.mark.ng{color:var(--shu)}
+.mark.pass{color:var(--ink-soft);font-size:12px}
+.mark.hint{color:var(--ai);font-size:12px}
+.misskeys{font-family:var(--mono);font-size:14px;color:var(--ink)}
+
+@media (max-width:560px){
+  .box{width:64px;height:64px;font-size:42px}
+  .box.en{width:36px;height:50px;font-size:23px}
+  .box.en.gap{width:10px}
+  .yomi.prompt{font-size:24px}
+  .key{width:30px;height:34px;font-size:12px}
+  .key.space{width:150px}
+  .key.sym{width:36px}
+  .romaji{font-size:20px}
+  .grades{grid-template-columns:repeat(3,1fr)}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important}
+  .hanko.on{opacity:1;transform:scale(1) rotate(-11deg)}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+  <header class="masthead">
+    <h1>ことばタイピング</h1>
+    <p data-t="sub"></p>
+  </header>
+
+  <!-- ======== スタート ======== -->
+  <section id="scr-start">
+    <div class="userbar">
+      <span class="ub-label" data-t="lbl_user"></span>
+      <b id="userName"></b>
+      <button class="quit" id="btnUsers" data-t="btn_users"></button>
+    </div>
+    <div class="sheet">
+      <h2 data-t="h_mode"></h2>
+      <div class="count-pick" id="modes"></div>
+      <p class="mode-note" id="modeNote"></p>
+    </div>
+
+    <div class="sheet">
+      <h2 data-t="h_grade"></h2>
+      <div class="grades" id="grades"></div>
+      <p class="sub-label" data-t="h_adv"></p>
+      <div class="grades" id="grades2"></div>
+      <p class="sub-label" data-t="h_subject"></p>
+      <div class="grades" id="grades4"></div>
+      <p class="sub-label hidden" id="customLabel" data-t="h_custom"></p>
+      <div class="grades" id="grades3"></div>
+    </div>
+
+    <div class="sheet">
+      <h2 data-t="h_count"></h2>
+      <div class="count-pick" id="counts"></div>
+    </div>
+
+    <div class="sheet">
+      <h2 data-t="h_learn"></h2>
+      <div class="count-pick" id="learns"></div>
+      <p class="mode-note" id="learnNote"></p>
+    </div>
+
+    <div class="sheet" id="diffSheet">
+      <h2 data-t="h_diff"></h2>
+      <div class="diffs" id="diffs"></div>
+      <p class="mode-note" id="diffNote"></p>
+      <div class="opts" style="margin-top:14px">
+        <label class="opt"><input type="checkbox" id="optSound" checked><span data-t="opt_sound"></span></label>
+      </div>
+    </div>
+
+    <button class="start" id="btnStart" data-t="btn_start"></button>
+    <p class="best" id="bestLine"></p>
+    <button class="hist-btn" id="btnHist" data-t="btn_hist"></button>
+    <button class="hist-btn" id="btnImport" data-t="btn_import"></button>
+    <p class="credit">英単語のCEFRレベルは『CEFR-J Wordlist Version 1.6』（東京外国語大学 投野由紀夫研究室）に準拠。日本語訳は本アプリ独自。漢字の学年は文部科学省「学年別漢字配当表」、漢検2級は日本漢字能力検定の級別配当による。</p>
+  </section>
+
+  <!-- ======== プレイ ======== -->
+  <section id="scr-play" class="hidden">
+    <div class="bar">
+      <span class="q" id="qCount">1 / 10</span>
+      <span id="liveStat"></span>
+      <button class="quit" id="btnQuit" data-t="btn_quit"></button>
+    </div>
+    <div class="track"><i id="trackFill"></i></div>
+    <div class="limit hidden" id="limitWrap"><span class="limit-bar"><i id="limitFill"></i></span><b id="limitNum"></b></div>
+
+    <div class="sheet">
+      <div class="card" id="card">
+        <div class="hanko" id="hanko">合格</div>
+        <div class="phase hidden" id="phaseBadge"></div>
+        <div class="yomi" id="yomi"></div>
+        <div class="boxes" id="boxes"></div>
+        <p class="imi" id="imi"></p>
+        <div class="spk-row hidden" id="spkRow"><button class="spk" id="btnSpeak" type="button" aria-label="発音を聞く"></button></div>
+        <div class="romaji" id="romaji"><span class="typed" id="rTyped"></span><i class="caret"></i><span class="guide" id="rGuide"></span></div>
+      </div>
+      <div class="pass-row"><button class="pass hidden" id="btnHint" data-t="btn_hint"></button><button class="pass" id="btnPass" data-t="btn_pass"></button></div>
+      <div class="kb" id="kb"></div>
+      <p class="tap-hint hidden" id="tapHint" data-t="tap_hint"></p>
+    </div>
+    <input id="catcher" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="latin">
+  </section>
+
+  <!-- ======== 問題の取り込み ======== -->
+  <section id="scr-import" class="hidden">
+    <div class="sheet">
+      <h2 data-t="h_import"></h2>
+      <input id="setName" type="text" maxlength="20" class="tin">
+      <textarea id="setData" rows="9" class="tin ta"></textarea>
+      <button class="hist-btn" id="btnSaveSet" data-t="btn_saveset"></button>
+      <p class="hnote" id="importMsg"></p>
+      <p class="hnote" data-t="import_note"></p>
+      <pre class="sample" id="importSample"></pre>
+    </div>
+    <div class="sheet">
+      <h2 data-t="h_sets"></h2>
+      <ul class="hlist" id="setList"></ul>
+    </div>
+    <button class="start" id="btnImportBack" data-t="btn_back"></button>
+  </section>
+
+  <!-- ======== ユーザー ======== -->
+  <section id="scr-users" class="hidden">
+    <div class="sheet">
+      <h2 data-t="h_user"></h2>
+      <ul class="hlist" id="userList"></ul>
+      <div class="adduser">
+        <input id="newUserName" type="text" maxlength="12" autocomplete="off">
+        <button class="quit" id="btnAddUser" data-t="btn_adduser"></button>
+      </div>
+      <p class="hnote" data-t="users_note"></p>
+    </div>
+    <button class="start" id="btnUsersBack" data-t="btn_back"></button>
+  </section>
+
+  <!-- ======== きろく ======== -->
+  <section id="scr-hist" class="hidden">
+    <div class="sheet">
+      <div class="tabs" id="histTabs">
+        <button type="button" data-tab="score" aria-pressed="true" data-t="tab_score"></button>
+        <button type="button" data-tab="words" aria-pressed="false" data-t="tab_words"></button>
+        <button type="button" data-tab="rank" aria-pressed="false" data-t="tab_rank"></button>
+      </div>
+
+      <div id="tab-score">
+        <ul class="hlist" id="scoreList"></ul>
+        <p class="hnote" id="scoreNote"></p>
+      </div>
+
+      <div id="tab-rank" class="hidden">
+        <p class="sub-label" data-t="rank_streak" style="border:none;padding:0;margin-top:0"></p>
+        <ul class="hlist" id="rankStreak"></ul>
+        <p class="sub-label" data-t="rank_total"></p>
+        <ul class="hlist" id="rankTotal"></ul>
+      </div>
+
+      <div id="tab-words" class="hidden">
+        <div class="tabs" id="wordSort">
+          <button type="button" data-sort="n" aria-pressed="true" data-t="sort_n"></button>
+          <button type="button" data-sort="ng" aria-pressed="false" data-t="sort_ng"></button>
+        </div>
+        <ul class="hlist" id="wordList"></ul>
+        <p class="hnote" id="wordNote"></p>
+      </div>
+    </div>
+    <button class="start" id="btnHistBack" data-t="btn_back"></button>
+    <p class="best"><button class="quit" id="btnHistClear" data-t="btn_clear"></button></p>
+  </section>
+
+  <!-- ======== けっか ======== -->
+  <section id="scr-result" class="hidden">
+    <div class="sheet">
+      <h2 id="resultTitle"></h2>
+      <div class="score">
+        <div><b id="rSpeed">0</b><span data-t="u_speed"></span></div>
+        <div><b id="rAcc">0%</b><span data-t="u_acc"></span></div>
+        <div><b id="rClear">0</b><span data-t="u_clear"></span></div>
+      </div>
+      <p class="best" id="rBest"></p>
+    </div>
+    <div class="sheet">
+      <h2 data-t="h_review"></h2>
+      <ul class="review" id="review"></ul>
+    </div>
+    <div class="sheet" id="missSheet">
+      <h2 data-t="h_miss"></h2>
+      <p class="misskeys" id="missKeys"></p>
+    </div>
+    <button class="start" id="btnAgain" data-t="btn_again"></button>
+    <p class="best"><button class="quit" id="btnHome" data-t="btn_home"></button></p>
+  </section>
+</div>
+
+<script>
+/* =========================================================
+   1. ことばデータ（学年別配当漢字ベース）
+   [表記, 読み(ひらがな), 意味]
+========================================================= */
+const WORDS = {
+1:[["学校","がっこう","みんなが べんきょうする ところ"],
+   ["先生","せんせい","おしえてくれる 人"],
+   ["天気","てんき","はれ・くもり・雨などの ようす"],
+   ["青空","あおぞら","よく はれた そら"],
+   ["森林","しんりん","木が たくさん ある ところ"],
+   ["子犬","こいぬ","うまれて まもない いぬ"],
+   ["一年生","いちねんせい","学校に 入って 一年目の 人"],
+   ["出入口","でいりぐち","出たり 入ったり する ところ"],
+   ["水玉","みずたま","まるい 水の つぶ"],
+   ["早口","はやくち","はやく しゃべること"],
+   ["竹林","ちくりん","たけが たくさん ある ところ"],
+   ["手足","てあし","手と あし"],
+   ["花火","はなび","夜空に ひらく 光の 花"],
+   ["大人","おとな","そだって 大きく なった 人"],
+   ["白玉","しらたま","こなで 作る まるい おかし"],
+   ["休日","きゅうじつ","学校や 仕事が 休みの 日"],
+   ["男女","だんじょ","男の人と 女の人"],
+   ["名字","みょうじ","名前の 上に つく 家の 名"],
+   ["糸車","いとぐるま","糸を つむぐ どうぐ"],
+   ["村人","むらびと","村に すんでいる 人"],
+   ["本気","ほんき","まじめに やる 気もち"],
+   ["左右","さゆう","ひだりと みぎ"],
+   ["上下","じょうげ","うえと した"],
+   ["目玉","めだま","目の まるい ところ"],
+   ["火山","かざん","土の中の 火が ふき出す 山"],
+   ["文字","もじ","ことばを 書き表す しるし"],
+   ["見学","けんがく","出かけて 見て 学ぶこと"],
+   ["入学","にゅうがく","学校に 入ること"],
+   ["夕日","ゆうひ","夕方に しずむ 日"],
+   ["小川","おがわ","はばの せまい 川"],
+   ["草花","くさばな","草に さく 花"],
+   ["中学生","ちゅうがくせい","中学校に かよう 人"],
+   ["七五三","しちごさん","子どもの せいちょうを いわう 日"]],
+2:[["電車","でんしゃ","線路の 上を はしる のりもの"],
+   ["公園","こうえん","みんなで あそべる ひろい ところ"],
+   ["教室","きょうしつ","じゅぎょうを うける へや"],
+   ["算数","さんすう","かずや 形を まなぶ きょうか"],
+   ["図書","としょ","本の こと"],
+   ["兄弟","きょうだい","あにと おとうと"],
+   ["毎朝","まいあさ","どの日の あさも"],
+   ["新聞","しんぶん","ニュースを のせた 紙"],
+   ["星空","ほしぞら","ほしが 見える 夜の そら"],
+   ["音楽","おんがく","音を ならべて つくる げいじゅつ"],
+   ["野原","のはら","草が はえた ひろい ところ"],
+   ["岩石","がんせき","大きくて かたい 石"],
+   ["汽船","きせん","じょうきの 力で すすむ ふね"],
+   ["親友","しんゆう","とくべつに なかの よい 友だち"],
+   ["通学","つうがく","学校に かよう こと"],
+   ["昼食","ちゅうしょく","おひるの 食事"],
+   ["白馬","はくば","毛が 白い うま"],
+   ["遠足","えんそく","歩いて 出かける 学校の 行事"],
+   ["図画","ずが","絵を かくこと"],
+   ["歩道","ほどう","人が 歩く ための 道"],
+   ["交通","こうつう","人や 車が 行き来 すること"],
+   ["作家","さっか","文しょうを 書く しごとの 人"],
+   ["海外","かいがい","海の むこうの 国"],
+   ["用心","ようじん","気を つけること"],
+   ["売買","ばいばい","売ることと 買うこと"],
+   ["麦茶","むぎちゃ","むぎから 作る お茶"],
+   ["牛肉","ぎゅうにく","うしの にく"],
+   ["市場","いちば","品物を 売り買いする ところ"],
+   ["光線","こうせん","まっすぐ すすむ 光"],
+   ["三角","さんかく","かどが 三つ ある 形"],
+   ["計算","けいさん","数を もとめること"],
+   ["弓矢","ゆみや","ゆみと や"],
+   ["台風","たいふう","強い 風と 雨を はこぶ あらし"],
+   ["大声","おおごえ","大きな こえ"],
+   ["会話","かいわ","話を かわすこと"],
+   ["日記","にっき","その日の ことを 書く きろく"],
+   ["半分","はんぶん","二つに 分けた 一つ"],
+   ["正直","しょうじき","うそを つかないこと"]],
+3:[["練習","れんしゅう","くりかえして じょうずに なること"],
+   ["太陽","たいよう","ちきゅうを てらす 星"],
+   ["写真","しゃしん","カメラで うつした 画ぞう"],
+   ["鉄道","てつどう","線路と 電車の しくみ"],
+   ["病院","びょういん","びょうきを なおす ところ"],
+   ["旅行","りょこう","とおくへ 出かけること"],
+   ["温度","おんど","あつさ・つめたさの ていど"],
+   ["商店","しょうてん","品物を 売る 店"],
+   ["農業","のうぎょう","さくもつを そだてる しごと"],
+   ["予想","よそう","さきに どうなるか 考えること"],
+   ["委員","いいん","役目を まかされた 人"],
+   ["平和","へいわ","あらそいが なく おだやかなこと"],
+   ["悪者","わるもの","悪い ことを する 人"],
+   ["全部","ぜんぶ","のこらず すべて"],
+   ["世界","せかい","地きゅう 全体"],
+   ["運動","うんどう","体を 動かすこと"],
+   ["水泳","すいえい","水の中を およぐこと"],
+   ["駅前","えきまえ","駅の すぐ 前の 場所"],
+   ["屋上","おくじょう","たてものの いちばん 上"],
+   ["漢字","かんじ","中国から つたわった 文字"],
+   ["感想","かんそう","見たり 聞いたりして 思ったこと"],
+   ["研究","けんきゅう","くわしく しらべて 考えること"],
+   ["記号","きごう","意味を 短く 表す しるし"],
+   ["銀行","ぎんこう","お金を あずかる ところ"],
+   ["幸福","こうふく","しあわせな こと"],
+   ["港町","みなとまち","港を 中心に 広がる 町"],
+   ["仕事","しごと","やりとげる べき つとめ"],
+   ["主役","しゅやく","中心に なる 役"],
+   ["宿題","しゅくだい","家で やる 学しゅう"],
+   ["消化","しょうか","食べ物を 体に とりこむ はたらき"],
+   ["乗客","じょうきゃく","のりものに 乗る 人"],
+   ["深海","しんかい","とても ふかい 海"],
+   ["整理","せいり","きちんと かたづけること"],
+   ["相談","そうだん","たがいに 話し合うこと"],
+   ["速度","そくど","すすむ はやさ"],
+   ["家族","かぞく","いっしょに くらす 人たち"],
+   ["地球","ちきゅう","わたしたちが すむ ほし"],
+   ["登山","とざん","山に のぼること"],
+   ["表面","ひょうめん","ものの 外がわ"],
+   ["勉強","べんきょう","学んで 力を つけること"],
+   ["放送","ほうそう","電ぱで 声や 画ぞうを おくること"],
+   ["薬局","やっきょく","薬を 売る 店"],
+   ["遊園地","ゆうえんち","のりもので あそべる しせつ"],
+   ["洋服","ようふく","西洋ふうの 服"],
+   ["落下","らっか","上から 下へ おちること"]],
+4:[["実験","じっけん","たしかめる ために ためすこと"],
+   ["努力","どりょく","力を つくして がんばること"],
+   ["給食","きゅうしょく","学校で 出る 食事"],
+   ["卒業","そつぎょう","学校を おえること"],
+   ["季節","きせつ","春・夏・秋・冬の うつりかわり"],
+   ["競争","きょうそう","どちらが 上か あらそうこと"],
+   ["熱帯","ねったい","一年中 あつい ちいき"],
+   ["印刷","いんさつ","文字や 絵を 紙に うつすこと"],
+   ["健康","けんこう","体の ちょうしが よいこと"],
+   ["大群","たいぐん","たくさん あつまった 群れ"],
+   ["道徳","どうとく","人として 正しい おこない"],
+   ["灯台","とうだい","船に 明かりで 場所を 知らせる 塔"],
+   ["博物館","はくぶつかん","めずらしい 品を 見せる しせつ"],
+   ["愛犬","あいけん","かわいがって いる 犬"],
+   ["案内","あんない","道や やり方を 教えること"],
+   ["以上","いじょう","それより 多いこと"],
+   ["位置","いち","ものが ある 場所"],
+   ["英語","えいご","イギリスや アメリカの ことば"],
+   ["塩分","えんぶん","食べ物に ふくまれる しおの 量"],
+   ["加熱","かねつ","熱を くわえること"],
+   ["結果","けっか","やった あとに 出てくる もの"],
+   ["機械","きかい","動力で うごく しかけ"],
+   ["希望","きぼう","こう なりたいと ねがうこと"],
+   ["共同","きょうどう","みんなで いっしょに すること"],
+   ["訓練","くんれん","くりかえし 教えて なれさせること"],
+   ["建物","たてもの","人が 中に 入れる 作り物"],
+   ["好物","こうぶつ","とくに 好きな 食べ物"],
+   ["材料","ざいりょう","作る もとに なる もの"],
+   ["散歩","さんぽ","ぶらぶらと 歩くこと"],
+   ["試験","しけん","力を ためして はかること"],
+   ["種類","しゅるい","にたもの どうしの わけ方"],
+   ["初日","しょにち","はじまりの 日"],
+   ["信号","しんごう","色や 音で 合図を おくる しくみ"],
+   ["成功","せいこう","思った とおりに できること"],
+   ["選挙","せんきょ","投票で 代表を えらぶこと"],
+   ["倉庫","そうこ","品物を しまって おく 建物"],
+   ["仲間","なかま","いっしょに 行動する 人たち"],
+   ["伝説","でんせつ","むかしから 語りつがれた 話"],
+   ["特別","とくべつ","ほかとは ちがって いること"],
+   ["熱心","ねっしん","一生けんめいに とりくむこと"],
+   ["飛行機","ひこうき","空を とぶ のりもの"],
+   ["必要","ひつよう","どうしても いること"],
+   ["変化","へんか","ようすが かわること"],
+   ["牧場","ぼくじょう","牛や 馬を 育てる 場所"],
+   ["満足","まんぞく","十分だと 思うこと"],
+   ["無料","むりょう","お金が かからないこと"],
+   ["約束","やくそく","前もって 決めておくこと"],
+   ["勇気","ゆうき","こわさに 立ち向かう 心"],
+   ["冷静","れいせい","あわてず 落ちついて いること"],
+   ["連続","れんぞく","つづけて おこること"],
+   ["労働","ろうどう","はたらくこと"],
+   ["記録","きろく","書きのこすこと。またその 数字"]],
+5:[["複雑","ふくざつ","こみいって いること"],
+   ["経験","けいけん","じっさいに やってみた こと"],
+   ["責任","せきにん","引きうけて やりとげる 義務"],
+   ["独立","どくりつ","ひとりで 立つこと"],
+   ["現在","げんざい","いま この とき"],
+   ["貿易","ぼうえき","国と国で 品物を 売り買いすること"],
+   ["可能","かのう","できる ということ"],
+   ["燃料","ねんりょう","もやして 力を 出す もの"],
+   ["政治","せいじ","国や 町を おさめる しごと"],
+   ["常識","じょうしき","みんなが 知っている あたりまえ"],
+   ["確率","かくりつ","おこりやすさを 数で 表したもの"],
+   ["統計","とうけい","数を あつめて まとめたもの"],
+   ["貯金","ちょきん","お金を ためること"],
+   ["移動","いどう","場所を うつすこと"],
+   ["永久","えいきゅう","いつまでも つづくこと"],
+   ["営業","えいぎょう","商売を おこなうこと"],
+   ["液体","えきたい","水のように 形を かえる もの"],
+   ["応用","おうよう","学んだことを ほかに 生かすこと"],
+   ["過去","かこ","すぎさった 時"],
+   ["快適","かいてき","気もちよく すごせること"],
+   ["解決","かいけつ","問題を かたづけること"],
+   ["価格","かかく","品物の ねだん"],
+   ["幹線","かんせん","中心と なる 主要な 路線"],
+   ["眼科","がんか","目を みる 医りょうの 科"],
+   ["基本","きほん","いちばん もとに なる こと"],
+   ["技術","ぎじゅつ","ものを つくる うでまえ"],
+   ["逆転","ぎゃくてん","立場が ひっくり返ること"],
+   ["境界","きょうかい","二つを 分ける さかい目"],
+   ["許可","きょか","してよいと みとめること"],
+   ["禁止","きんし","してはいけないと 決めること"],
+   ["清潔","せいけつ","よごれが なく きれいなこと"],
+   ["保険","ほけん","もしもの 損に そなえる しくみ"],
+   ["検査","けんさ","しらべて たしかめること"],
+   ["減少","げんしょう","数や 量が へること"],
+   ["個性","こせい","その人 だけの もちあじ"],
+   ["効果","こうか","やったことで 生まれる ききめ"],
+   ["構造","こうぞう","組み立ての しくみ"],
+   ["混合","こんごう","まぜ合わせること"],
+   ["災害","さいがい","地しんや 台風などの 大きな 被害"],
+   ["国際","こくさい","国と国の あいだに かかわること"],
+   ["財産","ざいさん","もっている お金や 品物"],
+   ["酸素","さんそ","呼吸に 必要な 気体"],
+   ["賛成","さんせい","よいと みとめること"],
+   ["資格","しかく","それを する ための みとめ"],
+   ["飼育","しいく","動物を 育てること"],
+   ["質問","しつもん","わからないことを 問うこと"],
+   ["準備","じゅんび","前もって ととのえること"],
+   ["条件","じょうけん","そのために 必要な きまり"],
+   ["情報","じょうほう","ものごとの 知らせ"],
+   ["職業","しょくぎょう","生活のために する しごと"],
+   ["製品","せいひん","作って 仕上げた 品物"],
+   ["設計","せっけい","作る前に 形や 数値を 決めること"],
+   ["増加","ぞうか","数や 量が ふえること"],
+   ["測定","そくてい","はかって 数で 表すこと"],
+   ["態度","たいど","気もちが 表れた ふるまい"],
+   ["団体","だんたい","同じ目的で あつまった 集まり"],
+   ["提案","ていあん","こうしようと 出す 考え"],
+   ["適当","てきとう","ちょうど よく 合うこと"],
+   ["銅像","どうぞう","どうで つくった 人の 像"],
+   ["指導","しどう","教えて みちびくこと"],
+   ["判断","はんだん","どうするか 見きわめて 決めること"],
+   ["比例","ひれい","一方が ふえると 他方も ふえる 関係"],
+   ["肥料","ひりょう","作物を 育てる ための 養分"],
+   ["評価","ひょうか","よしあしを 見きわめること"],
+   ["武士","ぶし","むかしの 戦う 身分の 人"],
+   ["復習","ふくしゅう","習ったことを もう一度 やること"],
+   ["編集","へんしゅう","集めて 一つに まとめること"],
+   ["報告","ほうこく","結果を 知らせること"],
+   ["防止","ぼうし","おきないように ふせぐこと"],
+   ["夢中","むちゅう","われを わすれて 熱中すること"],
+   ["輸出","ゆしゅつ","品物を 外国へ 売ること"],
+   ["容器","ようき","ものを 入れる いれもの"],
+   ["留学","りゅうがく","外国で 学ぶこと"],
+   ["領土","りょうど","その国が おさめる 土地"]],
+6:[["宇宙","うちゅう","星や 銀河が 広がる 空間"],
+   ["呼吸","こきゅう","いきを すったり はいたり すること"],
+   ["尊敬","そんけい","りっぱだと うやまうこと"],
+   ["討論","とうろん","たがいに 意見を ぶつけ合うこと"],
+   ["危険","きけん","あぶないこと"],
+   ["憲法","けんぽう","国の いちばん もとになる きまり"],
+   ["供給","きょうきゅう","必要な ものを あたえること"],
+   ["誠実","せいじつ","うそがなく まじめなこと"],
+   ["縮小","しゅくしょう","小さく ちぢめること"],
+   ["郵便","ゆうびん","手紙や 荷物を とどける しくみ"],
+   ["蒸気","じょうき","水が 熱せられて 気体に なったもの"],
+   ["難問","なんもん","とくのが むずかしい 問題"],
+   ["異常","いじょう","ふつうとは ちがう ようす"],
+   ["地域","ちいき","区切られた 土地の 範囲"],
+   ["映画","えいが","スクリーンに うつす 作品"],
+   ["延長","えんちょう","長さや 時間を のばすこと"],
+   ["沿岸","えんがん","海や 湖に そった 陸地"],
+   ["拡大","かくだい","大きく 広げること"],
+   ["内閣","ないかく","国の 政治を おこなう 組織"],
+   ["株式","かぶしき","会社の もち分を 表す しくみ"],
+   ["看板","かんばん","店の 名前などを 示す 板"],
+   ["簡単","かんたん","てまが かからず やさしいこと"],
+   ["指揮","しき","先頭に 立って 動かすこと"],
+   ["貴重","きちょう","とても 大切なこと"],
+   ["疑問","ぎもん","あやしいと 思う 点"],
+   ["故郷","こきょう","生まれ育った 土地"],
+   ["警察","けいさつ","人々の 安全を まもる 組織"],
+   ["権利","けんり","して よいと みとめられた 力"],
+   ["資源","しげん","ものを つくる もとに なる 天然の 材料"],
+   ["誤解","ごかい","まちがえて 受けとること"],
+   ["紅葉","こうよう","木の葉が 赤や 黄に なること"],
+   ["時刻","じこく","時の 一点"],
+   ["穀物","こくもつ","米や 麦などの 作物"],
+   ["骨折","こっせつ","ほねが 折れること"],
+   ["困難","こんなん","なしとげるのが むずかしいこと"],
+   ["砂糖","さとう","あまい 味の 調味料"],
+   ["経済","けいざい","お金や 品物が まわる しくみ"],
+   ["裁判","さいばん","争いの よしあしを 決める 手つづき"],
+   ["対策","たいさく","問題に 対する 手だて"],
+   ["姿勢","しせい","体の かまえ方"],
+   ["磁石","じしゃく","鉄を 引きつける もの"],
+   ["樹木","じゅもく","立っている 木"],
+   ["収入","しゅうにゅう","入ってくる お金"],
+   ["民衆","みんしゅう","世の中の ふつうの 人々"],
+   ["処理","しょり","かたづけて 始末すること"],
+   ["将来","しょうらい","これから 先"],
+   ["障害","しょうがい","さまたげに なる もの"],
+   ["針金","はりがね","金ぞくを ほそく のばしたもの"],
+   ["垂直","すいちょく","まっすぐ 下に おりる 向き"],
+   ["推理","すいり","手がかりから 考えを みちびくこと"],
+   ["宣言","せんげん","はっきりと 言いきること"],
+   ["専門","せんもん","一つの ことに しぼって 深めること"],
+   ["温泉","おんせん","地中から わき出る あたたかい 湯"],
+   ["演奏","えんそう","楽器を ならすこと"],
+   ["創造","そうぞう","新しく つくり出すこと"],
+   ["服装","ふくそう","身に つけた 服の ようす"],
+   ["地層","ちそう","土や 砂が かさなった 層"],
+   ["操作","そうさ","きかいを あつかい 動かすこと"],
+   ["内臓","ないぞう","体の 中に ある 器官"],
+   ["保存","ほぞん","そのままの 形で とっておくこと"],
+   ["住宅","じゅうたく","人が 住む 建物"],
+   ["担当","たんとう","その しごとを 受けもつこと"],
+   ["探検","たんけん","知られていない 所を しらべに 行くこと"],
+   ["誕生日","たんじょうび","生まれた 日"],
+   ["段階","だんかい","進み具合の 区切り"],
+   ["温暖","おんだん","気候が あたたかいこと"],
+   ["価値","かち","どれだけ ねうちが あるか"],
+   ["著者","ちょしゃ","本を 書いた 人"],
+   ["頂上","ちょうじょう","山の いちばん 高い ところ"],
+   ["発展","はってん","勢いよく のびて 広がること"],
+   ["牛乳","ぎゅうにゅう","牛から しぼった ちち"],
+   ["頭脳","ずのう","考える はたらきを もつ 脳"],
+   ["背中","せなか","体の うしろがわ"],
+   ["俳句","はいく","五・七・五で よむ 短い 詩"],
+   ["批判","ひはん","よしあしを 問いただすこと"],
+   ["秘密","ひみつ","人に 知らせない こと"],
+   ["並木","なみき","道に そって ならぶ 木"],
+   ["宝物","たからもの","とても 大切に している もの"],
+   ["訪問","ほうもん","人を たずねること"],
+   ["鉄棒","てつぼう","鉄の 棒。またその 運動"],
+   ["同盟","どうめい","同じ目的で 力を 合わせる 約束"],
+   ["模型","もけい","本物を まねて 作った もの"],
+   ["通訳","つうやく","ことばを その場で 伝えなおす 人"],
+   ["優勝","ゆうしょう","一番に なること"],
+   ["幼児","ようじ","小さな 子ども"],
+   ["翌日","よくじつ","次の 日"],
+   ["法律","ほうりつ","国が 定めた きまり"],
+   ["議論","ぎろん","たがいに 考えを 述べ合うこと"]],
+7:[["握手","あくしゅ","手をにぎり合うあいさつ"],
+   ["依頼","いらい","人に用件を頼むこと"],
+   ["影響","えいきょう","他に力がおよぶこと"],
+   ["汚染","おせん","よごれが広がること"],
+   ["恐怖","きょうふ","強くおそれる気持ち"],
+   ["歓迎","かんげい","喜んで迎えること"],
+   ["環境","かんきょう","まわりを取り巻く条件"],
+   ["鑑賞","かんしょう","作品を味わうこと"],
+   ["監視","かんし","見張って注意すること"],
+   ["奇跡","きせき","起こりえないような出来事"],
+   ["脚本","きゃくほん","劇や映画のせりふを書いた本"],
+   ["距離","きょり","二点のあいだの長さ"],
+   ["傾向","けいこう","全体がかたよって向かう方向"],
+   ["傾斜","けいしゃ","ななめに傾いていること"],
+   ["継続","けいぞく","とぎれずに続けること"],
+   ["剣道","けんどう","竹刀で技を競う武道"],
+   ["恋愛","れんあい","たがいに恋しく思うこと"],
+   ["豪雨","ごうう","激しく降る大量の雨"],
+   ["更新","こうしん","新しく改めること"],
+   ["攻撃","こうげき","相手をせめること"],
+   ["荒野","こうや","荒れはてた野原"],
+   ["抗議","こうぎ","反対の意見を強く申し立てること"],
+   ["婚約","こんやく","結婚の約束"],
+   ["歳月","さいげつ","過ぎていく年月"],
+   ["色彩","しきさい","色合い"],
+   ["斜面","しゃめん","ななめに傾いた面"],
+   ["指摘","してき","問題点を示すこと"],
+   ["就寝","しゅうしん","ねどこに入ること"],
+   ["触覚","しょっかく","ふれて感じる感覚"],
+   ["侵入","しんにゅう","勝手に入りこむこと"],
+   ["振動","しんどう","小刻みにゆれ動くこと"],
+   ["震災","しんさい","地震による災害"],
+   ["是非","ぜひ","よしあし。また、ぜひとも"],
+   ["騒音","そうおん","うるさく不快な音"],
+   ["贈答","ぞうとう","品物を贈り合うこと"],
+   ["到着","とうちゃく","目的地に着くこと"],
+   ["逃走","とうそう","にげて去ること"],
+   ["透明","とうめい","すきとおっていること"],
+   ["特徴","とくちょう","他と比べて目立つ点"],
+   ["突然","とつぜん","前ぶれなく急に"],
+   ["鈍感","どんかん","感じ方がにぶいこと"],
+   ["濃度","のうど","濃さの度合い"],
+   ["発掘","はっくつ","うもれたものを掘り出すこと"],
+   ["一般","いっぱん","広く全体に共通すること"],
+   ["疲労","ひろう","つかれ"],
+   ["描写","びょうしゃ","ようすを書き表すこと"],
+   ["普通","ふつう","ごくあたりまえであること"],
+   ["噴火","ふんか","火山が火や灰をふき出すこと"],
+   ["舞台","ぶたい","演技を行う場所"],
+   ["腐敗","ふはい","くさること。乱れること"],
+   ["捕獲","ほかく","つかまえること"],
+   ["名誉","めいよ","よい評判を得ていること"],
+   ["溶解","ようかい","とけて液体にまざること"],
+   ["療養","りょうよう","治療して体を休めること"],
+   ["隣人","りんじん","となりに住む人"],
+   ["年齢","ねんれい","年の数"],
+   ["知恵","ちえ","物事をうまく処理する力"],
+   ["腕力","わんりょく","うでの力"],
+   ["活躍","かつやく","目立って働くこと"],
+   ["驚異","きょうい","おどろくべきすばらしさ"]],
+8:[["悲哀","ひあい","もの悲しくあわれな感じ"],
+   ["慰問","いもん","たずねてなぐさめること"],
+   ["炎上","えんじょう","激しく燃え上がること"],
+   ["欧米","おうべい","ヨーロッパとアメリカ"],
+   ["穏和","おんわ","おだやかで角が立たないこと"],
+   ["架空","かくう","事実ではなく想像で作ったもの"],
+   ["華麗","かれい","はなやかで美しいこと"],
+   ["概念","がいねん","物事のおおまかな考え"],
+   ["既存","きそん","すでに存在していること"],
+   ["企画","きかく","計画を立てること"],
+   ["犠牲","ぎせい","他のために失うもの"],
+   ["喫茶","きっさ","茶やコーヒーを飲むこと"],
+   ["虐待","ぎゃくたい","むごい扱いをすること"],
+   ["緊張","きんちょう","気持ちが張りつめること"],
+   ["契約","けいやく","取り決めを結ぶこと"],
+   ["携帯","けいたい","身につけて持ち歩くこと"],
+   ["倹約","けんやく","むだを省いて節約すること"],
+   ["賢明","けんめい","かしこく道理に合っていること"],
+   ["孤独","こどく","ひとりぼっちであること"],
+   ["娯楽","ごらく","心をなぐさめる楽しみ"],
+   ["硬貨","こうか","金属でできたお金"],
+   ["郊外","こうがい","都市の周辺の地域"],
+   ["削減","さくげん","けずって減らすこと"],
+   ["錯覚","さっかく","実際とちがって感じること"],
+   ["施設","しせつ","目的のために設けた建物や設備"],
+   ["湿度","しつど","空気中の水分の割合"],
+   ["衝突","しょうとつ","ぶつかること"],
+   ["上昇","じょうしょう","上がっていくこと"],
+   ["促進","そくしん","早く進むようにうながすこと"],
+   ["滞在","たいざい","よそにとどまること"],
+   ["奪回","だっかい","うばい返すこと"],
+   ["鍛錬","たんれん","きたえて強くすること"],
+   ["聴衆","ちょうしゅう","話や演奏を聞く人々"],
+   ["超越","ちょうえつ","ふつうの程度をはるかに超えること"],
+   ["陳列","ちんれつ","並べて見せること"],
+   ["塗装","とそう","塗料をぬって仕上げること"],
+   ["粘土","ねんど","ねばり気のある土"],
+   ["排出","はいしゅつ","外へおし出すこと"],
+   ["漂流","ひょうりゅう","流れにまかせてただようこと"],
+   ["封書","ふうしょ","封をした手紙"],
+   ["覆面","ふくめん","顔をおおいかくすこと"],
+   ["紛失","ふんしつ","なくしてしまうこと"],
+   ["募金","ぼきん","寄付を広くつのること"],
+   ["魅力","みりょく","人を引きつける力"],
+   ["滅亡","めつぼう","ほろびてなくなること"],
+   ["誘導","ゆうどう","さそってみちびくこと"],
+   ["動揺","どうよう","ゆれ動くこと。心が乱れること"],
+   ["譲歩","じょうほ","自分の主張をゆずること"],
+   ["零下","れいか","温度がセ氏零度より低いこと"],
+   ["廊下","ろうか","建物の中の通路"],
+   ["湾岸","わんがん","入り江にそった岸"],
+   ["慈悲","じひ","いつくしみあわれむ心"],
+   ["潜水","せんすい","水にもぐること"],
+   ["撮影","さつえい","写真や映像をとること"],
+   ["審判","しんぱん","勝負の判定をすること"],
+   ["駐車","ちゅうしゃ","車をとめておくこと"],
+   ["締結","ていけつ","条約や契約を結ぶこと"],
+   ["凝固","ぎょうこ","かたまること"],
+   ["裁縫","さいほう","布をたち、ぬうこと"],
+   ["膨張","ぼうちょう","ふくれて大きくなること"],
+   ["休憩","きゅうけい","ひと休みすること"]],
+9:[["亜熱帯","あねったい","熱帯につぐ暖かい気候の地域"],
+   ["逸話","いつわ","あまり知られていない興味深い話"],
+   ["陥没","かんぼつ","落ちこんでへこむこと"],
+   ["還元","かんげん","もとの状態にもどすこと"],
+   ["患者","かんじゃ","病気やけがで治療を受ける人"],
+   ["寛容","かんよう","心が広く人を受け入れること"],
+   ["頑固","がんこ","かたくなに考えを変えないこと"],
+   ["飢餓","きが","食べ物がなく飢えること"],
+   ["偽装","ぎそう","本物らしく見せかけること"],
+   ["窮地","きゅうち","追いつめられた苦しい立場"],
+   ["謹慎","きんしん","言動をつつしんで反省すること"],
+   ["細菌","さいきん","目に見えない小さな生物"],
+   ["傑作","けっさく","特にすぐれた作品"],
+   ["献立","こんだて","食事の品目の組み合わせ"],
+   ["懇談","こんだん","うちとけて話し合うこと"],
+   ["懐中","かいちゅう","ふところや身に持つこと"],
+   ["購入","こうにゅう","買い入れること"],
+   ["酷使","こくし","むごいほど使うこと"],
+   ["粉砕","ふんさい","こなごなにくだくこと"],
+   ["遮断","しゃだん","さえぎって断ち切ること"],
+   ["充実","じゅうじつ","内容が満ちたりていること"],
+   ["渋滞","じゅうたい","流れがとどこおること"],
+   ["循環","じゅんかん","ひとまわりしてもどること"],
+   ["症状","しょうじょう","病気に現れるようす"],
+   ["診察","しんさつ","医師が病状を調べること"],
+   ["睡眠","すいみん","ねむること"],
+   ["誓約","せいやく","かたく誓って約束すること"],
+   ["繊維","せんい","細い糸状のもの"],
+   ["洗濯","せんたく","衣類をあらうこと"],
+   ["素朴","そぼく","かざりけがなく自然なこと"],
+   ["挑戦","ちょうせん","困難なことにいどむこと"],
+   ["徹底","てってい","すみずみまでやりとおすこと"],
+   ["撤去","てっきょ","取りのぞいて片づけること"],
+   ["妥当","だとう","無理がなく適切なこと"],
+   ["頻度","ひんど","くり返し起こる回数の多さ"],
+   ["憤慨","ふんがい","激しくいきどおること"],
+   ["併用","へいよう","あわせて用いること"],
+   ["偏見","へんけん","かたよったものの見方"],
+   ["研磨","けんま","みがいて仕上げること"],
+   ["融合","ゆうごう","とけ合って一つになること"],
+   ["猶予","ゆうよ","実行を先にのばすこと"],
+   ["裕福","ゆうふく","財産があり豊かなこと"],
+   ["履歴","りれき","これまでの経歴"],
+   ["清涼","せいりょう","さわやかで涼しいこと"],
+   ["累積","るいせき","次々に積み重なること"],
+   ["過疎","かそ","人口が少なくなりすぎること"],
+   ["貢献","こうけん","役に立つよう力をつくすこと"],
+   ["醸造","じょうぞう","発酵させて酒などを造ること"],
+   ["高騰","こうとう","値段が大きく上がること"],
+   ["派閥","はばつ","出身や利害で結びついた集団"],
+   ["雨傘","あまがさ","雨をよけるかさ"],
+   ["弦楽","げんがく","弦をはった楽器による音楽"],
+   ["摩擦","まさつ","こすれ合うこと。対立"],
+   ["愉快","ゆかい","楽しく気持ちのよいこと"],
+   ["旋回","せんかい","円をえがいてまわること"],
+   ["本棚","ほんだな","本を並べておく棚"],
+   ["診断","しんだん","状態を調べて判断すること"],
+   ["核心","かくしん","物事の中心となる大事な点"],
+   ["悪臭","あくしゅう","いやなにおい"],
+   ["捜索","そうさく","さがしもとめること"],
+   ["唯一","ゆいいつ","ただ一つであること"],
+   ["庶民","しょみん","世間一般の人々"],
+   ["交渉","こうしょう","話し合って取り決めること"],
+   ["探偵","たんてい","ひそかに調べる人"],
+   ["培養","ばいよう","育てて増やすこと"],
+   ["廃止","はいし","やめて取りやめること"],
+   ["喪失","そうしつ","失ってなくすこと"],
+   ["砂漠","さばく","雨が少なく砂や岩が広がる土地"],
+   ["報酬","ほうしゅう","働きに対して支払われるもの"],
+   ["嫌悪","けんお","ひどくきらうこと"],
+   ["囲碁","いご","白黒の石で陣地を争う遊び"],
+   ["監督","かんとく","指図して取りしまる人"],
+   ["風鈴","ふうりん","風で鳴らす小さなすず"],
+   ["革靴","かわぐつ","革で作ったくつ"],
+   ["同僚","どうりょう","同じ職場で働く仲間"],
+   ["感銘","かんめい","深く心に刻まれること"],
+   ["表彰","ひょうしょう","功績をたたえて示すこと"],
+   ["無駄","むだ","役に立たないこと"],
+   ["丁寧","ていねい","注意が行き届いて礼儀正しいこと"],
+   ["稼働","かどう","機械が動いて働くこと"],
+   ["勲章","くんしょう","功績に対しておくられるしるし"],
+   ["賠償","ばいしょう","与えた損害をつぐなうこと"],
+   ["推薦","すいせん","よいものとして人にすすめること"],
+   ["土壌","どじょう","作物を育てる土"],
+   ["管轄","かんかつ","権限をもって取りしきる範囲"],
+   ["模擬","もぎ","本物をまねて行うこと"],
+   ["謙虚","けんきょ","ひかえめですなおなこと"],
+   ["治癒","ちゆ","病気やけがが治ること"],
+   ["制覇","せいは","戦って一位になること"],
+   ["楽譜","がくふ","音楽を記号で書き表したもの"],
+   ["海藻","かいそう","海に育つ藻の仲間"],
+   ["懸命","けんめい","力のかぎりつとめること"],
+   ["軍艦","ぐんかん","戦うために造られた船"]],
+10:[["挨拶","あいさつ","出会いや別れのときに交わす言葉"],
+   ["曖昧","あいまい","はっきりしないこと"],
+   ["宛先","あてさき","郵便などを送る相手先"],
+   ["椅子","いす","腰かけるための家具"],
+   ["語彙","ごい","その言語で使われる語の集まり"],
+   ["畏敬","いけい","おそれうやまうこと"],
+   ["萎縮","いしゅく","しぼんで小さくなること"],
+   ["咽喉","いんこう","のど"],
+   ["臆病","おくびょう","ちょっとしたことをこわがる性質"],
+   ["旺盛","おうせい","勢いがさかんなこと"],
+   ["断崖","だんがい","切り立ったがけ"],
+   ["象牙","ぞうげ","ゾウのきば"],
+   ["楷書","かいしょ","点画をくずさない書体"],
+   ["葛藤","かっとう","心の中で対立して悩むこと"],
+   ["韓国","かんこく","大韓民国"],
+   ["玩具","がんぐ","おもちゃ"],
+   ["亀裂","きれつ","ひび割れ"],
+   ["僅少","きんしょう","ごくわずかなこと"],
+   ["洞窟","どうくつ","岩や地中にできた深い穴"],
+   ["稽古","けいこ","芸事や武道を習い練習すること"],
+   ["憧憬","しょうけい","あこがれること"],
+   ["拳法","けんぽう","こぶしを用いる武術"],
+   ["鍵盤","けんばん","ピアノなどのキーの並び"],
+   ["禁錮","きんこ","刑務所に閉じこめる刑罰"],
+   ["勾配","こうばい","傾きの度合い"],
+   ["傲慢","ごうまん","おごり高ぶって人を見下すこと"],
+   ["痕跡","こんせき","何かがあったあと"],
+   ["挫折","ざせつ","途中で気持ちが折れること"],
+   ["采配","さいはい","指図して人を動かすこと"],
+   ["斬新","ざんしん","発想が際立って新しいこと"],
+   ["真摯","しんし","まじめでひたむきなこと"],
+   ["叱責","しっせき","しかって責めること"],
+   ["半袖","はんそで","ひじまでの短いそで"],
+   ["払拭","ふっしょく","すっかり取りのぞくこと"],
+   ["腎臓","じんぞう","血液から尿をつくる臓器"],
+   ["必須","ひっす","かならず必要なこと"],
+   ["覚醒","かくせい","目がさめること。迷いから覚めること"],
+   ["脊椎","せきつい","背骨"],
+   ["親戚","しんせき","血縁や婚姻でつながる人々"],
+   ["煎茶","せんちゃ","茶葉を湯でいれた日本茶"],
+   ["羨望","せんぼう","うらやましく思うこと"],
+   ["詮索","せんさく","細かく調べ立てること"],
+   ["便箋","びんせん","手紙を書くための紙"],
+   ["爽快","そうかい","さわやかで気持ちのよいこと"],
+   ["捕捉","ほそく","とらえること"],
+   ["謙遜","けんそん","ひかえめにふるまうこと"],
+   ["唾液","だえき","口の中に出るつば"],
+   ["堆積","たいせき","積み重なること"],
+   ["頂戴","ちょうだい","もらうことのへりくだった言い方"],
+   ["元旦","がんたん","元日の朝"],
+   ["破綻","はたん","うまくいかずやぶれること"],
+   ["緻密","ちみつ","細かくゆきとどいていること"],
+   ["貼付","ちょうふ","のりなどではりつけること"],
+   ["進捗","しんちょく","物事が進んでいく具合"],
+   ["牛丼","ぎゅうどん","牛肉をのせたどんぶり"],
+   ["整頓","せいとん","きちんと片づけること"],
+   ["土鍋","どなべ","土を焼いて作ったなべ"],
+   ["虹色","にじいろ","にじのような七色"],
+   ["捻挫","ねんざ","関節をひねって痛めること"],
+   ["汎用","はんよう","広くいろいろに使えること"],
+   ["氾濫","はんらん","水があふれ出ること"],
+   ["斑点","はんてん","まだらの点"],
+   ["眉毛","まゆげ","目の上に生えている毛"],
+   ["訃報","ふほう","人が亡くなったという知らせ"],
+   ["隠蔽","いんぺい","おおいかくすこと"],
+   ["完璧","かんぺき","欠点がまったくないこと"],
+   ["哺乳","ほにゅう","乳であたえて子を育てること"],
+   ["蜂蜜","はちみつ","ミツバチが集めた甘い蜜"],
+   ["変貌","へんぼう","すがたが大きく変わること"],
+   ["親睦","しんぼく","たがいに親しみ合うこと"],
+   ["麺類","めんるい","うどん・そばなどの総称"],
+   ["比喩","ひゆ","他のものにたとえて表すこと"],
+   ["藍色","あいいろ","濃く暗い青色"],
+   ["瑠璃","るり","青く美しい宝石。またその色"],
+   ["伴侶","はんりょ","連れ添う相手"],
+   ["明瞭","めいりょう","はっきりしていること"],
+   ["山麓","さんろく","山のふもと"],
+   ["風呂","ふろ","湯につかって体を洗う設備"],
+   ["近畿","きんき","京都・大阪を中心とする地方"],
+   ["嗅覚","きゅうかく","においを感じる感覚"],
+   ["危惧","きぐ","悪い結果をおそれ心配すること"],
+   ["歌舞伎","かぶき","日本の伝統的な演劇"],
+   ["俳諧","はいかい","連歌から生まれた文芸"],
+   ["初詣","はつもうで","年の初めに社寺へ参ること"],
+   ["隙間","すきま","物と物のあいだのあき"]]
+};
+/* 英単語データ：[つづり, 日本語, なかま]
+   CEFR（A1/A2/B1/B2）のレベル判定は下記に準拠：
+   『CEFR-J Wordlist Version 1.6』東京外国語大学 投野由紀夫研究室
+   http://www.cefr-j.org/download.html#cefrj_wordlist
+   （日本語訳は本アプリで独自に付与）
+   小3・小4＝外国語活動（Let's Try! 1・2）／小5・小6＝外国語（NEW HORIZON Elementary 5・6）の
+   単元で扱うカテゴリーに沿って配列。1語で書ける語のみ（連語・慣用表現は対象外）。 */
+const EN_WORDS = {
+3:[
+ ["hello","こんにちは","あいさつ"],["hi","やあ","あいさつ"],["goodbye","さようなら","あいさつ"],
+ ["name","名前","あいさつ"],["friend","友だち","あいさつ"],["yes","はい","あいさつ"],
+ ["no","いいえ","あいさつ"],["please","おねがいします","あいさつ"],["sorry","ごめんなさい","あいさつ"],
+ ["nice","すてきな","あいさつ"],
+ ["fine","元気な","気もち"],["happy","うれしい","気もち"],["sad","かなしい","気もち"],
+ ["sleepy","ねむい","気もち"],["tired","つかれた","気もち"],["hungry","おなかがすいた","気もち"],
+ ["thirsty","のどがかわいた","気もち"],["angry","おこった","気もち"],["good","よい","気もち"],
+ ["great","とてもよい","気もち"],
+ ["one","1","数"],["two","2","数"],["three","3","数"],["four","4","数"],["five","5","数"],
+ ["six","6","数"],["seven","7","数"],["eight","8","数"],["nine","9","数"],["ten","10","数"],
+ ["eleven","11","数"],["twelve","12","数"],["thirteen","13","数"],["fourteen","14","数"],
+ ["fifteen","15","数"],["sixteen","16","数"],["seventeen","17","数"],["eighteen","18","数"],
+ ["nineteen","19","数"],["twenty","20","数"],
+ ["red","あか","色"],["blue","あお","色"],["green","みどり","色"],["yellow","きいろ","色"],
+ ["black","くろ","色"],["white","しろ","色"],["pink","ピンク","色"],["purple","むらさき","色"],
+ ["brown","ちゃいろ","色"],["orange","オレンジ色","色"],["gold","金色","色"],["silver","銀色","色"],
+ ["soccer","サッカー","スポーツ"],["baseball","やきゅう","スポーツ"],["basketball","バスケットボール","スポーツ"],
+ ["tennis","テニス","スポーツ"],["volleyball","バレーボール","スポーツ"],["badminton","バドミントン","スポーツ"],
+ ["dodgeball","ドッジボール","スポーツ"],["swimming","すいえい","スポーツ"],["judo","じゅうどう","スポーツ"],
+ ["rugby","ラグビー","スポーツ"],
+ ["pizza","ピザ","食べもの"],["hamburger","ハンバーガー","食べもの"],["spaghetti","スパゲッティ","食べもの"],
+ ["curry","カレー","食べもの"],["steak","ステーキ","食べもの"],["cake","ケーキ","食べもの"],
+ ["bread","パン","食べもの"],["rice","ごはん","食べもの"],["egg","たまご","食べもの"],
+ ["soup","スープ","食べもの"],["sandwich","サンドイッチ","食べもの"],
+ ["apple","りんご","くだもの"],["banana","バナナ","くだもの"],["grapes","ぶどう","くだもの"],
+ ["peach","もも","くだもの"],["lemon","レモン","くだもの"],["melon","メロン","くだもの"],
+ ["strawberry","いちご","くだもの"],["cherry","さくらんぼ","くだもの"],["kiwi","キウイ","くだもの"],
+ ["pineapple","パイナップル","くだもの"],["watermelon","すいか","くだもの"],
+ ["carrot","にんじん","やさい"],["onion","たまねぎ","やさい"],["potato","じゃがいも","やさい"],
+ ["tomato","トマト","やさい"],["cucumber","きゅうり","やさい"],["corn","とうもろこし","やさい"],
+ ["cabbage","キャベツ","やさい"],["pumpkin","かぼちゃ","やさい"],["mushroom","きのこ","やさい"],
+ ["circle","まる","形"],["triangle","さんかく","形"],["square","しかく","形"],
+ ["rectangle","長方形","形"],["star","ほし","形"],["heart","ハート","形"],
+ ["diamond","ひしがた","形"],["cross","十字","形"],["line","線","形"],
+ ["dog","いぬ","動物"],["cat","ねこ","動物"],["rabbit","うさぎ","動物"],["bird","とり","動物"],
+ ["fish","さかな","動物"],["monkey","さる","動物"],["elephant","ぞう","動物"],["bear","くま","動物"],
+ ["panda","パンダ","動物"],["lion","ライオン","動物"],["tiger","とら","動物"],["horse","うま","動物"],
+ ["cow","うし","動物"],["pig","ぶた","動物"],["sheep","ひつじ","動物"],["mouse","ねずみ","動物"],
+ ["frog","かえる","動物"],["snake","へび","動物"],["gorilla","ゴリラ","動物"],["zebra","シマウマ","動物"],
+ ["giraffe","キリン","動物"],["koala","コアラ","動物"],["fox","きつね","動物"],["dragon","りゅう","動物"],
+ ["head","あたま","体"],["shoulder","かた","体"],["knee","ひざ","体"],["toe","足のゆび","体"],
+ ["eye","目","体"],["ear","耳","体"],["mouth","口","体"],["nose","はな","体"],
+ ["hand","手","体"],["face","かお","体"],["hair","かみの毛","体"],["arm","うで","体"],
+ ["leg","あし","体"],["foot","足","体"],["finger","ゆび","体"],["body","体","体"]],
+
+4:[
+ ["Japan","日本","国"],["America","アメリカ","国"],["Australia","オーストラリア","国"],
+ ["Brazil","ブラジル","国"],["Canada","カナダ","国"],["China","中国","国"],["Egypt","エジプト","国"],
+ ["France","フランス","国"],["India","インド","国"],["Italy","イタリア","国"],["Kenya","ケニア","国"],
+ ["Korea","かん国","国"],["Spain","スペイン","国"],["Russia","ロシア","国"],["Germany","ドイツ","国"],
+ ["Thailand","タイ","国"],["Vietnam","ベトナム","国"],["Singapore","シンガポール","国"],
+ ["Mexico","メキシコ","国"],["Peru","ペルー","国"],
+ ["sunny","はれ","天気"],["rainy","あめ","天気"],["cloudy","くもり","天気"],["snowy","ゆき","天気"],
+ ["windy","風が強い","天気"],["hot","あつい","天気"],["cold","さむい","天気"],
+ ["warm","あたたかい","天気"],["cool","すずしい","天気"],
+ ["shirt","シャツ","衣類"],["cap","ぼうし","衣類"],["hat","つばのあるぼうし","衣類"],
+ ["shoes","くつ","衣類"],["socks","くつ下","衣類"],["jacket","上着","衣類"],
+ ["gloves","手ぶくろ","衣類"],["boots","ブーツ","衣類"],["sweater","セーター","衣類"],
+ ["skirt","スカート","衣類"],["pants","ズボン","衣類"],["dress","ワンピース","衣類"],
+ ["uniform","せいふく","衣類"],
+ ["Monday","月曜日","曜日"],["Tuesday","火曜日","曜日"],["Wednesday","水曜日","曜日"],
+ ["Thursday","木曜日","曜日"],["Friday","金曜日","曜日"],["Saturday","土曜日","曜日"],
+ ["Sunday","日曜日","曜日"],
+ ["game","ゲーム","あそび"],["card","カード","あそび"],["ball","ボール","あそび"],
+ ["time","時こく","時こく"],["morning","朝","時こく"],["afternoon","昼すぎ","時こく"],
+ ["evening","夕方","時こく"],["night","夜","時こく"],["noon","正午","時こく"],
+ ["snack","おやつ","時こく"],["homework","しゅくだい","時こく"],["bath","おふろ","時こく"],
+ ["bed","ベッド","時こく"],
+ ["pencil","えんぴつ","文ぼうぐ"],["eraser","けしゴム","文ぼうぐ"],["ruler","じょうぎ","文ぼうぐ"],
+ ["notebook","ノート","文ぼうぐ"],["scissors","はさみ","文ぼうぐ"],["glue","のり","文ぼうぐ"],
+ ["marker","マーカー","文ぼうぐ"],["crayon","クレヨン","文ぼうぐ"],["stapler","ホッチキス","文ぼうぐ"],
+ ["pen","ペン","文ぼうぐ"],["book","本","文ぼうぐ"],["bag","かばん","文ぼうぐ"],
+ ["desk","つくえ","文ぼうぐ"],["chair","いす","文ぼうぐ"],["clock","かけ時計","文ぼうぐ"],
+ ["box","はこ","文ぼうぐ"],["tape","テープ","文ぼうぐ"],
+ ["classroom","教室","学校の場所"],["library","図書室","学校の場所"],["gym","体育館","学校の場所"],
+ ["playground","運動場","学校の場所"],["restroom","トイレ","学校の場所"],["entrance","げんかん","学校の場所"],
+ ["school","学校","学校の場所"],["garden","にわ・花だん","学校の場所"],["pool","プール","学校の場所"],
+ ["ground","グラウンド","学校の場所"],
+ ["straight","まっすぐに","道案内"],["left","左","道案内"],["right","右","道案内"],
+ ["turn","まがる","道案内"],["stop","止まる","道案内"],
+ ["wake","目をさます","一日の動作"],["wash","あらう","一日の動作"],["brush","みがく","一日の動作"],
+ ["eat","食べる","一日の動作"],["study","勉強する","一日の動作"],["watch","見る","一日の動作"],
+ ["clean","そうじする","一日の動作"],["walk","歩く","一日の動作"],["sleep","ねむる","一日の動作"],
+ ["read","読む","一日の動作"],["write","書く","一日の動作"],["listen","聞く","一日の動作"]],
+
+5:[
+ ["math","算数","教科"],["science","理科","教科"],["music","音楽","教科"],["art","図工","教科"],
+ ["English","英語","教科"],["Japanese","国語","教科"],["calligraphy","書写","教科"],
+ ["history","歴史","教科"],
+ ["January","1月","月"],["February","2月","月"],["March","3月","月"],["April","4月","月"],
+ ["May","5月","月"],["June","6月","月"],["July","7月","月"],["August","8月","月"],
+ ["September","9月","月"],["October","10月","月"],["November","11月","月"],["December","12月","月"],
+ ["first","1日目・1番目","順番"],["second","2番目","順番"],["third","3番目","順番"],
+ ["fourth","4番目","順番"],["fifth","5番目","順番"],["sixth","6番目","順番"],
+ ["seventh","7番目","順番"],["eighth","8番目","順番"],["ninth","9番目","順番"],
+ ["tenth","10番目","順番"],["eleventh","11番目","順番"],["twelfth","12番目","順番"],
+ ["twentieth","20番目","順番"],["thirtieth","30番目","順番"],
+ ["teacher","先生","しょくぎょう"],["doctor","医者","しょくぎょう"],["nurse","かんごし","しょくぎょう"],
+ ["farmer","農家","しょくぎょう"],["singer","歌手","しょくぎょう"],["baker","パン屋","しょくぎょう"],
+ ["pilot","パイロット","しょくぎょう"],["astronaut","うちゅう飛行士","しょくぎょう"],
+ ["vet","じゅうい","しょくぎょう"],["dentist","歯科医","しょくぎょう"],["artist","芸術家","しょくぎょう"],
+ ["writer","作家","しょくぎょう"],["chef","料理人","しょくぎょう"],["musician","音楽家","しょくぎょう"],
+ ["dancer","ダンサー","しょくぎょう"],["florist","花屋","しょくぎょう"],["carpenter","大工","しょくぎょう"],
+ ["driver","運転手","しょくぎょう"],
+ ["swim","およぐ","動作"],["run","走る","動作"],["jump","とぶ","動作"],["sing","歌う","動作"],
+ ["dance","おどる","動作"],["ski","スキーをする","動作"],["skate","スケートをする","動作"],
+ ["ride","乗る","動作"],["cook","料理する","動作"],["draw","えがく","動作"],["fly","とぶ","動作"],
+ ["climb","のぼる","動作"],["catch","つかまえる","動作"],["throw","投げる","動作"],
+ ["kick","ける","動作"],["help","手伝う","動作"],
+ ["piano","ピアノ","楽器"],["guitar","ギター","楽器"],["violin","バイオリン","楽器"],
+ ["drums","ドラム","楽器"],["recorder","リコーダー","楽器"],["flute","フルート","楽器"],
+ ["trumpet","トランペット","楽器"],
+ ["father","父","家族・人"],["mother","母","家族・人"],["brother","兄弟","家族・人"],
+ ["sister","姉妹","家族・人"],["grandfather","そふ","家族・人"],["grandmother","そぼ","家族・人"],
+ ["family","家族","家族・人"],["uncle","おじ","家族・人"],["aunt","おば","家族・人"],
+ ["baby","赤ちゃん","家族・人"],["boy","男の子","家族・人"],["girl","女の子","家族・人"],
+ ["man","男の人","家族・人"],["woman","女の人","家族・人"],["people","人々","家族・人"],
+ ["hero","あこがれの人","家族・人"],
+ ["on","〜の上に","位置"],["in","〜の中に","位置"],["under","〜の下に","位置"],
+ ["by","〜のそばに","位置"],["near","〜の近くに","位置"],["behind","〜のうしろに","位置"],
+ ["station","駅","町の場所"],["hospital","病院","町の場所"],["park","公園","町の場所"],
+ ["bookstore","本屋","町の場所"],["restaurant","レストラン","町の場所"],["museum","はく物館","町の場所"],
+ ["temple","寺","町の場所"],["shrine","神社","町の場所"],["stadium","競技場","町の場所"],
+ ["zoo","動物園","町の場所"],["aquarium","水族館","町の場所"],["castle","城","町の場所"],
+ ["bank","銀行","町の場所"],["hotel","ホテル","町の場所"],["supermarket","スーパー","町の場所"],
+ ["airport","空港","町の場所"],["factory","工場","町の場所"],["house","家","町の場所"],
+ ["town","町","町の場所"],["city","都市","町の場所"],["corner","かど","町の場所"],
+ ["water","水","のみもの・デザート"],["milk","牛にゅう","のみもの・デザート"],["juice","ジュース","のみもの・デザート"],
+ ["tea","お茶","のみもの・デザート"],["coffee","コーヒー","のみもの・デザート"],["soda","たんさん飲料","のみもの・デザート"],
+ ["parfait","パフェ","のみもの・デザート"],["pudding","プリン","のみもの・デザート"],
+ ["doughnut","ドーナツ","のみもの・デザート"],["chocolate","チョコレート","のみもの・デザート"],
+ ["candy","あめ","のみもの・デザート"],["cookie","クッキー","のみもの・デザート"],
+ ["yogurt","ヨーグルト","のみもの・デザート"],
+ ["breakfast","朝食","食事"],["lunch","昼食","食事"],["dinner","夕食","食事"],
+ ["dessert","デザート","食事"],["salad","サラダ","食事"],["menu","メニュー","食事"],
+ ["money","お金","食事"],["yen","円","食事"],["delicious","おいしい","食事"],
+ ["spring","春","季節"],["summer","夏","季節"],["autumn","秋","季節"],["winter","冬","季節"],
+ ["festival","お祭り","行事"],["fireworks","花火","行事"],["birthday","たんじょう日","行事"],
+ ["party","パーティー","行事"],["holiday","休日","行事"],["vacation","長い休み","行事"],
+ ["camping","キャンプ","行事"],["hiking","ハイキング","行事"],["shopping","買い物","行事"],
+ ["fishing","つり","行事"],
+ ["always","いつも","ひんど"],["usually","たいてい","ひんど"],["sometimes","ときどき","ひんど"],
+ ["often","よく","ひんど"],["never","一度もない","ひんど"],
+ ["kind","やさしい","せいかく"],["friendly","人なつこい","せいかく"],["brave","ゆうかんな","せいかく"],
+ ["funny","おもしろい","せいかく"],["active","活発な","せいかく"],["powerful","力強い","せいかく"],
+ ["strong","強い","せいかく"],["gentle","おだやかな","せいかく"],["smart","かしこい","せいかく"],
+ ["quiet","しずかな","せいかく"]],
+
+6:[
+ ["bus","バス","乗りもの"],["train","電車","乗りもの"],["car","車","乗りもの"],
+ ["bike","自転車","乗りもの"],["taxi","タクシー","乗りもの"],["ship","船","乗りもの"],
+ ["plane","飛行機","乗りもの"],["subway","地下鉄","乗りもの"],["boat","ボート","乗りもの"],
+ ["truck","トラック","乗りもの"],
+ ["beautiful","美しい","ようす"],["exciting","わくわくする","ようす"],["wonderful","すばらしい","ようす"],
+ ["fantastic","とてもすてきな","ようす"],["amazing","おどろくほどすごい","ようす"],
+ ["interesting","きょうみ深い","ようす"],["popular","人気のある","ようす"],["famous","有名な","ようす"],
+ ["fun","楽しみ","ようす"],["cute","かわいい","ようす"],["big","大きい","ようす"],
+ ["small","小さい","ようす"],["long","長い","ようす"],["short","短い","ようす"],
+ ["sweet","あまい","味"],["sour","すっぱい","味"],["salty","しおからい","味"],
+ ["bitter","にがい","味"],["spicy","からい","味"],["fresh","新せんな","味"],
+ ["soft","やわらかい","味"],["juicy","しるが多い","味"],
+ ["went","行った","過去形"],["ate","食べた","過去形"],["saw","見た","過去形"],
+ ["enjoyed","楽しんだ","過去形"],["visited","おとずれた","過去形"],["played","（スポーツを）した","過去形"],
+ ["was","〜だった","過去形"],["were","〜だった","過去形"],["had","持っていた","過去形"],
+ ["got","手に入れた","過去形"],["made","作った","過去形"],["bought","買った","過去形"],
+ ["watched","見た","過去形"],["joined","参加した","過去形"],
+ ["forest","森","自然"],["ocean","大洋","自然"],["river","川","自然"],["mountain","山","自然"],
+ ["nature","自然","自然"],["earth","地球","自然"],["sea","海","自然"],["lake","湖","自然"],
+ ["sky","空","自然"],["beach","すな浜","自然"],["island","島","自然"],["desert","さばく","自然"],
+ ["jungle","ジャングル","自然"],["field","野原","自然"],["flower","花","自然"],["tree","木","自然"],
+ ["grass","草","自然"],["moon","月","自然"],["sun","太陽","自然"],["cloud","雲","自然"],
+ ["whale","くじら","海の生きもの"],["dolphin","いるか","海の生きもの"],["shark","さめ","海の生きもの"],
+ ["turtle","うみがめ","海の生きもの"],["octopus","たこ","海の生きもの"],["jellyfish","くらげ","海の生きもの"],
+ ["penguin","ペンギン","海の生きもの"],["seal","あざらし","海の生きもの"],["crab","かに","海の生きもの"],
+ ["squid","いか","海の生きもの"],["starfish","ひとで","海の生きもの"],
+ ["animal","動物","自然"],
+ ["ant","あり","虫"],["bee","はち","虫"],["butterfly","ちょう","虫"],["spider","くも","虫"],
+ ["beetle","かぶと虫","虫"],["grasshopper","ばった","虫"],["dragonfly","とんぼ","虫"],
+ ["ladybug","てんとう虫","虫"],
+ ["beef","牛肉","食ざい"],["pork","ぶた肉","食ざい"],["chicken","とり肉","食ざい"],
+ ["cheese","チーズ","食ざい"],["butter","バター","食ざい"],["sugar","さとう","食ざい"],
+ ["salt","しお","食ざい"],["oil","あぶら","食ざい"],["flour","小麦こ","食ざい"],
+ ["meat","肉","食ざい"],["vegetable","やさい","食ざい"],["fruit","くだもの","食ざい"],
+ ["seafood","魚かい類","食ざい"],
+ ["energy","エネルギー","かんきょう"],["plastic","プラスチック","かんきょう"],
+ ["recycle","リサイクルする","かんきょう"],["garbage","ごみ","かんきょう"],
+ ["environment","かんきょう","かんきょう"],["save","守る・節約する","かんきょう"],
+ ["protect","守る","かんきょう"],["problem","問題","かんきょう"],
+ ["graduation","そつ業","学校行事"],["ceremony","式","学校行事"],["trip","旅行","学校行事"],
+ ["camp","キャンプ","学校行事"],["marathon","マラソン","学校行事"],["concert","えんそう会","学校行事"],
+ ["contest","コンテスト","学校行事"],["memory","思い出","学校行事"],["event","行事","学校行事"],
+ ["drama","げき","学校行事"],
+ ["speech","スピーチ","学校行事"],
+ ["volunteer","ボランティア","学校行事"],
+ ["chorus","合唱","部活動"],["band","吹そう楽","部活動"],["track","陸上","部活動"],
+ ["club","部活動","部活動"],["team","チーム","部活動"],["softball","ソフトボール","部活動"],
+ ["kendo","けんどう","部活動"],["karate","からて","部活動"],
+ ["dream","ゆめ","しょうらい"],["future","しょうらい","しょうらい"],["engineer","技術者","しょうらい"],
+ ["scientist","科学者","しょうらい"],["designer","デザイナー","しょうらい"],
+ ["programmer","プログラマー","しょうらい"],["firefighter","消防士","しょうらい"],
+ ["police","けいさつ","しょうらい"],["job","仕事","しょうらい"],["work","はたらく","しょうらい"]],
+
+7:[
+ ["this","これ・この","中1"],["that","あれ・その","中1"],["these","これら","中1"],["those","それら","中1"],
+ ["here","ここに","中1"],["very","とても","中1"],["too","〜も・〜すぎる","中1"],["also","〜もまた","中1"],
+ ["but","しかし","中1"],["because","なぜなら","中1"],["when","いつ","中1"],["where","どこ","中1"],
+ ["who","だれ","中1"],["which","どちら","中1"],["how","どのように","中1"],["why","なぜ","中1"],
+ ["now","今","中1"],["then","そのとき","中1"],["again","再び","中1"],["well","じょうずに","中1"],
+ ["room","部屋","中1"],["kitchen","台所","中1"],["window","窓","中1"],["door","ドア","中1"],
+ ["wall","かべ","中1"],["floor","ゆか","中1"],["table","テーブル","中1"],["cup","カップ","中1"],
+ ["dish","皿","中1"],["knife","ナイフ","中1"],["fork","フォーク","中1"],["spoon","スプーン","中1"],
+ ["key","かぎ","中1"],["phone","電話","中1"],["camera","カメラ","中1"],["letter","手紙・文字","中1"],
+ ["picture","絵・写真","中1"],["map","地図","中1"],["computer","コンピューター","中1"],["movie","映画","中1"],
+ ["story","物語","中1"],["song","歌","中1"],["news","ニュース","中1"],["word","語","中1"],
+ ["question","質問","中1"],["answer","答え","中1"],["idea","考え","中1"],["number","数","中1"],
+ ["page","ページ","中1"],["class","授業・学級","中1"],["lesson","課・けいこ","中1"],["test","テスト","中1"],
+ ["student","生徒","中1"],["member","一員","中1"],["group","集団","中1"],["hobby","しゅみ","中1"],
+ ["want","ほしい","中1"],["need","必要とする","中1"],["know","知っている","中1"],["think","考える","中1"],
+ ["speak","話す","中1"],["talk","話す","中1"],["tell","伝える","中1"],["ask","たずねる","中1"],
+ ["learn","学ぶ","中1"],["teach","教える","中1"],["practice","練習する","中1"],["use","使う","中1"],
+ ["make","作る","中1"],["take","取る","中1"],["give","あたえる","中1"],["put","置く","中1"],
+ ["open","開ける","中1"],["close","閉じる","中1"],["start","始める","中1"],["finish","終える","中1"],
+ ["live","住む","中1"],["stay","とどまる","中1"],["meet","会う","中1"],["send","送る","中1"],
+ ["show","見せる","中1"],["find","見つける","中1"],["look","見る","中1"],["hear","聞こえる","中1"],
+ ["feel","感じる","中1"],["bring","持ってくる","中1"],["carry","運ぶ","中1"],["wear","身につける","中1"],
+ ["try","ためす","中1"],["wait","待つ","中1"],["sit","すわる","中1"],["stand","立つ","中1"],
+ ["drink","飲む","中1"],["new","新しい","中1"],["old","古い・年をとった","中1"],["young","若い","中1"],
+ ["tall","背が高い","中1"],["large","大きい","中1"],["easy","やさしい","中1"],["difficult","むずかしい","中1"],
+ ["busy","いそがしい","中1"],["free","自由な・ひまな","中1"],["early","早く","中1"],["late","おそい","中1"],
+ ["fast","速い","中1"],["slow","おそい","中1"],["high","高い","中1"],["heavy","重い","中1"],
+ ["light","軽い・光","中1"],["dirty","きたない","中1"],
+ ["get up","起きる","中1"],["go to bed","ねる","中1"],["come from","〜の出身である","中1"],
+ ["look at","〜を見る","中1"],["listen to","〜を聞く","中1"],["talk about","〜について話す","中1"],
+ ["a lot","たくさん","中1"],["a lot of","たくさんの","中1"],["after school","放課後に","中1"],
+ ["every day","毎日","中1"],["for example","たとえば","中1"],["go home","家に帰る","中1"],
+ ["go shopping","買い物に行く","中1"],["how many","いくつの","中1"],["how much","いくらの","中1"],
+ ["in front of","〜の前に","中1"],["of course","もちろん","中1"],["over there","向こうに","中1"],
+ ["play with","〜と遊ぶ","中1"],["take a picture","写真をとる","中1"],["thank you","ありがとう","中1"],
+ ["very much","とても","中1"],["wake up","目をさます","中1"],["watch TV","テレビを見る","中1"],
+ ["go fishing","つりに行く","中1"],["take care","気をつける","中1"],["by bus","バスで","中1"],
+ ["on foot","歩いて","中1"],["at home","家で","中1"],["at night","夜に","中1"],
+ ["this morning","今朝","中1"],["last night","昨夜","中1"],["right now","今すぐ","中1"],
+ ["a little","少し","中1"],["a few","少しの","中1"],["one day","ある日","中1"],
+ ["some day","いつか","中1"],["all day","一日じゅう","中1"],["stand up","立ち上がる","中1"],
+ ["sit down","すわる","中1"]],
+
+8:[
+ ["than","〜よりも","中2"],["better","よりよい","中2"],["best","最もよい","中2"],["more","もっと多く","中2"],
+ ["most","最も多く","中2"],["each","それぞれの","中2"],["other","ほかの","中2"],["another","もう一つの","中2"],
+ ["both","両方の","中2"],["either","どちらかの","中2"],["if","もし〜ならば","中2"],["though","〜だけれども","中2"],
+ ["while","〜する間に","中2"],["until","〜まで","中2"],["since","〜以来","中2"],["during","〜の間ずっと","中2"],
+ ["before","〜の前に","中2"],["after","〜のあとに","中2"],["between","〜の間に","中2"],["among","〜の中で","中2"],
+ ["around","まわりに","中2"],["across","横切って","中2"],["through","〜を通って","中2"],["along","〜にそって","中2"],
+ ["without","〜なしで","中2"],["into","〜の中へ","中2"],["over","〜の上に・こえて","中2"],
+ ["must","〜しなければならない","中2"],["should","〜すべきだ","中2"],["could","〜できた","中2"],
+ ["would","〜だろう","中2"],["might","〜かもしれない","中2"],["will","〜だろう","中2"],
+ ["begin","始まる","中2"],["continue","続ける","中2"],["decide","決める","中2"],["hope","望む","中2"],
+ ["plan","計画する","中2"],["agree","賛成する","中2"],["arrive","到着する","中2"],["believe","信じる","中2"],
+ ["borrow","借りる","中2"],["break","こわす","中2"],["build","建てる","中2"],["change","変える","中2"],
+ ["choose","選ぶ","中2"],["collect","集める","中2"],["add","加える","中2"],["cut","切る","中2"],
+ ["drive","運転する","中2"],["drop","落とす","中2"],["fall","落ちる","中2"],["fight","たたかう","中2"],
+ ["fill","満たす","中2"],["follow","ついていく","中2"],["forget","忘れる","中2"],["grow","育つ","中2"],
+ ["happen","起こる","中2"],["hold","かかえる","中2"],["hurt","傷つける","中2"],["invite","招く","中2"],
+ ["keep","保つ","中2"],["laugh","笑う","中2"],["lend","貸す","中2"],["lose","失う・負ける","中2"],
+ ["move","動かす","中2"],["pass","通り過ぎる・手わたす","中2"],["pay","支払う","中2"],["pick","つみとる","中2"],
+ ["prepare","準備する","中2"],["push","おす","中2"],["pull","引く","中2"],["receive","受け取る","中2"],
+ ["remember","思い出す","中2"],["repeat","くり返す","中2"],["report","報告する","中2"],["return","もどる","中2"],
+ ["share","分け合う","中2"],["shout","さけぶ","中2"],["smile","ほほえむ","中2"],["solve","解決する","中2"],
+ ["spend","費やす","中2"],["touch","さわる","中2"],["travel","旅行する","中2"],["understand","理解する","中2"],
+ ["win","勝つ","中2"],["worry","心配する","中2"],
+ ["culture","文化","中2"],["custom","習慣","中2"],["language","言語","中2"],["country","国","中2"],
+ ["world","世界","中2"],["life","生活・命","中2"],["health","健康","中2"],["accident","事故","中2"],
+ ["danger","危険","中2"],["peace","平和","中2"],["war","戦争","中2"],["power","力","中2"],
+ ["machine","機械","中2"],["internet","インターネット","中2"],["message","伝言","中2"],["email","電子メール","中2"],
+ ["opinion","意見","中2"],["reason","理由","中2"],["example","例","中2"],["chance","機会","中2"],
+ ["choice","選択","中2"],["result","結果","中2"],["effort","努力","中2"],["experience","経験","中2"],
+ ["information","情報","中2"],["weather","天気","中2"],["temperature","温度","中2"],["earthquake","地震","中2"],
+ ["important","重要な","中2"],["necessary","必要な","中2"],["possible","可能な","中2"],["different","ちがった","中2"],
+ ["same","同じ","中2"],["special","特別な","中2"],["useful","役に立つ","中2"],["dangerous","危険な","中2"],
+ ["careful","注意深い","中2"],["noisy","うるさい","中2"],["quickly","すばやく","中2"],["slowly","ゆっくりと","中2"],
+ ["suddenly","突然","中2"],["finally","ついに","中2"],["really","本当に","中2"],["almost","ほとんど","中2"],
+ ["already","すでに","中2"],["still","まだ","中2"],["enough","十分な","中2"],["several","いくつかの","中2"],
+ ["be able to","〜することができる","中2"],["be going to","〜するつもりだ","中2"],["be interested in","〜に興味がある","中2"],
+ ["be proud of","〜をほこりに思う","中2"],["be good at","〜が得意である","中2"],["look for","〜をさがす","中2"],
+ ["look forward to","〜を楽しみに待つ","中2"],["take care of","〜の世話をする","中2"],["think about","〜について考える","中2"],
+ ["try to","〜しようとする","中2"],["want to","〜したい","中2"],["would like","〜がほしい","中2"],
+ ["a kind of","一種の","中2"],["as soon as","〜するとすぐに","中2"],["at first","最初は","中2"],
+ ["at last","ついに","中2"],["by the way","ところで","中2"],["far from","〜から遠い","中2"],
+ ["find out","見つけ出す","中2"],["get to","〜に着く","中2"],["give up","あきらめる","中2"],
+ ["grow up","成長する","中2"],["in order to","〜するために","中2"],["more than","〜より多く","中2"],
+ ["most of","〜の大部分","中2"],["not only","〜だけでなく","中2"],["pick up","ひろい上げる","中2"],
+ ["put on","身につける","中2"],["take off","ぬぐ・りりくする","中2"],["turn off","消す","中2"],
+ ["turn on","つける","中2"],["wait for","〜を待つ","中2"],["write to","〜に手紙を書く","中2"],
+ ["such as","たとえば〜のような","中2"],["so that","〜するように","中2"],["thanks to","〜のおかげで","中2"],
+ ["a piece of","一切れの","中2"],["take part in","〜に参加する","中2"],["be full of","〜でいっぱいである","中2"],
+ ["for a while","しばらくの間","中2"],["a number of","いくつもの","中2"]],
+
+9:[
+ ["been","〜であった","中3"],["done","し終えた","中3"],["seen","見た","中3"],["taken","取った","中3"],
+ ["written","書いた","中3"],["spoken","話された","中3"],["known","知られた","中3"],["given","あたえられた","中3"],
+ ["told","告げた","中3"],["held","開かれた","中3"],["kept","保った","中3"],["built","建てられた","中3"],
+ ["born","生まれた","中3"],
+ ["society","社会","中3"],["government","政府","中3"],["economy","経済","中3"],["technology","科学技術","中3"],
+ ["industry","産業","中3"],["business","事業","中3"],["company","会社","中3"],["service","サービス","中3"],
+ ["product","製品","中3"],["customer","客","中3"],["community","地域社会","中3"],["education","教育","中3"],
+ ["university","大学","中3"],["college","大学","中3"],["research","研究","中3"],["development","発展","中3"],
+ ["project","計画","中3"],["purpose","目的","中3"],["situation","状況","中3"],["condition","条件・状態","中3"],
+ ["relationship","関係","中3"],["communication","意思の伝達","中3"],["discussion","議論","中3"],["decision","決定","中3"],
+ ["solution","解決策","中3"],["tradition","伝統","中3"],["generation","世代","中3"],["population","人口","中3"],
+ ["percent","パーセント","中3"],["average","平均","中3"],["material","材料","中3"],["resource","資源","中3"],
+ ["pollution","汚染","中3"],["climate","気候","中3"],["disaster","災害","中3"],["medicine","薬","中3"],
+ ["patient","患者","中3"],["survey","調査","中3"],["article","記事","中3"],["novel","小説","中3"],
+ ["achieve","成しとげる","中3"],["accept","受け入れる","中3"],["allow","許す","中3"],["appear","現れる","中3"],
+ ["apply","適用する・応募する","中3"],["avoid","さける","中3"],["cause","引き起こす","中3"],["compare","比べる","中3"],
+ ["connect","つなぐ","中3"],["consider","よく考える","中3"],["contain","ふくむ","中3"],["create","創造する","中3"],
+ ["describe","説明する","中3"],["develop","発展させる","中3"],["discover","発見する","中3"],["discuss","話し合う","中3"],
+ ["explain","説明する","中3"],["express","表現する","中3"],["imagine","想像する","中3"],["improve","改善する","中3"],
+ ["include","ふくむ","中3"],["increase","増やす","中3"],["introduce","紹介する","中3"],["invent","発明する","中3"],
+ ["manage","なんとかやりとげる","中3"],["mention","言及する","中3"],["notice","気づく","中3"],["offer","申し出る","中3"],
+ ["produce","生産する","中3"],["provide","提供する","中3"],["realize","気づく","中3"],["recognize","見分ける","中3"],
+ ["reduce","減らす","中3"],["refuse","断る","中3"],["remove","取りのぞく","中3"],["repair","修理する","中3"],
+ ["replace","取りかえる","中3"],["require","必要とする","中3"],["seem","〜のように見える","中3"],["suggest","提案する","中3"],
+ ["support","支える","中3"],["suppose","思う","中3"],["wonder","〜かしらと思う","中3"],
+ ["able","〜できる","中3"],["afraid","こわがって","中3"],["ancient","古代の","中3"],["common","共通の","中3"],
+ ["complete","完全な","中3"],["correct","正しい","中3"],["creative","創造的な","中3"],["curious","知りたがる","中3"],
+ ["effective","効果的な","中3"],["expensive","高価な","中3"],["foreign","外国の","中3"],["global","地球規模の","中3"],
+ ["huge","巨大な","中3"],["local","地元の","中3"],["modern","現代の","中3"],["natural","自然の","中3"],
+ ["negative","否定的な","中3"],["positive","前向きな","中3"],["perfect","完全な","中3"],["personal","個人の","中3"],
+ ["poor","貧しい","中3"],["rich","豊かな","中3"],["serious","深刻な","中3"],["similar","似ている","中3"],
+ ["simple","単純な","中3"],["successful","成功した","中3"],["terrible","ひどい","中3"],["traditional","伝統的な","中3"],
+ ["unique","独特の","中3"],["various","さまざまな","中3"],["wide","広い","中3"],
+ ["as well as","〜と同様に","中3"],["be afraid of","〜をこわがる","中3"],["be covered with","〜におおわれている","中3"],
+ ["be known as","〜として知られている","中3"],["be made from","〜から作られる","中3"],["be surprised at","〜におどろく","中3"],
+ ["bring about","引き起こす","中3"],["carry out","実行する","中3"],["come true","実現する","中3"],
+ ["cut down","切りたおす","中3"],["deal with","〜をあつかう","中3"],["depend on","〜にたよる","中3"],
+ ["get along","うまくやっていく","中3"],["get rid of","取りのぞく","中3"],["go on","続く","中3"],
+ ["hand in","提出する","中3"],["in addition","さらに","中3"],["in fact","実際は","中3"],
+ ["in other words","言いかえれば","中3"],["in spite of","〜にもかかわらず","中3"],["keep on","〜し続ける","中3"],
+ ["lead to","〜につながる","中3"],["look up","調べる","中3"],["make sure","たしかめる","中3"],
+ ["no longer","もはや〜ない","中3"],["on the other hand","一方では","中3"],["point out","指てきする","中3"],
+ ["put off","えんきする","中3"],["regard as","〜とみなす","中3"],["result in","〜という結果になる","中3"],
+ ["run out of","使い果たす","中3"],["set up","設立する","中3"],["take place","行われる","中3"],
+ ["turn out","結果的に〜になる","中3"],["up to","〜まで","中3"],["what is more","さらに","中3"],
+ ["be based on","〜にもとづく","中3"],["come up with","思いつく","中3"],["get used to","〜になれる","中3"],
+ ["make a difference","ちがいを生む","中3"],["take advantage of","うまく利用する","中3"]],
+
+11:[
+ ["about","〜について","A1"],["above","〜の上に","A1"],["action","行動","A1"],
+ ["activity","活動","A1"],["actor","俳優","A1"],["address","住所","A1"],
+ ["age","年れい","A1"],["album","アルバム","A1"],["alone","ひとりで","A1"],
+ ["anyone","だれか","A1"],["anything","何か","A1"],["awake","目がさめて","A1"],
+ ["away","はなれて","A1"],["back","背中・うしろへ","A1"],["bad","悪い","A1"],
+ ["bar","棒","A1"],["bat","バット","A1"],["bathroom","浴室","A1"],
+ ["bean","豆","A1"],["become","〜になる","A1"],["bedroom","寝室","A1"],
+ ["bell","ベル","A1"],["below","〜の下に","A1"],["beside","〜のそばに","A1"],
+ ["bicycle","自転車","A1"],["birth","誕生","A1"],["biscuit","ビスケット","A1"],
+ ["blank","空白の","A1"],["block","かたまり・区画","A1"],["blow","ふく","A1"],
+ ["board","板","A1"],["bone","骨","A1"],["boring","たいくつな","A1"],
+ ["bottle","びん","A1"],["bottom","底","A1"],["bowl","はち・どんぶり","A1"],
+ ["brain","脳","A1"],["breathe","呼吸する","A1"],["bridge","橋","A1"],
+ ["bright","明るい","A1"],["broken","こわれた","A1"],["bucket","バケツ","A1"],
+ ["building","建物","A1"],["burger","ハンバーガー","A1"],["button","ボタン","A1"],
+ ["buy","買う","A1"],["cafe","カフェ","A1"],["care","世話・気にかける","A1"],
+ ["cartoon","アニメ・まんが","A1"],["case","場合・入れ物","A1"],["celebrate","祝う","A1"],
+ ["character","性格・登場人物","A1"],["check","確認する","A1"],["child","子ども","A1"],
+ ["church","教会","A1"],["cinema","映画館","A1"],["classmate","同級生","A1"],
+ ["clever","りこうな","A1"],["closed","閉まった","A1"],["cloth","布","A1"],
+ ["clothes","衣服","A1"],["coach","指導者","A1"],["coat","コート","A1"],
+ ["code","記号・暗号","A1"],["collection","収集","A1"],["conversation","会話","A1"],
+ ["copy","写し","A1"],["couch","ソファ","A1"],["course","進路・課程","A1"],
+ ["cousin","いとこ","A1"],["cover","おおう・報道する","A1"],["cream","クリーム","A1"],
+ ["cry","泣く","A1"],["dad","お父さん","A1"],["dancing","ダンス","A1"],
+ ["dark","暗い","A1"],["date","日付","A1"],["daughter","むすめ","A1"],
+ ["day","日","A1"],["dear","親愛なる","A1"],["design","設計する","A1"],
+ ["dictionary","辞書","A1"],["difference","ちがい","A1"],["dig","ほる","A1"],
+ ["doll","人形","A1"],["dollar","ドル","A1"],["down","下へ","A1"],
+ ["drum","たいこ","A1"],["dry","かわいた","A1"],["due","予定されて・期限の","A1"],
+ ["eighty","80","A1"],["elementary","初等の","A1"],["else","ほかに","A1"],
+ ["end","終わり","A1"],["enjoy","楽しむ","A1"],["everybody","みんな","A1"],
+ ["everyday","毎日の","A1"],["everyone","だれもが","A1"],["fair","公平な","A1"],
+ ["fever","熱","A1"],["focus","焦点を合わせる","A1"],["grade","学年・等級","A1"],
+ ["guess","推測する","A1"],["habit","習慣","A1"],["interview","面接","A1"],
+ ["judge","判断する","A1"],["mind","心・気にする","A1"],["order","注文・命令・順序","A1"],
+ ["owner","所有者","A1"],["period","期間","A1"],["price","価格","A1"],
+ ["role","役割","A1"],["rule","規則","A1"],["skill","技能","A1"],
+ ["social","社会の","A1"],["strange","奇妙な","A1"],["subject","科目・主題","A1"],
+ ["surprise","おどろかせる","A1"],["tool","道具","A1"],["topic","話題","A1"],
+ ["CD player","CDプレーヤー","A1"],["all right","だいじょうぶ","A1"],["credit card","クレジットカード","A1"],
+ ["dining room","食堂","A1"],["each other","おたがい","A1"],["good afternoon","こんにちは","A1"],
+ ["good morning","おはよう","A1"],["good night","おやすみ","A1"],["have to","〜しなければならない","A1"],
+ ["ice cream","アイスクリーム","A1"],["last name","名字","A1"],["living room","居間","A1"],
+ ["mobile phone","けいたい電話","A1"],["swimming pool","プール","A1"]],
+
+12:[
+ ["ability","能力","A2"],["abroad","海外へ","A2"],["advantage","利点","A2"],
+ ["advice","助言","A2"],["ancestor","祖先","A2"],["apologize","あやまる","A2"],
+ ["appreciate","感謝する・よさがわかる","A2"],["appropriate","適切な","A2"],["argue","議論する","A2"],
+ ["attempt","試みる","A2"],["attention","注意","A2"],["attitude","態度","A2"],
+ ["audience","観客","A2"],["author","著者","A2"],["behavior","ふるまい","A2"],
+ ["belong","所属する","A2"],["blame","責める","A2"],["branch","枝・支店","A2"],
+ ["budget","予算","A2"],["capital","首都・資本","A2"],["century","世紀","A2"],
+ ["certain","確かな","A2"],["challenge","課題・挑む","A2"],["cheap","安い","A2"],
+ ["chemical","化学の","A2"],["citizen","市民","A2"],["claim","主張する","A2"],
+ ["comfortable","心地よい","A2"],["complain","不平を言う","A2"],["concern","関心・心配","A2"],
+ ["confident","自信のある","A2"],["confuse","混乱させる","A2"],["consequence","結果","A2"],
+ ["contact","連絡する","A2"],["context","文脈","A2"],["contrast","対比","A2"],
+ ["convenient","便利な","A2"],["cost","費用","A2"],["count","数える","A2"],
+ ["crime","犯罪","A2"],["crowd","群衆","A2"],["deal","扱う・取引","A2"],
+ ["debate","討論","A2"],["degree","程度・学位","A2"],["delay","遅らせる","A2"],
+ ["depend","たよる","A2"],["destroy","破壊する","A2"],["detail","細部","A2"],
+ ["direct","直接の・指揮する","A2"],["disappear","消える","A2"],["divide","分ける","A2"],
+ ["doubt","疑う","A2"],["effect","効果","A2"],["encourage","はげます","A2"],
+ ["enormous","巨大な","A2"],["escape","逃げる","A2"],["establish","設立する","A2"],
+ ["evidence","証拠","A2"],["exchange","交換する","A2"],["exist","存在する","A2"],
+ ["expect","予期する","A2"],["expert","専門家","A2"],["explore","探検する","A2"],
+ ["extra","余分の","A2"],["fail","失敗する","A2"],["familiar","なじみのある","A2"],
+ ["fault","欠点・過失","A2"],["favor","好意","A2"],["feature","特徴","A2"],
+ ["figure","数字・人物像","A2"],["force","力・強制する","A2"],["fortune","幸運・財産","A2"],
+ ["freedom","自由","A2"],["gather","集める","A2"],["gender","性別","A2"],
+ ["guard","守る","A2"],["handle","扱う","A2"],["harm","害","A2"],
+ ["human","人間の","A2"],["impress","感心させる","A2"],["indicate","示す","A2"],
+ ["influence","影響","A2"],["injure","けがをさせる","A2"],["instead","その代わりに","A2"],
+ ["journey","旅","A2"],["knowledge","知識","A2"],["labor","労働","A2"],
+ ["lack","不足","A2"],["lead","導く","A2"],["level","水準","A2"],
+ ["major","主要な","A2"],["manner","やり方・作法","A2"],["mark","印をつける","A2"],
+ ["method","方法","A2"],["mistake","まちがい","A2"],["nation","国家","A2"],
+ ["native","生まれつきの・母語の","A2"],["normal","ふつうの","A2"],["operate","操作する","A2"],
+ ["opportunity","好機","A2"],["organize","組織する","A2"],["performance","上演・成績","A2"],
+ ["physical","身体の","A2"],["polite","礼儀正しい","A2"],["precise","精密な","A2"],
+ ["predict","予測する","A2"],["prefer","より好む","A2"],["pressure","圧力","A2"],
+ ["prevent","防ぐ","A2"],["private","私的な","A2"],["probably","おそらく","A2"],
+ ["professional","専門職の","A2"],["promise","約束","A2"],["proper","適切な","A2"],
+ ["public","公共の","A2"],["publish","出版する","A2"],["pursue","追求する","A2"],
+ ["quality","質","A2"],["range","範囲","A2"],["rate","割合","A2"],
+ ["recent","最近の","A2"],["reflect","反射する・反映する","A2"],["regret","後悔する","A2"],
+ ["regular","定期的な","A2"],["release","解放する・発売する","A2"],["remain","とどまる","A2"],
+ ["reveal","明らかにする","A2"],["satisfy","満足させる","A2"],["scene","場面","A2"],
+ ["schedule","予定","A2"],["search","さがす","A2"],["secret","秘密","A2"],
+ ["sense","感覚","A2"],["separate","分ける","A2"],["shape","形","A2"],
+ ["significant","重要な","A2"],["silence","沈黙","A2"],["source","源","A2"],
+ ["space","空間・宇宙","A2"],["specific","特定の","A2"],["statement","声明","A2"],
+ ["strategy","戦略","A2"],["strength","強さ","A2"],["structure","構造","A2"],
+ ["style","様式","A2"],["succeed","成功する","A2"],["sudden","突然の","A2"],
+ ["suit","合う・スーツ","A2"],["survive","生きのびる","A2"],["system","体系","A2"],
+ ["target","標的","A2"],["task","仕事","A2"],["trade","貿易","A2"],
+ ["trust","信頼する","A2"],["value","価値","A2"],["view","眺め・見方","A2"],
+ ["wealth","富","A2"],["whole","全体の","A2"],
+ ["ID card","身分証","A2"],["alarm clock","目ざまし時計","A2"],["board game","ボードゲーム","A2"],
+ ["bus station","バスターミナル","A2"],["bus stop","バス停","A2"],["capital letter","大文字","A2"],
+ ["car park","駐車場","A2"],["classical music","クラシック音楽","A2"],["department store","デパート","A2"],
+ ["digital camera","デジタルカメラ","A2"],["driving licence","運転免許証","A2"],["fast food","ファストフード","A2"],
+ ["first name","名前","A2"],["grocery store","食料品店","A2"],["high school","高校","A2"],
+ ["hip hop","ヒップホップ","A2"],["main course","主菜","A2"],["mineral water","ミネラルウォーター","A2"],
+ ["next to","〜のとなりに","A2"],["no one","だれも〜ない","A2"],["olive oil","オリーブ油","A2"],
+ ["out of","〜の外へ","A2"],["pen friend","文通相手","A2"],["petrol station","ガソリンスタンド","A2"],
+ ["police officer","警察官","A2"],["police station","警察署","A2"],["post office","郵便局","A2"],
+ ["shop assistant","店員","A2"],["sitting room","居間","A2"],["soft drink","清涼飲料","A2"],
+ ["sports center","スポーツセンター","A2"],["swimming costume","水着","A2"],["table tennis","卓球","A2"],
+ ["text message","ショートメッセージ","A2"],["tour guide","ツアーガイド","A2"],["traffic light","信号機","A2"],
+ ["video game","テレビゲーム","A2"],["washing machine","洗たく機","A2"],["web page","ウェブページ","A2"]],
+
+13:[
+ ["absolute","絶対の","B1"],["abstract","抽象的な","B1"],["academic","学問の","B1"],
+ ["accompany","同行する","B1"],["accurate","正確な","B1"],["acquire","獲得する","B1"],
+ ["adapt","適応させる","B1"],["adopt","採用する","B1"],["advance","進歩・前進","B1"],
+ ["affect","影響を与える","B1"],["aggressive","攻撃的な","B1"],["agriculture","農業","B1"],
+ ["aim","目的・ねらう","B1"],["alternative","代わりの","B1"],["ambitious","野心的な","B1"],
+ ["amount","量","B1"],["analyze","分析する","B1"],["announce","発表する","B1"],
+ ["apparent","明白な","B1"],["approach","近づく・取り組み方","B1"],["approve","承認する","B1"],
+ ["arise","生じる","B1"],["arrange","手配する","B1"],["assign","割り当てる","B1"],
+ ["assume","仮定する","B1"],["attain","達成する","B1"],["attend","出席する","B1"],
+ ["attract","引きつける","B1"],["authority","権威・当局","B1"],["available","利用できる","B1"],
+ ["aware","気づいている","B1"],["balance","均衡","B1"],["benefit","利益","B1"],
+ ["brief","簡潔な","B1"],["broad","幅広い","B1"],["calm","おだやかな","B1"],
+ ["capable","能力がある","B1"],["capacity","容量・能力","B1"],["career","職歴","B1"],
+ ["category","分類","B1"],["charge","料金・請求する","B1"],["civil","市民の","B1"],
+ ["classify","分類する","B1"],["collapse","崩壊する","B1"],["combine","組み合わせる","B1"],
+ ["command","命令","B1"],["comment","論評","B1"],["commercial","商業の","B1"],
+ ["commit","ゆだねる・関与する","B1"],["compete","競争する","B1"],["complex","複雑な","B1"],
+ ["conclude","結論づける","B1"],["conduct","行う","B1"],["confirm","確認する","B1"],
+ ["conflict","対立","B1"],["considerable","かなりの","B1"],["constitute","構成する","B1"],
+ ["construct","建設する","B1"],["consume","消費する","B1"],["contrary","反対の","B1"],
+ ["contribute","貢献する","B1"],["convince","納得させる","B1"],["courage","勇気","B1"],
+ ["crisis","危機","B1"],["critical","批判的な・重大な","B1"],["cultivate","育てる","B1"],
+ ["cure","治す","B1"],["damage","損害","B1"],["declare","宣言する","B1"],
+ ["dedicate","ささげる","B1"],["definite","明確な","B1"],["deliver","配達する","B1"],
+ ["demand","要求","B1"],["demonstrate","実証する","B1"],["deny","否定する","B1"],
+ ["derive","引き出す","B1"],["desire","願望","B1"],["despite","〜にもかかわらず","B1"],
+ ["determine","決定する","B1"],["distance","距離","B1"],["distribute","分配する","B1"],
+ ["diverse","多様な","B1"],["efficient","効率的な","B1"],["eliminate","除去する","B1"],
+ ["emerge","現れる","B1"],["emphasize","強調する","B1"],["enable","可能にする","B1"],
+ ["engine","エンジン","B1"],["ensure","確実にする","B1"],["entire","全体の","B1"],
+ ["equal","等しい","B1"],["essential","不可欠な","B1"],["estimate","見積もる","B1"],
+ ["eventually","結局は","B1"],["expand","拡大する","B1"],["extend","延長する","B1"],
+ ["forecast","予報","B1"],["foundation","基礎・財団","B1"],["generate","生み出す","B1"],
+ ["goods","商品","B1"],["grant","与える","B1"],["guarantee","保証する","B1"],
+ ["guide","案内する","B1"],["hire","雇う","B1"],["honest","正直な","B1"],
+ ["ignore","無視する","B1"],["incident","出来事","B1"],["independent","独立した","B1"],
+ ["inevitable","避けられない","B1"],["initial","最初の","B1"],["insight","洞察","B1"],
+ ["insist","主張する","B1"],["instance","例","B1"],["intend","意図する","B1"],
+ ["intense","激しい","B1"],["invest","投資する","B1"],["involve","巻きこむ・ふくむ","B1"],
+ ["justice","正義","B1"],["legal","法律の","B1"],["limit","限界","B1"],
+ ["link","結びつける","B1"],["maintain","維持する","B1"],["measure","測る・対策","B1"],
+ ["mental","精神の","B1"],["minimum","最小限","B1"],["minor","小さいほうの","B1"],
+ ["modify","修正する","B1"],["monitor","監視する","B1"],["moral","道徳の","B1"],
+ ["motive","動機","B1"],["mutual","相互の","B1"],["negotiate","交渉する","B1"],
+ ["network","網状組織","B1"],["neutral","中立の","B1"],["objective","目的・客観的な","B1"],
+ ["obtain","入手する","B1"],["obvious","明らかな","B1"],["occupy","占める","B1"],
+ ["occur","起こる","B1"],["origin","起源","B1"],["overcome","克服する","B1"],
+ ["overwhelm","圧倒する","B1"],["pain","痛み","B1"],["participant","参加者","B1"],
+ ["participate","参加する","B1"],["permit","許可する","B1"],["phenomenon","現象","B1"],
+ ["philosophy","哲学","B1"],["policy","方針","B1"],["potential","潜在的な","B1"],
+ ["practical","実用的な","B1"],["preserve","保存する","B1"],["previous","前の","B1"],
+ ["principle","原理","B1"],["process","過程","B1"],["progress","進歩","B1"],
+ ["prominent","著名な","B1"],["promote","促進する","B1"],["propose","提案する","B1"],
+ ["prove","証明する","B1"],["quantity","量","B1"],["recommend","すすめる","B1"],
+ ["recover","回復する","B1"],["regard","みなす","B1"],["region","地域","B1"],
+ ["relate","関連づける","B1"],["rely","たよる","B1"],["remarkable","注目すべき","B1"],
+ ["respect","尊敬する","B1"],["responsible","責任のある","B1"],["restore","回復させる","B1"],
+ ["restrict","制限する","B1"],["retain","保持する","B1"],["revise","改訂する","B1"],
+ ["reward","報酬","B1"],["risk","危険","B1"],["safety","安全","B1"],
+ ["scope","範囲","B1"],["secure","安全な・確保する","B1"],["select","選ぶ","B1"],
+ ["sequence","連続","B1"],["series","連続・シリーズ","B1"],["shift","移行","B1"],
+ ["signal","合図","B1"],["stable","安定した","B1"],["standard","基準","B1"],
+ ["stress","重圧・強調する","B1"],["struggle","もがく","B1"],["substantial","相当な","B1"],
+ ["substitute","代用する","B1"],["sufficient","十分な","B1"],["summarize","要約する","B1"],
+ ["supply","供給する","B1"],["surface","表面","B1"],["temporary","一時的な","B1"],
+ ["tendency","傾向","B1"],["theory","理論","B1"],["thorough","徹底的な","B1"],
+ ["threat","脅威","B1"],["total","合計の","B1"],["transfer","移す","B1"],
+ ["transform","変形させる","B1"],["treat","扱う・治療する","B1"],["typical","典型的な","B1"],
+ ["undergo","経験する","B1"],["variety","多様性","B1"],["vary","変化する","B1"],
+ ["vast","広大な","B1"],["via","〜経由で","B1"],["victim","犠牲者","B1"],
+ ["virtual","仮想の","B1"],["visible","目に見える","B1"],["widespread","広まった","B1"],
+ ["worth","価値がある","B1"],
+ ["according to","〜によれば","B1"],["air conditioning","冷暖房","B1"],["air force","空軍","B1"],
+ ["bank account","銀行口座","B1"],["because of","〜のために","B1"],["central heating","集中暖房","B1"],
+ ["chat show","トーク番組","B1"],["chest of drawers","たんす","B1"],["chewing gum","チューインガム","B1"],
+ ["common sense","常識","B1"],["definite article","定冠詞","B1"],["disc jockey","ディスクジョッキー","B1"],
+ ["exchange rate","為替レート","B1"],["extreme sports","過激なスポーツ","B1"],["face to face","面と向かって","B1"],
+ ["fire station","消防署","B1"],["first floor","（米）1階","B1"],["first lady","大統領夫人","B1"],
+ ["frying pan","フライパン","B1"],["full stop","終止符","B1"],["ground floor","（英）1階","B1"],
+ ["heart attack","心臓発作","B1"],["ice hockey","アイスホッケー","B1"],["ice skating","アイススケート","B1"],
+ ["identity card","身分証明書","B1"],["indefinite article","不定冠詞","B1"],["instead of","〜の代わりに","B1"],
+ ["message board","掲示板","B1"],["mixing bowl","混ぜ用のボウル","B1"],["modal verb","助動詞","B1"],
+ ["navy blue","濃紺","B1"],["next door","となりの家","B1"],["on to","〜の上へ","B1"],
+ ["ought to","〜すべきだ","B1"],["per cent","パーセント","B1"],["phrasal verb","句動詞","B1"],
+ ["pocket money","こづかい","B1"],["primary school","小学校","B1"],["public transport","公共交通機関","B1"],
+ ["question mark","疑問符","B1"],["remote control","リモコン","B1"],["science fiction","空想科学小説","B1"],
+ ["secondary school","中等学校","B1"],["soap opera","連続ドラマ","B1"],["social networking","SNS","B1"],
+ ["traffic jam","交通渋滞","B1"],["travel agent","旅行代理店","B1"],["used to","以前は〜だった","B1"],
+ ["vice president","副大統領","B1"],["video clip","動画クリップ","B1"],["weather forecast","天気予報","B1"]],
+
+14:[
+ ["abandoned","見捨てられた","B2"],["abolish","廃止する","B2"],["actively","積極的に","B2"],
+ ["additionally","さらに","B2"],["adequate","十分な","B2"],["adoption","採用・養子縁組","B2"],
+ ["alliance","同盟","B2"],["alter","変更する","B2"],["ambiguous","あいまいな","B2"],
+ ["analogy","類推","B2"],["anticipate","予期する","B2"],["arena","競技場","B2"],
+ ["assert","断言する","B2"],["assess","評価する","B2"],["assure","保証する","B2"],
+ ["attentive","注意深い","B2"],["backwards","後ろ向きに","B2"],["ballot","投票","B2"],
+ ["barrier","障壁","B2"],["beam","光線・はり","B2"],["campaign","運動","B2"],
+ ["catalogue","目録","B2"],["cease","やむ","B2"],["ceiling","天井","B2"],
+ ["chip","かけら・チップ","B2"],["circumstance","事情","B2"],["client","顧客","B2"],
+ ["clothing","衣類","B2"],["collector","収集家","B2"],["compensate","償う","B2"],
+ ["complexity","複雑さ","B2"],["component","構成要素","B2"],["comprehensive","包括的な","B2"],
+ ["condemn","非難する","B2"],["consent","同意","B2"],["consistent","一貫した","B2"],
+ ["constant","絶え間ない","B2"],["contract","契約","B2"],["conventional","従来型の","B2"],
+ ["convert","変換する","B2"],["cooperate","協力する","B2"],["cope","対処する","B2"],
+ ["corruption","腐敗","B2"],["craftsman","職人","B2"],["crucial","決定的な","B2"],
+ ["decisive","決定的な","B2"],["delegate","代表・委任する","B2"],["destiny","運命","B2"],
+ ["digest","消化する","B2"],["diploma","卒業証書","B2"],["dismiss","解雇する・退ける","B2"],
+ ["dispute","論争","B2"],["domestic","国内の・家庭の","B2"],["donation","寄付","B2"],
+ ["dose","服用量","B2"],["draft","下書き","B2"],["duplicate","複製する","B2"],
+ ["ease","容易さ・やわらげる","B2"],["elect","選挙で選ぶ","B2"],["employ","雇う","B2"],
+ ["employee","従業員","B2"],["enhance","高める","B2"],["enterprise","企業・事業","B2"],
+ ["evaluate","評価する","B2"],["evidently","明らかに","B2"],["evolve","進化する","B2"],
+ ["exceed","超える","B2"],["exclude","除外する","B2"],["exclusively","もっぱら","B2"],
+ ["exhibit","展示する","B2"],["expedition","探検隊","B2"],["exploit","活用する・搾取する","B2"],
+ ["extension","延長","B2"],["external","外部の","B2"],["fabric","布地","B2"],
+ ["facilitate","容易にする","B2"],["factor","要因","B2"],["federal","連邦の","B2"],
+ ["fierce","猛烈な","B2"],["flexibility","柔軟性","B2"],["flexible","柔軟な","B2"],
+ ["fragrance","香り","B2"],["fundamental","根本的な","B2"],["furious","激怒した","B2"],
+ ["genuine","本物の","B2"],["genuinely","心から","B2"],["gloomy","うす暗い・陰気な","B2"],
+ ["grasp","つかむ・理解する","B2"],["grin","にっと笑う","B2"],["hedge","生け垣","B2"],
+ ["hesitation","ためらい","B2"],["humble","謙虚な","B2"],["hybrid","混成の","B2"],
+ ["identical","同一の","B2"],["identify","特定する","B2"],["ideology","思想体系","B2"],
+ ["illustrate","例示する","B2"],["imagery","心に浮かぶ映像","B2"],["implement","実施する","B2"],
+ ["implication","含み・影響","B2"],["import","輸入する","B2"],["impose","課す","B2"],
+ ["incentive","誘因","B2"],["infer","推論する","B2"],["influential","影響力のある","B2"],
+ ["initiative","主導権","B2"],["injection","注射","B2"],["innovation","革新","B2"],
+ ["institution","機関","B2"],["instruct","指示する","B2"],["integrate","統合する","B2"],
+ ["interior","内部","B2"],["interpret","解釈する","B2"],["investigator","調査員","B2"],
+ ["justify","正当化する","B2"],["keen","熱心な・鋭い","B2"],["label","ラベル","B2"],
+ ["landslide","土砂くずれ","B2"],["lawmaker","立法者","B2"],["lease","賃貸契約","B2"],
+ ["legislation","法律","B2"],["legislative","立法の","B2"],["liberal","自由主義の","B2"],
+ ["likewise","同様に","B2"],["literal","文字どおりの","B2"],["manufacturer","製造業者","B2"],
+ ["master","熟達する・主人","B2"],["mature","成熟した","B2"],["melody","旋律","B2"],
+ ["messenger","使者","B2"],["microphone","マイク","B2"],["migration","移住","B2"],
+ ["minister","大臣","B2"],["modest","ひかえめな","B2"],["motion","運動・動議","B2"],
+ ["navigate","進路を決める","B2"],["neglect","怠る","B2"],["nightmare","悪夢","B2"],
+ ["nuisance","めいわく","B2"],["obey","従う","B2"],["offence","違反","B2"],
+ ["olive","オリーブ","B2"],["optimist","楽観主義者","B2"],["optimistic","楽観的な","B2"],
+ ["originality","独創性","B2"],["outcome","結果","B2"],["outlook","見通し","B2"],
+ ["outskirts","郊外","B2"],["packet","小包","B2"],["particular","特定の","B2"],
+ ["peak","頂点","B2"],["pension","年金","B2"],["perceive","知覚する","B2"],
+ ["persist","固執する","B2"],["persistence","粘り強さ","B2"],["perspective","観点","B2"],
+ ["pessimistic","悲観的な","B2"],["pitch","投げる・調子","B2"],["postpone","延期する","B2"],
+ ["prestige","名声","B2"],["priceless","値がつけられないほど貴重な","B2"],["primary","第一の","B2"],
+ ["prior","前の","B2"],["priority","優先事項","B2"],["procedure","手順","B2"],
+ ["profile","横顔・人物紹介","B2"],["profit","利益","B2"],["prohibit","禁止する","B2"],
+ ["prospect","見込み","B2"],["prosper","繁栄する","B2"],["publication","出版","B2"],
+ ["punctuality","時間厳守","B2"],["quote","引用する","B2"],["radical","急進的な","B2"],
+ ["realization","実現・認識","B2"],["reckon","見積もる","B2"],["rectangular","長方形の","B2"],
+ ["reflective","反射する・内省的な","B2"],["regardless","かまわずに","B2"],["reinforce","補強する","B2"],
+ ["relief","安心・救済","B2"],["reluctant","気が進まない","B2"],["rental","賃貸","B2"],
+ ["replica","複製品","B2"],["resignation","辞職","B2"],["respiratory","呼吸の","B2"],
+ ["retreat","退却する","B2"],["reverse","逆にする","B2"],["revive","よみがえらせる","B2"],
+ ["ridge","尾根","B2"],["roar","ほえる","B2"],["route","経路","B2"],
+ ["sanitation","公衆衛生","B2"],["scheme","計画","B2"],["senator","上院議員","B2"],
+ ["setback","つまずき","B2"],["sharply","鋭く","B2"],["shopkeeper","店主","B2"],
+ ["shrink","縮む","B2"],["skateboard","スケートボード","B2"],["slang","俗語","B2"],
+ ["soak","ひたす","B2"],["spare","予備の・さく","B2"],["specifically","具体的には","B2"],
+ ["stain","しみ","B2"],["statistics","統計","B2"],["stimulate","刺激する","B2"],
+ ["subside","おさまる","B2"],["superb","すばらしい","B2"],["suppress","抑える","B2"],
+ ["sustain","持続させる","B2"],["sympathetic","思いやりのある","B2"],["tackle","取り組む","B2"],
+ ["temptation","誘惑","B2"],["testify","証言する","B2"],["thermometer","温度計","B2"],
+ ["thoroughly","徹底的に","B2"],["thrilling","わくわくさせる","B2"],["timing","時機","B2"],
+ ["tolerate","がまんする","B2"],["toxic","有毒な","B2"],["transition","移行","B2"],
+ ["translation","翻訳","B2"],["transmit","伝送する","B2"],["treaty","条約","B2"],
+ ["trio","三人組","B2"],["trunk","幹・トランク","B2"],["ultimate","究極の","B2"],
+ ["undertake","引き受ける","B2"],["undoubtedly","疑いなく","B2"],["universal","普遍的な","B2"],
+ ["unwilling","気が進まない","B2"],["urgently","緊急に","B2"],["utilize","利用する","B2"],
+ ["vacant","空いている","B2"],["valid","妥当な","B2"],["venture","冒険的事業","B2"],
+ ["violate","違反する","B2"],["welfare","福祉","B2"],["withdraw","引き出す・撤退する","B2"],
+ ["yield","産出する・ゆずる","B2"],
+ ["carbon dioxide","二酸化炭素","B2"],["carbon footprint","炭素はい出量","B2"],["carbon monoxide","一酸化炭素","B2"],
+ ["climate change","気候変動","B2"],["de facto","事実上の","B2"],["debit card","デビットカード","B2"],
+ ["environmentally friendly","環境にやさしい","B2"],["exclamation mark","感嘆符","B2"],["fed up","うんざりして","B2"],
+ ["fire brigade","消防隊","B2"],["first language","母語","B2"],["first person","一人称","B2"],
+ ["global warming","地球温暖化","B2"],["hard drive","ハードディスク","B2"],["health care","医療","B2"],
+ ["human rights","人権","B2"],["inverted commas","引用符","B2"],["junk food","ジャンクフード","B2"],
+ ["last minute","直前","B2"],["martial art","武術","B2"],["native speaker","母語話者","B2"],
+ ["net surfer","ネット利用者","B2"],["owing to","〜のために","B2"],["point of view","観点","B2"],
+ ["polar bear","ホッキョクグマ","B2"],["prime minister","首相","B2"],["real estate","不動産","B2"],
+ ["rush hour","ラッシュアワー","B2"],["second person","二人称","B2"],["steering wheel","ハンドル","B2"],
+ ["stock market","株式市場","B2"],["third person","三人称","B2"],["upside down","さかさまに","B2"],
+ ["virtual reality","仮想現実","B2"],["worn out","すり切れた","B2"]]
+};
+
+/* 教科の問題（社会）：[問題, 答え, 読み, 補足] */
+const BUILTIN_SETS={
+ rekishi:{name:"社会 歴史",items:[
+ ["打製石器を使っていた時代","旧石器時代","きゅうせっきじだい",""],
+ ["縄文時代の人々が食べ物の残りを捨てた場所","貝塚","かいづか",""],
+ ["弥生時代に米を保存した建物","高床倉庫","たかゆかそうこ",""],
+ ["魏に使いを送った邪馬台国の女王","卑弥呼","ひみこ",""],
+ ["聖徳太子が定めた役人の位の制度","冠位十二階","かんいじゅうにかい",""],
+ ["聖徳太子が定めた役人の心構え","十七条の憲法","じゅうしちじょうのけんぽう",""],
+ ["645年に中大兄皇子らが始めた政治改革","大化の改新","たいかのかいしん",""],
+ ["701年に定められた律令","大宝律令","たいほうりつりょう",""],
+ ["人々に口分田を与えた奈良時代の制度","班田収授法","はんでんしゅうじゅのほう",""],
+ ["743年に開墾地の私有を認めた法","墾田永年私財法","こんでんえいねんしざいのほう",""],
+ ["聖武天皇が奈良に建てた寺","東大寺","とうだいじ","大仏をつくった"],
+ ["794年に平安京へ都を移した天皇","桓武天皇","かんむてんのう",""],
+ ["藤原氏が天皇の外戚となって行った政治","摂関政治","せっかんせいじ",""],
+ ["白河上皇が始めた政治","院政","いんせい",""],
+ ["源頼朝が開いた幕府","鎌倉幕府","かまくらばくふ",""],
+ ["国ごとに置かれ御家人を統率した役職","守護","しゅご",""],
+ ["1232年に北条泰時が定めた武士の法","御成敗式目","ごせいばいしきもく",""],
+ ["元寇のときの鎌倉幕府の執権","北条時宗","ほうじょうときむね",""],
+ ["足利尊氏が開いた幕府","室町幕府","むろまちばくふ",""],
+ ["応仁の乱が始まった年","1467","","11年続いた"],
+ ["戦国大名が領国を治めるために定めた法","分国法","ぶんこくほう",""],
+ ["織田信長が城下町の商工業を自由にした政策","楽市楽座","らくいちらくざ",""],
+ ["豊臣秀吉が全国の田畑を測った政策","太閤検地","たいこうけんち",""],
+ ["豊臣秀吉が農民から武器を取り上げた政策","刀狩","かたながり",""],
+ ["1600年に徳川家康が勝った戦い","関ヶ原の戦い","せきがはらのたたかい",""],
+ ["大名を統制するために定めた法","武家諸法度","ぶけしょはっと",""],
+ ["大名に江戸と領地を往復させた制度","参勤交代","さんきんこうたい",""],
+ ["徳川吉宗が行った改革","享保の改革","きょうほうのかいかく",""],
+ ["松平定信が行った改革","寛政の改革","かんせいのかいかく",""],
+ ["水野忠邦が行った改革","天保の改革","てんぽうのかいかく",""],
+ ["1853年に浦賀に来航したアメリカの使節","ペリー","",""],
+ ["1858年に結ばれた不平等条約","日米修好通商条約","にちべいしゅうこうつうしょうじょうやく",""],
+ ["1867年に徳川慶喜が政権を朝廷に返した出来事","大政奉還","たいせいほうかん",""],
+ ["1871年に藩を廃止して県を置いた改革","廃藩置県","はいはんちけん",""],
+ ["1873年に始まった土地に課税する制度","地租改正","ちそかいせい",""],
+ ["板垣退助らが国会開設を求めた運動","自由民権運動","じゆうみんけんうんどう",""],
+ ["1889年に発布された憲法","大日本帝国憲法","だいにほんていこくけんぽう",""],
+ ["1894年に始まった清との戦争","日清戦争","にっしんせんそう",""],
+ ["日清戦争の講和条約","下関条約","しものせきじょうやく",""],
+ ["1904年に始まったロシアとの戦争","日露戦争","にちろせんそう",""],
+ ["日露戦争の講和条約","ポーツマス条約","ポーツマスじょうやく",""],
+ ["1910年に日本が朝鮮を植民地とした出来事","韓国併合","かんこくへいごう",""],
+ ["第一次世界大戦後にできた国際組織","国際連盟","こくさいれんめい",""],
+ ["1925年に成立した満25歳以上の男子の選挙法","普通選挙法","ふつうせんきょほう",""],
+ ["1929年にアメリカから世界に広がった不況","世界恐慌","せかいきょうこう",""],
+ ["1931年に始まった中国東北部での軍事行動","満州事変","まんしゅうじへん",""],
+ ["1941年に始まった戦争","太平洋戦争","たいへいようせんそう",""],
+ ["1945年に日本が受け入れた降伏の宣言","ポツダム宣言","ポツダムせんげん",""],
+ ["日本国憲法が公布された年","1946","","施行は1947年"],
+ ["1951年に結ばれた講和条約","サンフランシスコ平和条約","サンフランシスコへいわじょうやく",""],
+ ["1956年に日本が加盟した国際組織","国際連合","こくさいれんごう",""],
+ ["1950年代後半から続いた急速な経済成長","高度経済成長","こうどけいざいせいちょう",""],
+ ["1972年に日本に復帰した地域","沖縄","おきなわ",""],
+ ["1989年に取りこわされた東西分断の象徴","ベルリンの壁","ベルリンのかべ",""],
+ ["農地を地主から小作人に分け与えた戦後改革","農地改革","のうちかいかく",""]
+ ]},
+ chiri:{name:"社会 地理",items:[
+ ["世界でいちばん面積が大きい国","ロシア","",""],
+ ["世界でいちばん人口が多い国","インド","","2023年に中国を上回った"],
+ ["地球上の位置を示す南北の座標","緯度","いど","赤道が0度"],
+ ["地球上の位置を示す東西の座標","経度","けいど","本初子午線が0度"],
+ ["日本の標準時子午線が通る兵庫県の市","明石市","あかしし","東経135度"],
+ ["三大洋のうち最も広い海洋","太平洋","たいへいよう",""],
+ ["世界最大の大陸","ユーラシア大陸","ユーラシアたいりく",""],
+ ["雨が少なく樹木が育たない気候帯","乾燥帯","かんそうたい",""],
+ ["一年中気温が高く雨の多い気候帯","熱帯","ねったい",""],
+ ["イスラム教徒が食べてはいけない肉","豚肉","ぶたにく",""],
+ ["ヒンドゥー教で神聖とされる動物","牛","うし",""],
+ ["EUの共通通貨","ユーロ","",""],
+ ["アメリカ南部に広がる新しい工業地域","サンベルト","","北緯37度より南"],
+ ["南アメリカで最も流域面積が広い川","アマゾン川","アマゾンがわ",""],
+ ["特定の産物の輸出にたよる経済","モノカルチャー経済","モノカルチャーけいざい","アフリカに多い"],
+ ["オーストラリアの先住民","アボリジニ","",""],
+ ["日本の最南端の島","沖ノ鳥島","おきのとりしま","東京都に属する"],
+ ["日本の最東端の島","南鳥島","みなみとりしま",""],
+ ["本州の中央部を南北に走る大地溝帯","フォッサマグナ","",""],
+ ["季節によって向きが変わる風","季節風","きせつふう","モンスーンともいう"],
+ ["川が山地から平地に出るところにできる地形","扇状地","せんじょうち",""],
+ ["川の河口にできる三角形の低地","三角州","さんかくす",""],
+ ["東北地方の太平洋側に夏ふく冷たい北東風","やませ","","冷害の原因になる"],
+ ["千葉県の東京湾岸に広がる工業地域","京葉工業地域","けいようこうぎょうちいき",""],
+ ["愛知県を中心とする日本最大の工業地帯","中京工業地帯","ちゅうきょうこうぎょうちたい",""],
+ ["出荷時期を早める栽培方法","促成栽培","そくせいさいばい","高知平野や宮崎平野"],
+ ["出荷時期を遅らせる栽培方法","抑制栽培","よくせいさいばい","長野県の高原など"],
+ ["乳牛を飼って牛乳や乳製品をつくる農業","酪農","らくのう","北海道の根釧台地など"],
+ ["地図をつくる国の機関","国土地理院","こくどちりいん",""],
+ ["高さが等しい地点を結んだ線","等高線","とうこうせん",""],
+ ["人口や産業が集中しすぎること","過密","かみつ",""],
+ ["人口が減りすぎて生活が難しくなること","過疎","かそ",""],
+ ["沿岸から200海里までの水域","排他的経済水域","はいたてきけいざいすいいき",""],
+ ["日本が石油を最も多く輸入している地域","西アジア","にしアジア",""],
+ ["世界遺産を登録する国際連合の専門機関","ユネスコ","",""],
+ ["関東から九州北部まで工業が連なる地域","太平洋ベルト","たいへいようベルト",""],
+ ["輸入した原料を加工して輸出する貿易","加工貿易","かこうぼうえき",""],
+ ["海岸線が複雑に入り組んだ地形","リアス海岸","リアスかいがん","三陸海岸など"],
+ ["火山の噴火でできた大きなくぼ地","カルデラ","","阿蘇山が代表"],
+ ["夏に雨が少なく冬に雪が多い日本海側の気候","日本海側の気候","にほんかいがわのきこう",""]
+ ]},
+ koumin:{name:"社会 公民",items:[
+ ["国の政治のあり方を最終的に国民が決めるという原則","国民主権","こくみんしゅけん",""],
+ ["戦争を放棄するという日本国憲法の原則","平和主義","へいわしゅぎ","第9条に定める"],
+ ["すべての人が生まれながらに持つ権利","基本的人権","きほんてきじんけん",""],
+ ["健康で文化的な最低限度の生活を営む権利","生存権","せいぞんけん","第25条"],
+ ["だれもが学ぶことを保障される権利","教育を受ける権利","きょういくをうけるけんり",""],
+ ["労働者が団結して労働組合をつくる権利","団結権","だんけつけん",""],
+ ["政治に参加する権利","参政権","さんせいけん",""],
+ ["良好な環境で生活する新しい人権","環境権","かんきょうけん",""],
+ ["個人の私生活を守る新しい人権","プライバシーの権利","プライバシーのけんり",""],
+ ["国政について情報の公開を求める新しい人権","知る権利","しるけんり",""],
+ ["国の唯一の立法機関","国会","こっかい",""],
+ ["国会が衆議院と参議院からなるしくみ","二院制","にいんせい",""],
+ ["予算の議決などで衆議院に強い権限を認めること","衆議院の優越","しゅうぎいんのゆうえつ",""],
+ ["毎年1月に召集される国会","通常国会","つうじょうこっかい",""],
+ ["内閣が国会の信任にもとづいて成り立つしくみ","議院内閣制","ぎいんないかくせい",""],
+ ["内閣の方針を決める会議","閣議","かくぎ",""],
+ ["衆議院が内閣を信任しないと決める議決","内閣不信任決議","ないかくふしんにんけつぎ",""],
+ ["同じ事件で3回まで裁判を受けられるしくみ","三審制","さんしんせい",""],
+ ["法律などが憲法に違反していないか判断する権限","違憲審査権","いけんしんさけん",""],
+ ["最高裁判所が憲法の番人と呼ばれる理由となる権限","違憲審査権","いけんしんさけん","終審裁判所だから"],
+ ["国民が刑事裁判に参加する制度","裁判員制度","さいばんいんせいど","2009年開始"],
+ ["国の権力を三つに分けて互いに抑制させるしくみ","三権分立","さんけんぶんりつ",""],
+ ["地方公共団体が定める独自のきまり","条例","じょうれい",""],
+ ["住民が署名を集めて議会の解散などを求める権利","直接請求権","ちょくせつせいきゅうけん",""],
+ ["一票の価値に差が生じている問題","一票の格差","いっぴょうのかくさ",""],
+ ["経済を動かす三つの主体のうち消費を担うもの","家計","かけい",""],
+ ["買いたい量と売りたい量で決まる価格","均衡価格","きんこうかかく",""],
+ ["少数の企業が市場を支配する状態","寡占","かせん",""],
+ ["公正な競争を守るための法律","独占禁止法","どくせんきんしほう",""],
+ ["独占禁止法を運用する機関","公正取引委員会","こうせいとりひきいいんかい",""],
+ ["株式を発行して資金を集める会社","株式会社","かぶしきがいしゃ",""],
+ ["株主が経営方針を決める最高機関","株主総会","かぶぬしそうかい",""],
+ ["会社の利益から株主に分配されるお金","配当","はいとう",""],
+ ["労働時間や賃金の最低基準を定めた法律","労働基準法","ろうどうきじゅんほう",""],
+ ["日本の中央銀行","日本銀行","にっぽんぎんこう",""],
+ ["日本銀行が景気を調整する政策","金融政策","きんゆうせいさく",""],
+ ["物価が上がり続けお金の価値が下がる現象","インフレーション","",""],
+ ["物価が下がり続ける現象","デフレーション","",""],
+ ["円の価値が上がり輸入に有利になる状態","円高","えんだか",""],
+ ["所得が多いほど税率が高くなるしくみ","累進課税","るいしんかぜい",""],
+ ["納める人と負担する人が異なる税","間接税","かんせつぜい","消費税など"],
+ ["国が歳入不足を補うために発行する債券","国債","こくさい",""],
+ ["社会保障の四つの柱のうち年金や医療保険にあたるもの","社会保険","しゃかいほけん",""],
+ ["生活に困る人を助ける社会保障の柱","公的扶助","こうてきふじょ","生活保護など"],
+ ["国際連合で世界の平和と安全に責任を持つ機関","安全保障理事会","あんぜんほしょうりじかい",""],
+ ["安全保障理事会の常任理事国が持つ権限","拒否権","きょひけん",""],
+ ["国連が行う平和維持活動の略称","PKO","pko",""],
+ ["2015年に採択された温暖化対策の国際的な枠組み","パリ協定","パリきょうてい",""],
+ ["2015年に国連で採択された持続可能な開発目標","SDGs","sdgs",""],
+ ["先進国と発展途上国の経済格差の問題","南北問題","なんぼくもんだい",""]
+ ]},
+ butsuri:{name:"理科 物理",items:[
+ ["光が鏡ではね返るときの決まり","反射の法則","はんしゃのほうそく","入射角と反射角が等しい"],
+ ["光が種類のちがう物質へ進むとき折れ曲がる現象","屈折","くっせつ",""],
+ ["光がすべてはね返って外へ出ない現象","全反射","ぜんはんしゃ","光ファイバーに利用"],
+ ["凸レンズを通った光が集まる点","焦点","しょうてん",""],
+ ["スクリーンにうつすことができる像","実像","じつぞう",""],
+ ["レンズをのぞいたときに見える光が集まらない像","虚像","きょぞう",""],
+ ["音の高さを決めるもの","振動数","しんどうすう","単位はヘルツ"],
+ ["音の大きさを決めるもの","振幅","しんぷく",""],
+ ["音が空気中を伝わる速さは約何メートル毎秒か","340","",""],
+ ["力の大きさの単位","ニュートン","","記号はN"],
+ ["ばねののびが力の大きさに比例するという法則","フックの法則","フックのほうそく",""],
+ ["地球が物体を引く力","重力","じゅうりょく",""],
+ ["面を垂直におす力のはたらきを表す量","圧力","あつりょく","単位はパスカル"],
+ ["空気の重さによって生じる圧力","大気圧","たいきあつ",""],
+ ["水中の物体にはたらく上向きの力","浮力","ふりょく",""],
+ ["電流の単位","アンペア","","記号はA"],
+ ["電圧の単位","ボルト","","記号はV"],
+ ["電流の流れにくさを表す量","抵抗","ていこう","単位はオーム"],
+ ["電圧が電流に比例するという法則","オームの法則","オームのほうそく",""],
+ ["直列回路のどの点でも同じ大きさになるもの","電流","でんりゅう",""],
+ ["並列回路のどの区間にも同じ大きさで加わるもの","電圧","でんあつ",""],
+ ["1秒あたりに使われる電気エネルギーの量","電力","でんりょく","単位はワット"],
+ ["電流によって発生する熱の量","熱量","ねつりょう","単位はジュール"],
+ ["磁石の力がはたらいている空間","磁界","じかい",""],
+ ["コイルの中の磁界が変化して電流が流れる現象","電磁誘導","でんじゆうどう",""],
+ ["電磁誘導によって流れる電流","誘導電流","ゆうどうでんりゅう",""],
+ ["向きが周期的に変わる電流","交流","こうりゅう",""],
+ ["一方向にだけ流れる電流","直流","ちょくりゅう",""],
+ ["下じきをこすったときにたまる電気","静電気","せいでんき",""],
+ ["真空放電で見られる電子の流れ","陰極線","いんきょくせん","電子線ともいう"],
+ ["一定の速さで一直線に進む運動","等速直線運動","とうそくちょくせんうんどう",""],
+ ["力がはたらかないとき物体が運動を続けようとする性質","慣性","かんせい",""],
+ ["仕事の大きさの単位","ジュール","","記号はJ"],
+ ["道具を使っても仕事の量が変わらないこと","仕事の原理","しごとのげんり",""],
+ ["1秒あたりにする仕事の大きさ","仕事率","しごとりつ","単位はワット"],
+ ["高いところにある物体がもつエネルギー","位置エネルギー","いちエネルギー",""],
+ ["運動している物体がもつエネルギー","運動エネルギー","うんどうエネルギー",""],
+ ["位置エネルギーと運動エネルギーの和","力学的エネルギー","りきがくてきエネルギー",""],
+ ["エネルギーの総量が変化しないという法則","エネルギー保存の法則","エネルギーほぞんのほうそく",""],
+ ["物体どうしがふれ合って熱が伝わること","伝導","でんどう",""]
+ ]},
+ kagaku:{name:"理科 化学",items:[
+ ["物質をつくるもっとも小さな粒子","原子","げんし",""],
+ ["いくつかの原子が結びついてできた粒子","分子","ぶんし",""],
+ ["1種類の原子だけでできている物質","単体","たんたい",""],
+ ["2種類以上の原子からできている物質","化合物","かごうぶつ",""],
+ ["みがくと特有の光を放つ金属の性質","金属光沢","きんぞくこうたく",""],
+ ["物質1立方センチメートルあたりの質量","密度","みつど",""],
+ ["固体がとけて液体になる温度","融点","ゆうてん",""],
+ ["液体が沸騰して気体になる温度","沸点","ふってん",""],
+ ["沸点のちがいを利用して液体を分ける方法","蒸留","じょうりゅう",""],
+ ["一定量の水にとかすことができる物質の最大量","溶解度","ようかいど",""],
+ ["物質をとけるだけとかした水溶液","飽和水溶液","ほうわすいようえき",""],
+ ["水溶液の濃さを百分率で表したもの","質量パーセント濃度","しつりょうパーセントのうど",""],
+ ["石灰水を白くにごらせる気体","二酸化炭素","にさんかたんそ",""],
+ ["ものを燃やすはたらきのある気体","酸素","さんそ",""],
+ ["最も軽く音を立てて燃える気体","水素","すいそ",""],
+ ["水の化学式","H2O","h2o",""],
+ ["二酸化炭素の化学式","CO2","co2",""],
+ ["1種類の物質が2種類以上の物質に分かれる化学変化","分解","ぶんかい",""],
+ ["物質が酸素と結びつく化学変化","酸化","さんか",""],
+ ["酸化物から酸素を取り去る化学変化","還元","かんげん",""],
+ ["熱や光を出しながら激しく酸化すること","燃焼","ねんしょう",""],
+ ["化学変化の前後で全体の質量が変わらないという法則","質量保存の法則","しつりょうほぞんのほうそく",""],
+ ["まわりに熱を出す化学変化","発熱反応","はつねつはんのう",""],
+ ["まわりから熱を吸収する化学変化","吸熱反応","きゅうねつはんのう",""],
+ ["水にとかすと電流が流れる物質","電解質","でんかいしつ",""],
+ ["水にとかしても電流が流れない物質","非電解質","ひでんかいしつ",""],
+ ["原子が電気を帯びたもの","イオン","",""],
+ ["電子を失って正の電気を帯びたイオン","陽イオン","ようイオン",""],
+ ["電子を受け取って負の電気を帯びたイオン","陰イオン","いんイオン",""],
+ ["水にとけて水素イオンを生じる物質","酸","さん",""],
+ ["水にとけて水酸化物イオンを生じる物質","アルカリ","",""],
+ ["酸とアルカリがたがいの性質を打ち消し合う反応","中和","ちゅうわ",""],
+ ["中和で水とともにできる物質","塩","えん",""],
+ ["酸性やアルカリ性の強さを表す数値","pH","ph","7が中性"],
+ ["青色リトマス紙を赤色に変える性質","酸性","さんせい",""],
+ ["赤色リトマス紙を青色に変える性質","アルカリ性","アルカリせい",""],
+ ["電流を流して物質を分解すること","電気分解","でんきぶんかい",""],
+ ["化学変化を利用して電気エネルギーを取り出す装置","電池","でんち",""],
+ ["水素と酸素を反応させて電気を取り出す電池","燃料電池","ねんりょうでんち",""],
+ ["原子核のまわりにある負の電気をもつ粒子","電子","でんし",""],
+ ["原子核をつくる正の電気をもつ粒子","陽子","ようし",""],
+ ["物質が温度によって固体と液体と気体に変わること","状態変化","じょうたいへんか",""]
+ ]},
+ seibutsu:{name:"理科 生物",items:[
+ ["おしべの先にあり花粉がつくられる部分","やく","",""],
+ ["花粉がめしべの柱頭につくこと","受粉","じゅふん",""],
+ ["胚珠が子房の中にある植物","被子植物","ひししょくぶつ",""],
+ ["胚珠がむき出しになっている植物","裸子植物","らししょくぶつ",""],
+ ["子葉が2枚である植物のなかま","双子葉類","そうしよるい",""],
+ ["葉に見られる水や養分の通り道","葉脈","ようみゃく",""],
+ ["根から吸い上げた水が通る管","道管","どうかん",""],
+ ["葉でつくられた養分が通る管","師管","しかん",""],
+ ["道管と師管が集まって束になった部分","維管束","いかんそく",""],
+ ["植物が光を受けて養分をつくるはたらき","光合成","こうごうせい",""],
+ ["光合成が行われる細胞の中の緑色の粒","葉緑体","ようりょくたい",""],
+ ["葉の表面にある気体の出入り口","気孔","きこう",""],
+ ["植物の体から水が水蒸気となって出ていくこと","蒸散","じょうさん",""],
+ ["背骨をもつ動物のなかま","セキツイ動物","セキツイどうぶつ",""],
+ ["背骨をもたない動物のなかま","無セキツイ動物","むセキツイどうぶつ",""],
+ ["体が外骨格でおおわれ節がある動物","節足動物","せっそくどうぶつ",""],
+ ["内臓が外とう膜に包まれている動物","軟体動物","なんたいどうぶつ",""],
+ ["まわりの温度が変わっても体温がほぼ一定の動物","恒温動物","こうおんどうぶつ",""],
+ ["生物の体をつくっている最小の単位","細胞","さいぼう",""],
+ ["細胞の中にあり染色液でよく染まるつくり","核","かく",""],
+ ["植物の細胞だけにある細胞のまわりのじょうぶなつくり","細胞壁","さいぼうへき",""],
+ ["デンプンを分解するだ液にふくまれる消化酵素","アミラーゼ","",""],
+ ["タンパク質が消化されてできる物質","アミノ酸","アミノさん",""],
+ ["小腸の壁にあり養分を吸収する小さな突起","柔毛","じゅうもう",""],
+ ["肺の中で気体の交換を行う小さな袋","肺胞","はいほう",""],
+ ["赤血球にふくまれ酸素を運ぶ物質","ヘモグロビン","",""],
+ ["全身から心臓へもどる血液が流れる血管","静脈","じょうみゃく",""],
+ ["心臓から送り出される血液が流れる血管","動脈","どうみゃく",""],
+ ["アンモニアを尿素に変える器官","肝臓","かんぞう",""],
+ ["血液から尿素をこしとる器官","じん臓","じんぞう",""],
+ ["光や音などの刺激を受け取る器官","感覚器官","かんかくきかん",""],
+ ["意識とは関係なく起こる反応","反射","はんしゃ",""],
+ ["細胞分裂のときに見られるひも状のもの","染色体","せんしょくたい",""],
+ ["雌雄の生殖細胞が結びついて子をつくる生殖","有性生殖","ゆうせいせいしょく",""],
+ ["体細胞が分かれるだけでふえる生殖","無性生殖","むせいせいしょく",""],
+ ["受精卵が細胞分裂をくり返して成長していく過程","発生","はっせい",""],
+ ["生殖細胞ができるときに行われる特別な細胞分裂","減数分裂","げんすうぶんれつ",""],
+ ["親の形質を子に伝えるもとになるもの","遺伝子","いでんし",""],
+ ["対立形質のうち子に現れるほうの形質","顕性形質","けんせいけいしつ","優性形質ともいう"],
+ ["生物どうしの食べる食べられるというつながり","食物連鎖","しょくもつれんさ",""],
+ ["有機物を無機物に分解するはたらきをもつ生物","分解者","ぶんかいしゃ",""],
+ ["光合成で自ら養分をつくり出す生物","生産者","せいさんしゃ",""]
+ ]},
+ chigaku:{name:"理科 地学",items:[
+ ["マグマが地表に流れ出たもの","溶岩","ようがん",""],
+ ["マグマが地下深くでゆっくり冷えてできた岩石","深成岩","しんせいがん",""],
+ ["マグマが地表近くで急に冷えてできた岩石","火山岩","かざんがん",""],
+ ["深成岩に見られる大きな結晶がそろったつくり","等粒状組織","とうりゅうじょうそしき",""],
+ ["火山岩に見られる細かい粒の中に結晶があるつくり","斑状組織","はんじょうそしき",""],
+ ["地震が発生した地下の場所","震源","しんげん",""],
+ ["震源の真上にあたる地表の点","震央","しんおう",""],
+ ["地震ではじめに伝わる小さなゆれ","初期微動","しょきびどう",""],
+ ["地震であとから伝わる大きなゆれ","主要動","しゅようどう",""],
+ ["地震のゆれの大きさを表す階級","震度","しんど","0から7まで"],
+ ["地震の規模の大きさを表す値","マグニチュード","",""],
+ ["海のプレートが沈みこむ細長いくぼみ","海溝","かいこう",""],
+ ["流れる水が土砂を運ぶはたらき","運搬","うんぱん",""],
+ ["地層ができた当時の環境を示す化石","示相化石","しそうかせき",""],
+ ["地層ができた年代を示す化石","示準化石","しじゅんかせき",""],
+ ["火山灰が押し固められてできた岩石","凝灰岩","ぎょうかいがん",""],
+ ["うすい塩酸をかけると二酸化炭素が出る岩石","石灰岩","せっかいがん",""],
+ ["地層に力が加わってできたずれ","断層","だんそう",""],
+ ["地層が波打つように曲がったもの","しゅう曲","しゅうきょく",""],
+ ["空気中の水蒸気が水滴に変わり始める温度","露点","ろてん",""],
+ ["空気のしめりぐあいを百分率で表したもの","湿度","しつど",""],
+ ["あたたかい空気が冷たい空気の上にはい上がる前線","温暖前線","おんだんぜんせん",""],
+ ["冷たい空気があたたかい空気をおし上げる前線","寒冷前線","かんれいぜんせん",""],
+ ["中心に向かって風がふきこむ気圧の低いところ","低気圧","ていきあつ",""],
+ ["日本の夏にはり出すあたたかくしめった気団","小笠原気団","おがさわらきだん",""],
+ ["日本の冬に発達する冷たくかわいた気団","シベリア気団","シベリアきだん",""],
+ ["6月ごろに日本付近にできる停滞前線","梅雨前線","ばいうぜんせん",""],
+ ["地球が地軸を中心に1日1回転する運動","自転","じてん",""],
+ ["地球が太陽のまわりを1年かけて回る運動","公転","こうてん",""],
+ ["天体が真南を通り高度が最も高くなること","南中","なんちゅう",""],
+ ["星座の中を1年かけて動いて見える太陽の通り道","黄道","こうどう",""],
+ ["太陽のまわりを回る8つの天体","惑星","わくせい",""],
+ ["太陽の表面に見える黒い部分","黒点","こくてん","まわりより温度が低い"],
+ ["太陽をふくむ恒星の大集団","銀河系","ぎんがけい",""],
+ ["月が太陽をかくす現象","日食","にっしょく",""],
+ ["月が地球の影に入る現象","月食","げっしょく",""],
+ ["地球の地軸が傾いたまま公転することで生じるもの","季節","きせつ",""],
+ ["地球の自転によって天体が動いて見えること","日周運動","にっしゅううんどう",""],
+ ["地球の公転によって星座が少しずつ動いて見えること","年周運動","ねんしゅううんどう",""],
+ ["太陽のように自ら光を出す天体","恒星","こうせい",""],
+ ["夕方に西の空に見える金星","よいの明星","よいのみょうじょう",""]
+ ]},
+ eibunkei:{name:"英文法 5文型",items:[
+ ["鳥は歌う。","Birds sing.","","SV"],
+ ["彼は毎朝走る。","He runs every morning.","","SV"],
+ ["彼女はほほえんだ。","She smiled.","","SV"],
+ ["太陽は東からのぼる。","The sun rises in the east.","","SV"],
+ ["父は銀行で働いている。","My father works at a bank.","","SV"],
+ ["私は学生です。","I am a student.","","SVC"],
+ ["彼女は親切だ。","She is kind.","","SVC"],
+ ["彼は医者になった。","He became a doctor.","","SVC"],
+ ["このスープはおいしい。","This soup tastes good.","","SVC"],
+ ["暗くなった。","It got dark.","","SVC"],
+ ["あなたは疲れているように見える。","You look tired.","","SVC"],
+ ["それはおもしろそうだ。","That sounds interesting.","","SVC"],
+ ["彼はだまったままだった。","He remained silent.","","SVC"],
+ ["私はテニスをする。","I play tennis.","","SVO"],
+ ["彼女は音楽が好きだ。","She likes music.","","SVO"],
+ ["私たちは英語を勉強した。","We studied English.","","SVO"],
+ ["彼は新しい車を買った。","He bought a new car.","","SVO"],
+ ["彼らは家を建てた。","They built a house.","","SVO"],
+ ["私は彼の名前を知っている。","I know his name.","","SVO"],
+ ["彼女は窓を開けた。","She opened the window.","","SVO"],
+ ["トムはおじを訪ねた。","Tom visited his uncle.","","SVO"],
+ ["私はかさを忘れた。","I forgot my umbrella.","","SVO"],
+ ["私たちはもっと時間が必要だ。","We need more time.","","SVO"],
+ ["彼は私に本をくれた。","He gave me a book.","","SVOO"],
+ ["彼女は私たちに話をしてくれた。","She told us a story.","","SVOO"],
+ ["私は彼にメールを送った。","I sent him an email.","","SVOO"],
+ ["母は私にケーキを作ってくれた。","My mother made me a cake.","","SVOO"],
+ ["道を教えてくれませんか。","Can you show me the way?","","SVOO"],
+ ["彼らは私たちに英語を教えた。","They taught us English.","","SVOO"],
+ ["彼は彼女に指輪を買った。","He bought her a ring.","","SVOO"],
+ ["私の自転車を貸してあげます。","I will lend you my bike.","","SVOO"],
+ ["私たちは彼をケンと呼ぶ。","We call him Ken.","","SVOC"],
+ ["その知らせは私を幸せにした。","The news made me happy.","","SVOC"],
+ ["彼らはその犬をラッキーと名づけた。","They named the dog Lucky.","","SVOC"],
+ ["彼はドアを開けたままにした。","He kept the door open.","","SVOC"],
+ ["私はその本がやさしいとわかった。","I found the book easy.","","SVOC"],
+ ["彼女はかべを白くぬった。","She painted the wall white.","","SVOC"],
+ ["その映画は彼女を泣かせた。","The movie made her cry.","","SVOC"],
+ ["机の上に本が1冊ある。","There is a book on the desk.","","There is"],
+ ["ここにはたくさんの人がいる。","There are many people here.","","There are"],
+ ["ここには公園があった。","There was a park here.","","There was"],
+ ["この近くに銀行はありますか。","Is there a bank near here?","","There is の疑問文"]
+ ]},
+ eibunpou2:{name:"英文法 時制・助動詞",items:[
+ ["私は毎日ピアノをひく。","I play the piano every day.","","現在形"],
+ ["彼は毎朝コーヒーを飲む。","He drinks coffee every morning.","","三人称単数"],
+ ["彼女は肉を食べない。","She does not eat meat.","","三単現の否定"],
+ ["あなたはサッカーが好きですか。","Do you like soccer?","","一般動詞の疑問文"],
+ ["彼は先生ではありません。","He is not a teacher.","","be動詞の否定"],
+ ["私は今宿題をしている。","I am doing my homework now.","","現在進行形"],
+ ["彼らは公園で走っている。","They are running in the park.","","現在進行形"],
+ ["私は昨日その映画を見た。","I watched the movie yesterday.","","過去形"],
+ ["彼女は去年京都へ行った。","She went to Kyoto last year.","","不規則動詞の過去形"],
+ ["私は昨日忙しくなかった。","I was not busy yesterday.","","be動詞の過去の否定"],
+ ["そのとき彼は本を読んでいた。","He was reading a book then.","","過去進行形"],
+ ["私は明日彼女に会うつもりだ。","I will meet her tomorrow.","","will"],
+ ["明日は雨が降るだろう。","It will rain tomorrow.","","will"],
+ ["私は医者になるつもりだ。","I am going to be a doctor.","","be going to"],
+ ["私は3年間ここに住んでいる。","I have lived here for three years.","","現在完了 継続"],
+ ["彼はもう宿題を終えた。","He has already finished his homework.","","現在完了 完了"],
+ ["私は一度もハワイに行ったことがない。","I have never been to Hawaii.","","現在完了 経験"],
+ ["あなたはこの本を読んだことがありますか。","Have you ever read this book?","","現在完了 経験の疑問文"],
+ ["私は彼女に会ったことがあった。","I had met her before.","","過去完了"],
+ ["私は泳ぐことができる。","I can swim.","","can"],
+ ["彼女はピアノをひけない。","She cannot play the piano.","","can の否定"],
+ ["窓を開けてもいいですか。","May I open the window?","","may"],
+ ["あなたは今すぐ行かなければならない。","You must go right now.","","must"],
+ ["私は早く起きなければならない。","I have to get up early.","","have to"],
+ ["あなたはもっと休むべきだ。","You should take more rest.","","should"],
+ ["手伝ってくれませんか。","Will you help me?","","依頼の will"],
+ ["塩をとっていただけますか。","Could you pass me the salt?","","ていねいな依頼"],
+ ["いっしょに行きましょうか。","Shall we go together?","","shall"],
+ ["ドアを閉めなさい。","Close the door.","","命令文"],
+ ["遅れてはいけません。","Do not be late.","","否定の命令文"],
+ ["公園へ行きましょう。","Let us go to the park.","","Let us"],
+ ["これは何ですか。","What is this?","","疑問詞 what"],
+ ["あなたはどこに住んでいますか。","Where do you live?","","疑問詞 where"],
+ ["あなたはいつ帰りますか。","When will you come back?","","疑問詞 when"],
+ ["だれがこの絵をかいたのですか。","Who painted this picture?","","疑問詞 who"],
+ ["なぜあなたは泣いているのですか。","Why are you crying?","","疑問詞 why"],
+ ["駅へはどう行けばいいですか。","How can I get to the station?","","疑問詞 how"],
+ ["本を何冊持っていますか。","How many books do you have?","","How many"],
+ ["それはいくらですか。","How much is it?","","How much"],
+ ["あなたの誕生日はいつですか。","When is your birthday?","","疑問詞 when"],
+ ["あなたはテニスが好きですよね。","You like tennis, don't you?","","付加疑問"],
+ ["私は何も知らない。","I do not know anything.","","否定"],
+ ["彼は決してうそをつかない。","He never tells a lie.","","never"],
+ ["私も行きたい。","I want to go too.","","too"]
+ ]},
+ eibunpou3:{name:"英文法 不定詞・比較・関係詞",items:[
+ ["私は医者になりたい。","I want to be a doctor.","","不定詞 名詞的用法"],
+ ["英語を話すことは楽しい。","To speak English is fun.","","不定詞 名詞的用法"],
+ ["私には読む本がある。","I have a book to read.","","不定詞 形容詞的用法"],
+ ["彼女は水を飲みに来た。","She came to drink water.","","不定詞 副詞的用法"],
+ ["私はそれを聞いてうれしい。","I am glad to hear that.","","感情の原因"],
+ ["彼は忙しすぎて行けない。","He is too busy to go.","","too to"],
+ ["彼女は行けるほど元気だ。","She is well enough to go.","","enough to"],
+ ["どう使えばいいか教えてください。","Please tell me how to use it.","","疑問詞 + 不定詞"],
+ ["彼に手伝ってほしい。","I want him to help me.","","want 人 to"],
+ ["泳ぐことは楽しい。","Swimming is fun.","","動名詞"],
+ ["私は本を読むのが好きだ。","I like reading books.","","動名詞"],
+ ["彼は話すのをやめた。","He stopped talking.","","動名詞"],
+ ["来てくれてありがとう。","Thank you for coming.","","前置詞 + 動名詞"],
+ ["私は彼と同じくらい背が高い。","I am as tall as he is.","","as as"],
+ ["彼女は私より速く走る。","She runs faster than I do.","","比較級"],
+ ["これがクラスでいちばん高い。","This is the tallest in the class.","","最上級"],
+ ["この本はあの本よりおもしろい。","This book is more interesting than that one.","","more"],
+ ["数学は私にとっていちばん難しい。","Math is the most difficult for me.","","most"],
+ ["私はコーヒーより紅茶が好きだ。","I like tea better than coffee.","","better than"],
+ ["この部屋は毎日そうじされる。","This room is cleaned every day.","","受動態"],
+ ["その家は昨年建てられた。","The house was built last year.","","受動態 過去"],
+ ["英語は多くの国で話されている。","English is spoken in many countries.","","受動態"],
+ ["私はそのニュースに驚いた。","I was surprised at the news.","","受動態 感情"],
+ ["これは彼が書いた本です。","This is the book which he wrote.","","関係代名詞 which"],
+ ["私は英語を話す友達がいる。","I have a friend who speaks English.","","関係代名詞 who"],
+ ["これは私がほしかったかばんです。","This is the bag that I wanted.","","関係代名詞 that"],
+ ["向こうで走っている少年は私の弟です。","The boy running over there is my brother.","","現在分詞"],
+ ["これは日本で作られた車です。","This is a car made in Japan.","","過去分詞"],
+ ["彼が来たとき私は寝ていた。","I was sleeping when he came.","","接続詞 when"],
+ ["雨が降ったら家にいます。","If it rains, I will stay home.","","接続詞 if"],
+ ["私は疲れていたので早く寝た。","I went to bed early because I was tired.","","接続詞 because"],
+ ["寒かったけれど彼は外に出た。","Although it was cold, he went out.","","接続詞 although"],
+ ["私は彼が正しいと思う。","I think that he is right.","","接続詞 that"],
+ ["彼がどこに住んでいるか知っていますか。","Do you know where he lives?","","間接疑問"],
+ ["私は彼女が何をしたか知らない。","I do not know what she did.","","間接疑問"],
+ ["先生は私たちを笑わせた。","The teacher made us laugh.","","使役 make"],
+ ["母は私を行かせてくれた。","My mother let me go.","","使役 let"],
+ ["私は彼に部屋をそうじしてもらった。","I had him clean the room.","","使役 have"],
+ ["私は彼が歌うのを聞いた。","I heard him sing.","","知覚動詞"],
+ ["私は彼女が走っているのを見た。","I saw her running.","","知覚動詞"],
+ ["英語を学ぶことは大切だ。","It is important to learn English.","","It is to"],
+ ["私にとってそれを読むのは簡単ではない。","It is not easy for me to read it.","","It is for to"],
+ ["もし私が鳥ならば空を飛べるのに。","If I were a bird, I could fly.","","仮定法"],
+ ["もっと時間があればいいのに。","I wish I had more time.","","仮定法 wish"],
+ ["彼は何と言えばよいかわからなかった。","He did not know what to say.","","疑問詞 + 不定詞"]
+ ]}
+};
+
+/* =========================================================
+   2. ローマ字入力エンジン
+========================================================= */
+const KANA = {
+"あ":["a"],"い":["i","yi"],"う":["u","wu"],"え":["e"],"お":["o"],
+"か":["ka","ca"],"き":["ki"],"く":["ku","cu"],"け":["ke"],"こ":["ko","co"],
+"が":["ga"],"ぎ":["gi"],"ぐ":["gu"],"げ":["ge"],"ご":["go"],
+"さ":["sa"],"し":["shi","si","ci"],"す":["su"],"せ":["se"],"そ":["so"],
+"ざ":["za"],"じ":["ji","zi"],"ず":["zu"],"ぜ":["ze"],"ぞ":["zo"],
+"た":["ta"],"ち":["chi","ti"],"つ":["tsu","tu"],"て":["te"],"と":["to"],
+"だ":["da"],"ぢ":["di"],"づ":["du"],"で":["de"],"ど":["do"],
+"な":["na"],"に":["ni"],"ぬ":["nu"],"ね":["ne"],"の":["no"],
+"は":["ha"],"ひ":["hi"],"ふ":["fu","hu"],"へ":["he"],"ほ":["ho"],
+"ば":["ba"],"び":["bi"],"ぶ":["bu"],"べ":["be"],"ぼ":["bo"],
+"ぱ":["pa"],"ぴ":["pi"],"ぷ":["pu"],"ぺ":["pe"],"ぽ":["po"],
+"ま":["ma"],"み":["mi"],"む":["mu"],"め":["me"],"も":["mo"],
+"や":["ya"],"ゆ":["yu"],"よ":["yo"],
+"ら":["ra"],"り":["ri"],"る":["ru"],"れ":["re"],"ろ":["ro"],
+"わ":["wa"],"を":["wo"],"ん":["n","nn","xn"],
+"ぁ":["xa","la"],"ぃ":["xi","li"],"ぅ":["xu","lu"],"ぇ":["xe","le"],"ぉ":["xo","lo"],
+"ゃ":["xya","lya"],"ゅ":["xyu","lyu"],"ょ":["xyo","lyo"],"ー":["-"],
+"きゃ":["kya"],"きゅ":["kyu"],"きょ":["kyo"],
+"ぎゃ":["gya"],"ぎゅ":["gyu"],"ぎょ":["gyo"],
+"しゃ":["sha","sya"],"しゅ":["shu","syu"],"しょ":["sho","syo"],
+"じゃ":["ja","jya","zya"],"じゅ":["ju","jyu","zyu"],"じょ":["jo","jyo","zyo"],
+"ちゃ":["cha","tya","cya"],"ちゅ":["chu","tyu","cyu"],"ちょ":["cho","tyo","cyo"],
+"にゃ":["nya"],"にゅ":["nyu"],"にょ":["nyo"],
+"ひゃ":["hya"],"ひゅ":["hyu"],"ひょ":["hyo"],
+"びゃ":["bya"],"びゅ":["byu"],"びょ":["byo"],
+"ぴゃ":["pya"],"ぴゅ":["pyu"],"ぴょ":["pyo"],
+"みゃ":["mya"],"みゅ":["myu"],"みょ":["myo"],
+"りゃ":["rya"],"りゅ":["ryu"],"りょ":["ryo"],
+"ふぁ":["fa"],"ふぃ":["fi"],"ふぇ":["fe"],"ふぉ":["fo"],
+"うぃ":["wi"],"うぇ":["we"],"てぃ":["thi"],"でぃ":["dhi"]
+};
+const VOWELS = "aiueo";
+
+function toHira(s){
+  return String(s).replace(/[\u30a1-\u30f6]/g, c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+}
+function tokenize(yomi){
+  yomi=toHira(yomi);
+  const raw=[];
+  for(let i=0;i<yomi.length;){
+    const two=yomi.slice(i,i+2);
+    if(KANA[two]){raw.push(two);i+=2;continue;}
+    raw.push(yomi[i]);i+=1;
+  }
+  const units=[];
+  for(let i=0;i<raw.length;i++){
+    const k=raw[i];
+    if(k==="っ"){
+      const nxt=raw[i+1]&&KANA[raw[i+1]]?KANA[raw[i+1]]:null;
+      const set=new Set(["xtu","ltu","ltsu"]);
+      if(nxt) nxt.forEach(c=>{ if(!VOWELS.includes(c[0])) set.add(c[0]); });
+      units.push({kana:k,cands:[...set].sort((a,b)=>a.length-b.length)});
+      continue;
+    }
+    if(k==="ん"){
+      const nk=raw[i+1];
+      const nc=nk&&KANA[nk]?KANA[nk][0]:null;
+      const needDouble = !nc || VOWELS.includes(nc[0]) || nc[0]==="n" || nc[0]==="y";
+      units.push({kana:k,cands: needDouble?["nn","xn"]:["n","nn","xn"]});
+      continue;
+    }
+    units.push({kana:k,cands:(KANA[k]||[k]).slice()});
+  }
+  return units;
+}
+
+/* =========================================================
+   3. じょうたい
+========================================================= */
+const S={
+  grade:2, mode:"kanji", diff:"easy", learn:false, count:10, countPref:10, qTotal:0, hinted:{}, queue:[], qi:0, cur:null,
+  units:[], ui:0, buf:"", typed:"", ansStr:"",
+  startedAt:0, keysOK:0, keysNG:0, missMap:{}, results:[],
+  running:false, locked:false
+};
+const $=id=>document.getElementById(id);
+let bestStore={};
+
+/* ---- 英語の読み上げ ---- */
+let voiceEn=null;
+function pickVoice(){
+  if(!window.speechSynthesis) return;
+  const vs=speechSynthesis.getVoices()||[];
+  voiceEn = vs.find(v=>/^en[-_]US/i.test(v.lang))
+         || vs.find(v=>/^en[-_]GB/i.test(v.lang))
+         || vs.find(v=>/^en/i.test(v.lang)) || null;
+}
+if(window.speechSynthesis){
+  pickVoice();
+  speechSynthesis.addEventListener("voiceschanged",pickVoice);
+}
+const SPK_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+function speakEn(text,force){
+  if(!force && !$("optSound").checked) return;
+  if(!window.speechSynthesis) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=(voiceEn&&voiceEn.lang)||"en-US";
+    if(voiceEn) u.voice=voiceEn;
+    u.rate=.85;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function stopSpeak(){ try{ window.speechSynthesis && speechSynthesis.cancel(); }catch(e){} }
+/* iOSなどは利用者の操作がないと音声が出ないため、開始時に無音で1回ならす */
+function primeSpeech(){
+  if(!window.speechSynthesis) return;
+  try{
+    const u=new SpeechSynthesisUtterance(" ");
+    u.volume=0; speechSynthesis.speak(u); pickVoice();
+  }catch(e){}
+}
+
+/* ---- 音 ---- */
+let AC=null;
+function beep(freq,dur,type){
+  if(!$("optSound").checked) return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type=type||"sine";o.frequency.value=freq;
+    g.gain.setValueAtTime(.06,AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+dur);
+    o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+dur);
+  }catch(e){}
+}
+
+/* =========================================================
+   4. スタート画面
+========================================================= */
+const GRADE_LABEL={1:"小1",2:"小2",3:"小3",4:"小4",5:"小5",6:"小6",7:"中1",8:"中2",9:"中3",
+                   10:"漢検2級",11:"CEFR A1",12:"CEFR A2",13:"CEFR B1",14:"CEFR B2"};
+const BASIC_GRADES=[1,2,3,4,5,6,7,8,9], ADV_GRADES=[10,11,12,13,14];
+/* 文言：[漢字づかい（小3以上）, ひらがな中心（小1・小2）] */
+const TXT={
+ sub:["漢字と英単語を、打ちながら覚える","かん字と えい単語を、うちながら おぼえる"],
+ h_mode:["何を練習する？","なにを れんしゅうする？"],
+ h_grade:["学年を選ぶ","がくねんを えらぶ"],
+ h_adv:["別のものさし（検定・CEFR）","べつの ものさし（けんてい・CEFR）"],
+ h_count:["問題の数","もんだいの かず"],
+ h_diff:["難しさ","むずかしさ"],
+ opt_sound:["音を鳴らす・英語を読み上げる","音を ならす・えい語を 読み上げる"],
+ btn_start:["はじめる","はじめる"],
+ btn_hist:["これまでの記録","これまでの きろく"],
+ btn_quit:["やめる","やめる"],
+ btn_pass:["パス","パス"],
+ tap_hint:["画面をタップしてキーボードを出す","がめんを タップして キーボードを 出す"],
+ tab_score:["スコアの記録","スコアの きろく"],
+ tab_words:["ことばの記録","ことばの きろく"],
+ sort_n:["よく出た順","よく出た じゅん"],
+ sort_ng:["まちがえた順","まちがえた じゅん"],
+ btn_back:["もどる","もどる"],
+ btn_clear:["記録を全部消す","きろくを ぜんぶ 消す"],
+ btn_again:["もう一回","もう一かい"],
+ btn_home:["学年を選び直す","がくねんを えらびなおす"],
+ h_review:["出てきたことば","出てきた ことば"],
+ h_miss:["まちがえやすかったキー","まちがえやすかった キー"],
+ u_speed:["打/分","打/分"],
+ u_acc:["正確率","正かくりつ"],
+ u_clear:["クリアした語","クリアした ことば"],
+ acc:["正確","正かく"],
+ ken:["問","もん"],
+ mode_kanji:["漢字","かん字"],
+ mode_en:["英単語","えい単語"],
+ mode_mix:["ミックス","ミックス"],
+ mode_review:["復習","ふくしゅう"],
+ note_kanji:["小1〜中3と漢検2級。読みをローマ字で打ちます。","小1〜中3と かんけん2きゅう。読みを ローマ字で うちます。"],
+ note_en:["小3〜中3とCEFR A1〜B2。日本語を見てつづりを打ちます。","小3〜中3と CEFR A1〜B2。日本語を 見て つづりを うちます。"],
+ note_mix:["漢字と英単語が混ざって出ます。","かん字と えい単語が まざって 出ます。"],
+ note_review:["まちがえた語と、前に覚えてから日がたった語を出します。正解を重ねた語ほど、次に出るまでの間隔が延びます。","まちがえた ことばと、まえに おぼえてから 日が たった ことばを 出します。せいかいを かさねた ことばほど、つぎに 出るまでが 長く なります。"],
+ review_now:["　いまは{n}語（うち今日が期日の語 {d}語）。","　いまは {n}こ（きょうが じゅんばんの ことば {d}こ）。"],
+ review_none:["まちがえた語がまだありません。ほかのモードで何回か練習してから開いてください。","まちがえた ことばが まだ ありません。ほかの モードで なんかい か れんしゅう してから ひらいてください。"],
+ dnote_easy:["答え・打つ文字・キーボードを全部見せます。英単語は出たときに読み上げます。","答え・うつ文字・キーボードを ぜんぶ 見せます。えい単語は 出たときに 読み上げます。"],
+ dnote_normal:["キーボードだけ見せます。英単語は出たときに読み上げます。","キーボードだけ 見せます。えい単語は 出たときに 読み上げます。"],
+ dnote_hard:["表示の助けはなし。英単語は出たときに読み上げます。","見せる おたすけは なし。えい単語は 出たときに 読み上げます。"],
+ dnote_super:["助けなし。1語10秒以内に打ちます。","おたすけなし。1つ 10びょう いないに うちます。"],
+ dnote_ultra:["助けなし。1語3秒以内に打ちます。","おたすけなし。1つ 3びょう いないに うちます。"],
+ m_pass:["パス","パス"],
+ m_timeout:["時間切れ","時間ぎれ"],
+ best_of:["の最高記録：","の さいこう記録："],
+ best_new:["の最高記録を更新！","の さいこう記録を こうしん！"],
+ t_great:["すばらしい！","すばらしい！"],
+ t_good:["いい調子！","いい ちょうし！"],
+ t_ok:["おつかれさま","おつかれさま"],
+ h_empty:["まだ記録がありません","まだ きろくが ありません"],
+ s_sum:["全部で{t}回。いちばん速かったのは{s}打/分（{g}・{d}）","ぜんぶで {t}かい。いちばん はやかったのは {s}打/分（{g}・{d}）"],
+ w_sum:["{a}語を のべ{t}回練習。","{a}こを のべ {t}かい れんしゅう。"],
+ w_top:["上位100語を表示しています。","上から 100こを 出しています。"],
+ c_quit:["途中でやめますか？　記録は残りません。","とちゅうで やめますか？　きろくは のこりません。"],
+ c_clear:["記録を全部消しますか？　もとに戻せません。","きろくを ぜんぶ 消しますか？　もとに もどせません。"],
+ w_miss:["ミス","ミス"],
+ lbl_user:["いまのユーザー","いまの ユーザー"],
+ btn_users:["切り替え","きりかえ"],
+ h_user:["ユーザー","ユーザー"],
+ btn_adduser:["追加","ふやす"],
+ ph_user:["名前","なまえ"],
+ btn_select:["これにする","これにする"],
+ btn_rename:["名前","なまえ"],
+ btn_deluser:["消す","消す"],
+ users_note:["ユーザーはこの端末のブラウザに保存されます。記録はユーザーごとに分かれます。","ユーザーは この きかいの ブラウザに ほぞんされます。きろくは ユーザーごとに 分かれます。"],
+ c_deluser:["{n}の記録を全部消しますか？　もとに戻せません。","{n}の きろくを ぜんぶ 消しますか？　もとに もどせません。"],
+ q_rename:["新しい名前","あたらしい なまえ"],
+ tab_rank:["ランキング","ランキング"],
+ rank_streak:["連続勉強日数","れんぞく べんきょう日すう"],
+ rank_total:["累計回答数","ぜんぶで こたえた かず"],
+ u_days:["日","日"],
+ u_times:["回","かい"],
+ r_none:["ユーザーがいません","ユーザーが いません"],
+ h_learn:["学び方","まなびかた"],
+ learn_off:["ふつう","ふつう"],
+ learn_on:["学ぶ（2回打ち）","まなぶ（2かい うつ）"],
+ lnote_off:["1つの問題を1回打ちます。難しさの設定がそのまま効きます。","1つの もんだいを 1かい うちます。むずかしさの せっていが そのまま きいてきます。"],
+ lnote_on:["同じ問題を2回続けて出します。1回目は答えを見ながら、2回目は答えを隠して思い出して打ちます。難しさの設定は使いません。","おなじ もんだいを 2かい つづけて 出します。1かいめは 答えを 見ながら、2かいめは 答えを かくして 思い出して うちます。むずかしさの せっていは つかいません。"],
+ ph_see:["① 見て打つ","① 見て うつ"],
+ ph_recall:["② 思い出して打つ","② 思い出して うつ"],
+ btn_hint:["もう一度見る","もう一かい 見る"],
+ m_hint:["ヒント","ヒント"],
+ due_today:["今日","きょう"],
+ due_late:["{n}日すぎ","{n}日 すぎ"],
+ due_in:["あと{n}日","あと{n}日"],
+ due_none:["未設定","まだ"],
+ btn_import:["問題を取り込む","もんだいを とりこむ"],
+ h_import:["問題の取り込み","もんだいの とりこみ"],
+ h_sets:["取り込んだ問題","とりこんだ もんだい"],
+ btn_saveset:["読み込む","よみこむ"],
+ ph_setname:["問題の名前（例：理科 4年）","もんだいの なまえ"],
+ ph_setdata:["1行に1問。「問題,答え,読み,補足」","1ぎょうに 1もん。「もんだい,こたえ,よみ,ほそく」"],
+ import_note:["1行に1問。カンマかタブで区切り、順に 問題／答え／読み／補足。読みと補足は省略できます。答えに漢字を使うときは3列目に読みを書いてください。打つのは読み、画面に出るのは答えです。ひらがな・カタカナ・英字・数字が打てます。","1ぎょうに 1もん。「もんだい,こたえ,よみ,ほそく」の じゅんに 書きます。よみと ほそくは なくても だいじょうぶ。"],
+ im_ok:["{n}問を取り込みました。","{n}もん とりこみました。"],
+ im_err:["{n}行は取り込めませんでした（{l}行目）。","{n}ぎょうは とりこめませんでした（{l}ぎょうめ）。"],
+ im_none:["取り込める行がありませんでした。","とりこめる ぎょうが ありませんでした。"],
+ im_noname:["名前を入れてください。","なまえを 入れてください。"],
+ c_delset:["{n}を消しますか？","{n}を 消しますか？"],
+ h_custom:["自分の問題","じぶんの もんだい"],
+ h_subject:["教科の問題","きょうかの もんだい"],
+ u_items:["問","もん"]
+};
+function kanaUI(){ return S.mode!=="review" && (S.grade===1||S.grade===2); }
+function T(k,vars){
+  const v=TXT[k]; if(!v) return k;
+  let t = kanaUI()? v[1] : v[0];
+  if(vars) for(const key in vars) t=t.split("{"+key+"}").join(vars[key]);
+  return t;
+}
+function applyTexts(){
+  document.querySelectorAll("[data-t]").forEach(e=>{ e.textContent=T(e.dataset.t); });
+  document.querySelectorAll("#modes [data-mv]").forEach(b=>{ b.textContent=T("mode_"+b.dataset.mv); });
+  document.querySelectorAll("#counts [data-n]").forEach(b=>{ b.textContent=b.dataset.n+T("ken"); });
+  document.querySelectorAll("#learns [data-lv]").forEach(b=>{ b.textContent=T(b.dataset.lv); });
+  $("learnNote").textContent=T(S.learn?"lnote_on":"lnote_off");
+  $("diffSheet").style.opacity=S.learn?".45":"";
+  const nu=$("newUserName"); if(nu) nu.placeholder=T("ph_user");
+  $("diffNote").textContent=T("dnote_"+S.diff);
+  $("modeNote").textContent = S.mode==="review"
+    ? T("note_review")+T("review_now",{n:reviewPool().length,d:dueCount()})
+    : T("note_"+S.mode);
+}
+
+const MODES=[["kanji","漢字"],["en","英単語"],["mix","ミックス"],["review","復習"]];
+const DIFFS=[
+  ["easy","イージー",   {ans:1,guide:1,kb:1,limit:0,say:"ask"}, "答え・打つ文字・キーボードを ぜんぶ 見せます。英単語は 出たときに 読み上げます。"],
+  ["normal","ノーマル", {ans:0,guide:0,kb:1,limit:0,say:"ask"}, "キーボードだけ 見せます。英単語は 出たときに 読み上げます。"],
+  ["hard","ハード",     {ans:0,guide:0,kb:0,limit:0,say:"ask"}, "表示のおたすけはなし。英単語は出たときに読み上げます。"],
+  ["super","スーパー",  {ans:0,guide:0,kb:0,limit:10,say:"done"},"おたすけなし。1語 10びょう いないに 打ちます。"],
+  ["ultra","ウルトラ",  {ans:0,guide:0,kb:0,limit:3,say:"done"}, "おたすけなし。1語 3びょう いないに 打ちます。"]
+];
+function D(){ return (DIFFS.find(d=>d[0]===S.diff)||DIFFS[0])[2]; }
+/* 学ぶモードでは難易度より段階の設定が優先される */
+const LEARN_VIEW={
+  1:{ans:1,guide:1,kb:1,limit:0,say:"ask"},
+  2:{ans:0,guide:0,kb:1,limit:0,say:"done"}
+};
+function V(){
+  if(S.learn && S.cur && S.cur.phase) return LEARN_VIEW[S.cur.phase];
+  return D();
+}
+function diffLabel(){ return S.learn ? T("learn_on") : (DIFFS.find(d=>d[0]===S.diff)||DIFFS[0])[1]; }
+
+/* まちがえた語の見つけ方：履歴から引き当てる */
+let WORD_INDEX=null;
+function buildWordIndex(){
+  WORD_INDEX={};
+  for(const g in WORDS) WORDS[g].forEach(a=>WORD_INDEX["k:"+a[0]]={t:"k",w:a[0],y:a[1],m:a[2]});
+  for(const g in EN_WORDS) EN_WORDS[g].forEach(a=>WORD_INDEX["e:"+a[0]]={t:"e",w:a[0],y:a[1],m:a[2]});
+  const addSet=(key,st)=>st.items.forEach(a=>{
+    const disp=a[1], y=a[2]||a[1], m=a[3]||"";
+    WORD_INDEX["x:"+key+":"+a[0]]={t:"c",sid:key,w:a[0],disp:disp,y:y,m:m,direct:isDirectAns(y)};
+  });
+  for(const k in BUILTIN_SETS) addSet("b:"+k,BUILTIN_SETS[k]);
+  for(const id in DB.sets) addSet("c:"+id,DB.sets[id]);
+}
+function wordKeyOf(o){ return o.t==="c" ? ("x:"+o.sid+":"+o.w) : (o.t==="e"?"e:":"k:")+o.w; }
+function weakScore(v){ return (v.ng||0)+2*(v.p||0)+2*(v.to||0)+2*(v.h||0); }
+function reviewPool(){
+  if(!WORD_INDEX) buildWordIndex();
+  return Object.entries(hist.words)
+    .filter(([k,v])=>WORD_INDEX[k] && (overdue(v)>=0 || weakScore(v)>0))
+    .map(([k,v])=>({k,v,o:overdue(v),w:weakScore(v)}))
+    .sort((a,b)=>(b.o-a.o)||(b.w-a.w))
+    .map(x=>WORD_INDEX[x.k]);
+}
+function dueCount(){
+  return Object.entries(hist.words).filter(([k,v])=>{
+    if(!WORD_INDEX) buildWordIndex();
+    return WORD_INDEX[k] && overdue(v)>=0;
+  }).length;
+}
+function kCount(g){return (WORDS[g]||[]).length;}
+function enCount(g){return (EN_WORDS[g]||[]).length;}
+function poolSize(g,m){
+  if(isCustom(g)){ const st=setOf(g); return st?st.items.length:0; }
+  if(m==="kanji") return kCount(g);
+  if(m==="en") return enCount(g);
+  return kCount(g)+enCount(g);
+}
+/* 答えが英数字だけなら、そのまま打つ。それ以外はひらがな→ローマ字で打つ */
+function isDirectAns(y){ return /^[A-Za-z0-9\-.,;:'?! ]+$/.test(y); }
+function customItems(g){
+  const st=setOf(g); if(!st) return [];
+  const id=String(g);
+  return st.items.map(a=>{
+    const disp=a[1], y=a[2]||a[1], m=a[3]||"";
+    return {t:"c",sid:id,w:a[0],disp:disp,y:y,m:m,direct:isDirectAns(y)};
+  });
+}
+function gradeEnabled(g){ return S.mode!=="review" && poolSize(g,S.mode)>0; }
+
+function buildStart(){
+  const md=$("modes");md.innerHTML="";
+  MODES.forEach(([v,label])=>{
+    const b=document.createElement("button");b.type="button";b.dataset.mv=v;
+    b.textContent=T("mode_"+v);
+    b.setAttribute("aria-pressed",v===S.mode);
+    b.onclick=()=>{
+      S.mode=v;
+      [...md.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+      applyTexts();
+      if(S.mode!=="review" && !gradeEnabled(S.grade)){
+        S.grade=BASIC_GRADES.concat(ADV_GRADES).concat(BUILTIN_GRADES).concat(customGrades()).find(gradeEnabled)||1;
+      }
+      refreshGrades();
+    };
+    md.appendChild(b);
+  });
+
+  [["grades",BASIC_GRADES,""],["grades2",ADV_GRADES," adv"],
+   ["grades4",BUILTIN_GRADES," adv"],["grades3",customGrades()," adv"]].forEach(([id,list,cls])=>{
+    const g=$(id);g.innerHTML="";
+    list.forEach(i=>{
+      const b=document.createElement("button");
+      b.className="grade"+cls;b.type="button";b.dataset.g=i;
+      b.innerHTML=`<b>${esc(gradeLabel(i))}</b><small></small>`;
+      b.onclick=()=>{ S.grade=i; refreshGrades(); };
+      g.appendChild(b);
+    });
+  });
+
+  const ln=$("learns");ln.innerHTML="";
+  [[false,"learn_off"],[true,"learn_on"]].forEach(([v,key])=>{
+    const b=document.createElement("button");b.type="button";b.dataset.lv=key;
+    b.textContent=T(key);b.setAttribute("aria-pressed",v===S.learn);
+    b.onclick=()=>{
+      S.learn=v;
+      [...ln.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+      applyTexts(); showBest();
+    };
+    ln.appendChild(b);
+  });
+
+  const df=$("diffs");df.innerHTML="";
+  DIFFS.forEach(([v,label])=>{
+    const b=document.createElement("button");b.type="button";b.className="diff";
+    b.textContent=label;b.setAttribute("aria-pressed",v===S.diff);
+    b.onclick=()=>{
+      S.diff=v;
+      [...df.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+      applyTexts();
+      showBest();
+    };
+    df.appendChild(b);
+  });
+
+  const c=$("counts");c.innerHTML="";
+  [5,10,20,30].forEach(n=>{
+    const b=document.createElement("button");b.type="button";
+    b.dataset.n=n;b.textContent=n+T("ken");b.setAttribute("aria-pressed",n===S.countPref);
+    b.onclick=()=>{S.countPref=n;[...c.children].forEach(x=>x.setAttribute("aria-pressed",x===b));};
+    c.appendChild(b);
+  });
+  refreshGrades();
+}
+
+function refreshGrades(){
+  $("customLabel").classList.toggle("hidden", customGrades().length===0);
+  document.querySelectorAll("#grades [data-g], #grades2 [data-g], #grades3 [data-g], #grades4 [data-g]").forEach(b=>{
+    const i = isCustom(b.dataset.g) ? b.dataset.g : +b.dataset.g;
+    const ok=gradeEnabled(i);
+    b.disabled=!ok;
+    b.setAttribute("aria-pressed", ok&&i===S.grade);
+    b.querySelector("small").textContent = ok ? poolSize(i,S.mode)+(isCustom(i)?T("u_items"):"語") : "—";
+  });
+  applyTexts();
+  showBest();
+}
+
+/* ---- ユーザーごとの保存 ---- */
+const DB={active:null, users:{}, sets:{}};
+function U(){ return DB.users[DB.active]; }
+function newId(){ return "u"+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function blankUser(name){
+  return {name:name,best:{},hist:{sessions:[],words:{}},streak:{n:0,last:""},total:0,created:Date.now()};
+}
+async function saveDB(){
+  try{ await window.storage.set("kanji-typing:users",JSON.stringify(DB)); }catch(e){}
+}
+async function loadDB(){
+  try{
+    const r=await window.storage.get("kanji-typing:users");
+    if(r&&r.value){ const o=JSON.parse(r.value); DB.active=o.active||null; DB.users=o.users||{}; DB.sets=o.sets||{}; }
+  }catch(e){}
+  if(!DB.active || !DB.users[DB.active]){
+    const ids=Object.keys(DB.users);
+    if(ids.length){ DB.active=ids[0]; }
+    else{
+      /* 以前の保存データがあれば最初のユーザーに引き継ぐ */
+      const u=blankUser("ユーザー1");
+      try{ const a=await window.storage.get("kanji-typing:best"); if(a&&a.value) u.best=JSON.parse(a.value)||{}; }catch(e){}
+      try{
+        const b=await window.storage.get("kanji-typing:hist");
+        if(b&&b.value){ const o=JSON.parse(b.value); u.hist={sessions:o.sessions||[],words:o.words||{}}; }
+      }catch(e){}
+      u.total=(u.hist.sessions||[]).reduce((a,v)=>a+(v.n||0),0);
+      const id=newId(); DB.users[id]=u; DB.active=id;
+      await saveDB();
+    }
+  }
+  bindUser();
+}
+function bindUser(){
+  const u=U(); if(!u) return;
+  if(!u.streak) u.streak={n:0,last:""};
+  if(typeof u.total!=="number") u.total=0;
+  bestStore=u.best; hist.sessions=u.hist.sessions; hist.words=u.hist.words;
+  hist.ref=u.hist;
+}
+function saveBest(){ saveDB(); }
+function bestKey(){const d=S.learn?"learn":S.diff; return S.mode==="review" ? "review::"+d : S.mode+":"+S.grade+":"+d;}
+function modeLabel(){return (MODES.find(m=>m[0]===S.mode)||["","" ])[1];}
+function isCustom(g){
+  const k=String(g);
+  return typeof g==="string" && (k.slice(0,2)==="c:" || k.slice(0,2)==="b:");
+}
+function setOf(g){
+  const k=String(g);
+  if(k.slice(0,2)==="b:") return BUILTIN_SETS[k.slice(2)];
+  if(k.slice(0,2)==="c:") return DB.sets[k.slice(2)];
+  return null;
+}
+const BUILTIN_GRADES=Object.keys(BUILTIN_SETS).map(k=>"b:"+k);
+function gradeLabel(g){
+  if(isCustom(g)){ const st=setOf(g); return st?st.name:"?"; }
+  return GRADE_LABEL[g]||"";
+}
+function customGrades(){
+  return Object.keys(DB.sets)
+    .sort((a,b)=>(DB.sets[a].created||0)-(DB.sets[b].created||0))
+    .map(id=>"c:"+id);
+}
+function levelLabel(){return S.mode==="review" ? "復習" : gradeLabel(S.grade);}
+function showBest(){
+  const b=bestStore[bestKey()];
+  $("bestLine").textContent = b ? `${levelLabel()}・${modeLabel()}・${diffLabel()}${T("best_of")}${b.speed} ${T("u_speed")}（${T("u_acc")} ${b.acc}%）` : "";
+}
+
+/* =========================================================
+   5. キーボード
+========================================================= */
+const ROWS=[["1","2","3","4","5","6","7","8","9","0"],
+            ["q","w","e","r","t","y","u","i","o","p","-"],
+            ["a","s","d","f","g","h","j","k","l"],
+            ["z","x","c","v","b","n","m"],
+            ["'",",",".","?","!",";",":"],
+            [" "]];
+const LEFT=new Set("qwertasdfgzxcvb");
+function buildKb(){
+  const kb=$("kb");kb.innerHTML="";
+  ROWS.forEach(r=>{
+    const d=document.createElement("div");d.className="kb-row";
+    r.forEach(k=>{
+      const e=document.createElement("div");
+      if(k===" "){ e.className="key space"; e.textContent="space"; }
+      else if(/[0-9]/.test(k)){ e.className="key num"; e.textContent=k; }
+      else if(/['",.?!;:]/.test(k)){ e.className="key sym"; e.textContent=k; }
+      else { e.className="key "+(LEFT.has(k)?"left":"right")+((k==="f"||k==="j")?" home":""); e.textContent=k; }
+      e.dataset.k=k;d.appendChild(e);
+    });
+    kb.appendChild(d);
+  });
+}
+function hintKey(ch){
+  document.querySelectorAll(".key.hit").forEach(e=>e.classList.remove("hit"));
+  if(!ch) return;
+  const e=document.querySelector('.key[data-k="'+ch+'"]');
+  if(e) e.classList.add("hit");
+}
+
+/* =========================================================
+   6. ゲーム
+========================================================= */
+let limitTimer=null, limitEnd=0;
+function stopLimit(){
+  if(limitTimer){clearInterval(limitTimer);limitTimer=null;}
+  $("limitWrap").classList.add("hidden");
+}
+let limitSec=0;
+function startLimit(){
+  if(limitTimer){clearInterval(limitTimer);limitTimer=null;}
+  const sec=V().limit; limitSec=sec;
+  if(!sec){ $("limitWrap").classList.add("hidden"); return; }
+  $("limitWrap").classList.remove("hidden");
+  limitEnd=Date.now()+sec*1000;
+  tickLimit();
+  limitTimer=setInterval(tickLimit,80);
+}
+function tickLimit(){
+  const total=limitSec*1000;
+  const left=limitEnd-Date.now();
+  const r=Math.max(0,Math.min(1,left/total));
+  $("limitFill").style.width=(r*100).toFixed(1)+"%";
+  $("limitFill").classList.toggle("low",r<.34);
+  $("limitNum").textContent=Math.max(0,Math.ceil(left/1000));
+  if(left<=0){ stopLimit(); timeoutWord(); }
+}
+function timeoutWord(){
+  if(!S.running||S.locked) return;
+  S.locked=true;
+  const r=S.results[S.results.length-1];
+  if(r) r.timeout=true;
+  hintKey(null);
+  beep(200,.18,"square");
+  const card=$("card");card.classList.remove("shake");void card.offsetWidth;card.classList.add("shake");
+  S.qi++;
+  setTimeout(()=>{ if(S.qi>=S.qTotal) finish(); else loadWord(); },420);
+}
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function buildPool(){
+  if(S.mode==="review") return reviewPool();
+  if(isCustom(S.grade)) return customItems(S.grade);
+  const k=(WORDS[S.grade]||[]).map(a=>({t:"k",w:a[0],y:a[1],m:a[2]}));
+  const e=(EN_WORDS[S.grade]||[]).map(a=>({t:"e",w:a[0],y:a[1],m:a[2]}));
+  if(S.mode==="kanji") return k;
+  if(S.mode==="en") return e;
+  return k.concat(e);
+}
+function startGame(){
+  const pool=buildPool();
+  if(!pool.length){
+    if(S.mode==="review") $("modeNote").textContent=T("review_none");
+    return;
+  }
+  S.count=S.countPref;
+  let words;
+  if(S.mode==="review"){
+    words=shuffle(pool.slice(0,S.count));
+  }else{
+    shuffle(pool);
+    words=[];
+    while(words.length<S.count){ words=words.concat(pool); }
+    words=words.slice(0,S.count);
+  }
+  S.count=words.length;
+  words.forEach((w,i)=>{ w.no=i+1; });
+  /* 学ぶモードは 1語につき「見て打つ」→「思い出して打つ」の2回 */
+  S.queue = S.learn
+    ? words.flatMap(w=>[Object.assign({},w,{phase:1}),Object.assign({},w,{phase:2})])
+    : words;
+  S.qTotal=S.queue.length;
+  S.qi=0;S.keysOK=0;S.keysNG=0;S.missMap={};S.results=[];S.startedAt=0;S.running=true;S.locked=false;S.hinted={};
+  $("scr-start").classList.add("hidden");
+  $("scr-result").classList.add("hidden");
+  $("scr-play").classList.remove("hidden");
+  focusCatcher();
+  loadWord();
+}
+
+function loadWord(){
+  const it=S.queue[S.qi];
+  S.cur=it;S.ui=0;S.buf="";S.typed="";S.locked=false;
+  const hk=wordKeyOf(it);
+  S.results.push({t:it.t,sid:it.sid,w:it.w,y:it.y,m:it.m,miss:0,phase:it.phase||0,hinted:!!S.hinted[hk]});
+  $("qCount").textContent = S.learn
+    ? `${it.no||1} / ${S.count}`
+    : `${S.qi+1} / ${S.count}`;
+  $("imi").textContent = it.t==="e" ? "" : it.m;
+  const view=V();
+  $("rGuide").classList.toggle("off",!view.guide);
+  $("kb").classList.toggle("off",!view.kb);
+  const pb=$("phaseBadge");
+  pb.classList.toggle("hidden",!(S.learn&&it.phase));
+  pb.classList.toggle("recall",it.phase===2);
+  pb.textContent = it.phase===2 ? T("ph_recall") : T("ph_see");
+  $("btnHint").classList.toggle("hidden", !(S.learn && it.phase===2));
+  const yo=$("yomi"), bx=$("boxes");
+  bx.innerHTML="";
+  if(it.t==="c"){
+    S.ansStr=it.y;
+    S.units = it.direct
+      ? [...it.y.toLowerCase()].map(ch=>({kana:ch,cands:[ch]}))
+      : tokenize(it.y);
+    yo.classList.add("prompt");yo.classList.remove("off");
+    yo.textContent=it.w;
+    const cjk=/[\u4e00-\u9fff]/.test(it.disp||it.y);
+    [...(it.disp||it.y)].forEach(ch=>{
+      const d=document.createElement("div");
+      if(ch===" "){ d.className="box en gap"; }
+      else { d.className=cjk?"box":"box en"; d.textContent=ch; }
+      bx.appendChild(d);
+    });
+  }else if(it.t==="e"){
+    S.ansStr=it.w;
+    S.units=[...it.w.toLowerCase()].map(ch=>({kana:ch,cands:[ch]}));
+    yo.classList.add("prompt");yo.classList.remove("off");
+    yo.textContent=it.y;
+    [...it.w].forEach(ch=>{
+      const d=document.createElement("div");
+      if(ch===" "){ d.className="box en gap"; }
+      else { d.className="box en"; d.textContent=ch; }
+      bx.appendChild(d);
+    });
+  }else{
+    S.ansStr="";
+    S.units=tokenize(it.y);
+    yo.classList.remove("prompt");
+    const a=view.ans;
+    yo.classList.toggle("off",!a);
+    yo.textContent = a==="first"
+      ? it.y.slice(0,1)+"○".repeat(Math.max(0,it.y.length-1))
+      : it.y;
+    [...it.w].forEach(ch=>{
+      const d=document.createElement("div");d.className="box";d.textContent=ch;bx.appendChild(d);
+    });
+  }
+  render();
+  startLimit();
+  const canSpk = !!window.speechSynthesis;
+  $("spkRow").classList.toggle("hidden", !(canSpk && it.t==="e" && view.say==="ask"));
+  if(it.t==="e" && view.say==="ask") speakEn(it.w);
+}
+
+function render(){
+  let next="",rest="",p=0;
+  const direct = S.cur && (S.cur.t==="e" || (S.cur.t==="c" && S.cur.direct));
+  const boxN = $("boxes").children.length;
+  if(direct){
+    const w=S.ansStr||"";
+    next=w.slice(S.ui,S.ui+1);rest=w.slice(S.ui+1);
+    p=w.length?S.ui/w.length:0;
+  }else{
+    const cur=S.units[S.ui];
+    if(cur){
+      const cand=cur.cands.find(c=>c.startsWith(S.buf))||cur.cands[0];
+      next=cand.slice(S.buf.length,S.buf.length+1);
+      rest=cand.slice(S.buf.length+1);
+    }
+    for(let i=S.ui+1;i<S.units.length;i++) rest+=S.units[i].cands[0];
+    p=S.units.length?S.ui/S.units.length:0;
+  }
+  $("rTyped").textContent=S.typed;
+  $("rGuide").innerHTML=`<span class="next">${esc(next)}</span><span class="rest">${esc(rest)}</span>`;
+  hintKey(next.toLowerCase());
+
+  const boxes=$("boxes").children;
+  if(S.cur&&S.cur.t==="k"){
+    const filled=Math.floor(p*boxes.length+1e-9);
+    [...boxes].forEach((b,i)=>b.classList.toggle("done",i<filled));
+  }else{
+    const a=V().ans;
+    const sameLen = direct && S.ansStr.length===boxN;
+    const filled = sameLen ? S.ui : Math.floor(p*boxes.length+1e-9);
+    [...boxes].forEach((b,i)=>{
+      const reveal = a===1 || (a==="first"&&i===0) || i<filled;
+      b.classList.toggle("done",i<filled);
+      b.classList.toggle("ghost",!reveal);
+    });
+  }
+
+  const done=(S.qi+p)/(S.qTotal||S.count);
+  $("trackFill").style.width=(done*100).toFixed(1)+"%";
+  updateLive();
+}
+function esc(s){return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+
+function updateLive(){
+  const min=S.startedAt?(Date.now()-S.startedAt)/60000:0;
+  const spd=min>0?Math.round(S.keysOK/min):0;
+  const tot=S.keysOK+S.keysNG;
+  const acc=tot?Math.round(S.keysOK/tot*100):100;
+  $("liveStat").textContent=`${spd} ${T("u_speed")} ・ ${T("acc")} ${acc}%`;
+}
+
+function handleKey(chRaw){
+  if(!S.running||S.locked) return false;
+  const ch=chRaw.toLowerCase();
+  if(!/^[a-z0-9\-.,;:'?! ]$/.test(ch)) return false;
+  if(!S.startedAt) S.startedAt=Date.now();
+  const cur=S.units[S.ui];
+  if(!cur) return true;
+  const test=S.buf+ch;
+
+  if(cur.cands.some(c=>c.startsWith(test))){
+    S.buf=test;
+    S.typed+=ch;
+    S.keysOK++;
+    const exact=cur.cands.includes(test);
+    const longer=cur.cands.some(c=>c.length>test.length&&c.startsWith(test));
+    if(exact&&!longer) advance();
+    beep(720,.05);
+    render();
+    if(S.ui>=S.units.length) setTimeout(wordDone,80);
+    return true;
+  }
+  // 区切りをまたぐケース（「ん」のあとなど）
+  if(cur.cands.includes(S.buf)){
+    advance();
+    const nx=S.units[S.ui];
+    if(nx&&nx.cands.some(c=>c.startsWith(ch))){
+      S.buf=ch;S.typed+=ch;S.keysOK++;
+      const exact=nx.cands.includes(ch);
+      const longer=nx.cands.some(c=>c.length>1&&c.startsWith(ch));
+      if(exact&&!longer) advance();
+      beep(720,.05);
+      render();
+      if(S.ui>=S.units.length) setTimeout(wordDone,80);
+      return true;
+    }
+  }
+  // ミス
+  S.keysNG++;
+  const want=(cur.cands.find(c=>c.startsWith(S.buf))||cur.cands[0]).slice(S.buf.length,S.buf.length+1);
+  if(want) S.missMap[want]=(S.missMap[want]||0)+1;
+  S.results[S.results.length-1].miss++;
+  beep(180,.12,"square");
+  const card=$("card");card.classList.remove("shake");void card.offsetWidth;card.classList.add("shake");
+  updateLive();
+  return true;
+}
+function advance(){S.ui++;S.buf="";}
+
+function wordDone(){
+  if(S.locked) return;
+  S.locked=true;
+  stopLimit();
+  if(S.cur && S.cur.t==="e" && V().say==="done") speakEn(S.cur.w);
+  const isSecond = !S.learn || (S.cur && S.cur.phase===2);
+  if(isSecond){
+    const h=$("hanko");h.classList.remove("on");void h.offsetWidth;h.classList.add("on");
+    beep(980,.09);setTimeout(()=>beep(1320,.12),90);
+  }else{
+    beep(880,.07);
+  }
+  [...$("boxes").children].forEach(b=>{b.classList.add("done");b.classList.remove("ghost");});
+  S.qi++;
+  setTimeout(()=>{
+    if(S.qi>=S.qTotal) finish(); else loadWord();
+  },620);
+}
+
+function backToSee(){
+  if(!S.running||S.locked) return;
+  const it=S.cur;
+  if(!S.learn||!it||it.phase!==2) return;
+  stopLimit(); stopSpeak(); hintKey(null);
+  S.results.pop();                       /* 途中まで打った分の記録は捨てる */
+  S.hinted[wordKeyOf(it)]=true;
+  S.queue.splice(S.qi,1,
+    Object.assign({},it,{phase:1}),
+    Object.assign({},it,{phase:2}));
+  S.qTotal=S.queue.length;
+  loadWord();
+}
+
+function passWord(){
+  if(!S.running||S.locked) return;
+  S.locked=true;
+  stopLimit();
+  const r=S.results[S.results.length-1];
+  if(r) r.passed=true;
+  hintKey(null);
+  beep(300,.1);
+  S.qi++;
+  if(S.qi>=S.qTotal) finish(); else loadWord();
+}
+
+/* =========================================================
+   7. けっか
+========================================================= */
+function finish(){
+  S.running=false;S.locked=false;
+  stopLimit();stopSpeak();
+  hintKey(null);
+  const min=S.startedAt?(Date.now()-S.startedAt)/60000:0;
+  const spd=min>0?Math.round(S.keysOK/min):0;
+  const tot=S.keysOK+S.keysNG;
+  const acc=tot?Math.round(S.keysOK/tot*100):100;
+  $("rSpeed").textContent=spd;
+  $("rAcc").textContent=acc+"%";
+  const scored=S.results.filter(r=>!S.learn||r.phase===2);
+  $("rClear").textContent=scored.filter(r=>r.miss===0&&!r.passed&&!r.timeout&&!r.hinted).length;
+  $("resultTitle").textContent = acc>=95 ? T("t_great") : acc>=85 ? T("t_good") : T("t_ok");
+  recordSession(spd,acc,S.results.filter(r=>r.miss===0&&!r.passed&&!r.timeout).length);
+
+  const b=bestStore[bestKey()];
+  if(!b||spd>b.speed){ bestStore[bestKey()]={speed:spd,acc};saveBest();
+    $("rBest").textContent=`${levelLabel()}・${modeLabel()}・${diffLabel()}${T("best_new")}`;
+  }else{
+    $("rBest").textContent=`${levelLabel()}・${modeLabel()}・${diffLabel()}${T("best_of")}${b.speed} ${T("u_speed")}`;
+  }
+
+  const ul=$("review");ul.innerHTML="";
+  scored.forEach(r=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<span class="kw${r.t==="e"?" en":""}">${esc(r.w)}</span>
+      <span class="kd"><b>${esc(r.y)}</b><span>${r.t==="e"?"":esc(r.m)}</span></span>
+      ${(r.t==="e"&&window.speechSynthesis)?`<button class="spk sm" type="button" data-say="${esc(r.w)}" aria-label="発音を聞く">${SPK_ICON}</button>`:""}
+      <span class="mark ${(r.passed||r.timeout)?"pass":r.hinted?"hint":(r.miss===0?"ok":"ng")}">${r.timeout?T("m_timeout"):r.passed?T("m_pass"):r.hinted?T("m_hint"):(r.miss===0?"◎":"△")}</span>`;
+    ul.appendChild(li);
+  });
+
+  const ms=Object.entries(S.missMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if(ms.length){
+    $("missSheet").classList.remove("hidden");
+    $("missKeys").textContent=ms.map(([k,n])=>`${k} … ${n}回`).join("　／　");
+  }else{
+    $("missSheet").classList.add("hidden");
+  }
+  $("scr-play").classList.add("hidden");
+  $("scr-result").classList.remove("hidden");
+  window.scrollTo(0,0);
+}
+
+/* =========================================================
+   7.5 きろく
+========================================================= */
+const hist={sessions:[],words:{},ref:null};
+function syncHist(){ const u=U(); if(u){ u.hist.sessions=hist.sessions; u.hist.words=hist.words; } }
+function saveHist(){ syncHist(); saveDB(); }
+
+/* ---- 連続勉強日数と累計回答数 ---- */
+/* 間隔をあけた再出題：正解を重ねるほど次に出るまでの日数が延びる */
+const SR_INTERVAL=[1,2,4,7,15];
+function dayNum(d){
+  d=d||new Date();
+  return Math.floor(new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime()/86400000);
+}
+function overdue(v){
+  if(v.next==null) return weakScore(v)>0 ? 0 : -1;   /* 予定がない古い記録 */
+  return dayNum()-v.next;
+}
+function dayStr(d){ const z=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()); }
+function today(){ return dayStr(new Date()); }
+function yesterday(){ const d=new Date(); d.setDate(d.getDate()-1); return dayStr(d); }
+function currentStreak(u){
+  if(!u||!u.streak||!u.streak.last) return 0;
+  return (u.streak.last===today()||u.streak.last===yesterday()) ? (u.streak.n||0) : 0;
+}
+function bumpStreak(answers){
+  const u=U(); if(!u) return;
+  const t=today();
+  if(u.streak.last!==t){
+    u.streak.n = (u.streak.last===yesterday()) ? (u.streak.n||0)+1 : 1;
+    u.streak.last=t;
+  }
+  u.total=(u.total||0)+answers;
+}
+function recordSession(spd,acc,clear){
+  hist.sessions.unshift({d:Date.now(),g:S.grade,m:S.mode,f:S.diff,n:S.count,s:spd,a:acc,c:clear});
+  if(hist.sessions.length>200) hist.sessions.length=200;
+  bumpStreak(S.count);
+  S.results.filter(r=>!S.learn||r.phase===2).forEach(r=>{
+    const k=wordKeyOf(r);
+    const e=hist.words[k]||(hist.words[k]={n:0,ng:0,p:0,to:0,h:0,t:r.t,y:r.y,g:S.grade});
+    if(r.t==="c") e.sid=r.sid;
+    e.n++; e.ng+=r.miss; if(r.passed) e.p++; if(r.timeout) e.to=(e.to||0)+1;
+    if(r.hinted) e.h=(e.h||0)+1;
+    const ok = r.miss===0 && !r.passed && !r.timeout && !r.hinted;
+    e.box = ok ? Math.min(SR_INTERVAL.length,(e.box||0)+1) : 1;
+    e.last = dayNum();
+    e.next = e.last + SR_INTERVAL[e.box-1];
+    e.y=r.y; e.g=S.grade; e.t=r.t;
+  });
+  saveHist();
+}
+function fmtDate(t){
+  const d=new Date(t),z=n=>String(n).padStart(2,"0");
+  return `${d.getMonth()+1}/${d.getDate()} ${z(d.getHours())}:${z(d.getMinutes())}`;
+}
+function renderScoreHist(){
+  const ul=$("scoreList");ul.innerHTML="";
+  if(!hist.sessions.length){
+    ul.innerHTML=`<li><span class="empty">${T("h_empty")}</span></li>`;
+    $("scoreNote").textContent="";return;
+  }
+  hist.sessions.slice(0,60).forEach(v=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<span class="when">${fmtDate(v.d)}</span>
+      <span class="tag">${gradeLabel(v.g)}・${(MODES.find(m=>m[0]===v.m)||["",""])[1]}${v.f?"・"+((DIFFS.find(d=>d[0]===v.f)||["",""])[1]):""}</span>
+      <span class="num">${v.s} 打/分 ・ ${v.a}% ・ ${v.c}/${v.n}</span>`;
+    ul.appendChild(li);
+  });
+  const t=hist.sessions.length;
+  const best=hist.sessions.reduce((a,b)=>b.s>a.s?b:a);
+  $("scoreNote").textContent=T("s_sum",{t:t,s:best.s,g:gradeLabel(best.g),d:fmtDate(best.d)});
+}
+function dueLabel(v){
+  if(v.next==null) return "";
+  const o=dayNum()-v.next;
+  if(o===0) return "・"+T("due_today");
+  if(o>0)   return "・"+T("due_late",{n:o});
+  return "・"+T("due_in",{n:-o});
+}
+let wordSortKey="n";
+function renderWordHist(){
+  const ul=$("wordList");ul.innerHTML="";
+  const arr=Object.entries(hist.words).map(([k,v])=>({w:k.slice(2),...v}));
+  if(!arr.length){
+    ul.innerHTML=`<li><span class="empty">${T("h_empty")}</span></li>`;
+    $("wordNote").textContent="";return;
+  }
+  arr.sort((a,b)=> wordSortKey==="ng" ? (b.ng-a.ng)||(b.n-a.n) : (b.n-a.n)||(b.ng-a.ng));
+  arr.slice(0,100).forEach(v=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<span class="hw${v.t==="e"?" en":""}">${esc(v.w)}</span>
+      <span class="hy">${esc(v.y||"")}<span class="due">${dueLabel(v)}</span></span>
+      <span class="cnt">${v.n}回${v.ng?` <span class="ngc">${T("w_miss")}${v.ng}</span>`:""}${v.p?` ${T("m_pass")}${v.p}`:""}${v.to?` ${T("m_timeout")}${v.to}`:""}</span>`;
+    ul.appendChild(li);
+  });
+  const total=arr.reduce((a,b)=>a+b.n,0);
+  $("wordNote").textContent=T("w_sum",{a:arr.length,t:total})+(arr.length>100?T("w_top"):"");
+}
+/* ---- 問題の取り込み ---- */
+const SAMPLE=[
+ "# 問題,答え,読み,補足   ← 読みと補足は省略できます",
+ "参勤交代を定めた将軍,徳川家光,とくがわいえみつ,江戸幕府3代将軍",
+ "細胞の中でエネルギーをつくる器官,ミトコンドリア",
+ "水の化学式,H2O,h2o",
+ "鎌倉幕府が開かれた年,1192,,いい国つくろう"
+].join("\n");
+function typableAns(y){
+  if(!y) return false;
+  if(/^[A-Za-z0-9\-.,;:'?! ]+$/.test(y)) return true;
+  return [...toHira(y)].every(ch=>/[ぁ-んー0-9 ]/.test(ch));
+}
+/* 1行 = 問題, 答え, 読み（省略可）, 補足（省略可） */
+function normSym(s){
+  return String(s)
+    .replace(/[\u2018\u2019\u02bc\uff07]/g,"'")
+    .replace(/[\u201c\u201d]/g,'"')
+    .replace(/[\uff1f]/g,"?").replace(/[\uff01]/g,"!")
+    .replace(/[\uff0e\u3002]/g,".").replace(/[\uff1b]/g,";").replace(/[\uff1a]/g,":").replace(/[\u2010-\u2015\uff0d]/g,"-")
+    .replace(/\u3000/g," ");
+}
+function parseSet(text){
+  text=normSym(text);
+  const items=[], errs=[];
+  text.split(/\r?\n/).forEach((line,i)=>{
+    const t=line.trim();
+    if(!t || t.charAt(0)==="#") return;
+    const sep = t.indexOf("\t")>=0 ? "\t" : ",";
+    const c=t.split(sep).map(x=>x.trim());
+    const w=c[0]||"", disp=c[1]||"", yomi=c[2]||"", m=c[3]||"";
+    const y = yomi || disp;                       /* 読みがなければ答えをそのまま打つ */
+    if(!w || !disp || !typableAns(y)){ errs.push(i+1); return; }
+    items.push([w,disp,y,m]);
+  });
+  return {items,errs};
+}
+function renderSetList(){
+  const ul=$("setList"); ul.innerHTML="";
+  const ids=Object.keys(DB.sets).sort((a,b)=>(DB.sets[a].created||0)-(DB.sets[b].created||0));
+  if(!ids.length){ ul.innerHTML=`<li><span class="empty">${T("h_empty")}</span></li>`; return; }
+  ids.forEach(id=>{
+    const st=DB.sets[id];
+    const li=document.createElement("li");
+    li.innerHTML=`<span class="uname">${esc(st.name)}</span>
+      <span class="hy">${st.items.length}${T("u_items")}</span>
+      <span class="ubtns"><button data-sid="${id}">${T("btn_deluser")}</button></span>`;
+    ul.appendChild(li);
+  });
+}
+function openImport(){
+  $("scr-start").classList.add("hidden");
+  $("scr-import").classList.remove("hidden");
+  $("setName").placeholder=T("ph_setname");
+  $("setData").placeholder=T("ph_setdata");
+  $("importSample").textContent=SAMPLE;
+  $("importMsg").textContent="";
+  applyTexts(); renderSetList(); window.scrollTo(0,0);
+}
+
+/* ---- ユーザー ---- */
+function renderUserBar(){
+  const u=U();
+  $("userName").textContent = u ? u.name : "";
+  $("newUserName").placeholder = T("ph_user");
+}
+function renderUserList(){
+  const ul=$("userList"); ul.innerHTML="";
+  Object.entries(DB.users)
+    .sort((a,b)=>(a[1].created||0)-(b[1].created||0))
+    .forEach(([id,u])=>{
+      const li=document.createElement("li");
+      const now=id===DB.active;
+      li.innerHTML=`<span class="uname${now?" now":""}">${esc(u.name)}</span>
+        <span class="hy">${currentStreak(u)}${T("u_days")} ・ ${u.total||0}${T("u_times")}</span>
+        <span class="ubtns">
+          ${now?"":`<button data-act="sel" data-id="${id}">${T("btn_select")}</button>`}
+          <button data-act="ren" data-id="${id}">${T("btn_rename")}</button>
+          ${Object.keys(DB.users).length>1?`<button data-act="del" data-id="${id}">${T("btn_deluser")}</button>`:""}
+        </span>`;
+      ul.appendChild(li);
+    });
+}
+function openUsers(){
+  $("scr-start").classList.add("hidden");
+  $("scr-users").classList.remove("hidden");
+  applyTexts(); renderUserList(); renderUserBar(); window.scrollTo(0,0);
+}
+function rankList(key){
+  return Object.entries(DB.users).map(([id,u])=>({
+    id, name:u.name,
+    v: key==="streak" ? currentStreak(u) : (u.total||0)
+  })).sort((a,b)=>b.v-a.v||a.name.localeCompare(b.name));
+}
+function renderRank(){
+  [["rankStreak","streak",T("u_days")],["rankTotal","total",T("u_times")]].forEach(([elId,key,unit])=>{
+    const ul=$(elId); ul.innerHTML="";
+    const arr=rankList(key);
+    if(!arr.length){ ul.innerHTML=`<li><span class="empty">${T("r_none")}</span></li>`; return; }
+    arr.forEach((v,i)=>{
+      const li=document.createElement("li");
+      li.innerHTML=`<span class="rk${i===0&&v.v>0?" top":""}">${i+1}位</span>
+        <span class="uname${v.id===DB.active?" now":""}">${esc(v.name)}</span>
+        <span class="cnt">${v.v}${unit}</span>`;
+      ul.appendChild(li);
+    });
+  });
+}
+
+function openHist(){
+  $("scr-start").classList.add("hidden");
+  $("scr-hist").classList.remove("hidden");
+  renderScoreHist();renderWordHist();renderRank();window.scrollTo(0,0);
+}
+
+/* =========================================================
+   8. 入力の受け取り
+========================================================= */
+const catcher=$("catcher");
+let lastKd=0;
+function focusCatcher(){ try{catcher.focus({preventScroll:true});}catch(e){catcher.focus();} }
+window.addEventListener("keydown",e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  if(!S.running) return;
+  if(e.key==="Escape"){ e.preventDefault(); passWord(); return; }
+  if(e.key==="Enter"){ e.preventDefault(); return; }
+  if(e.key&&e.key.length===1){
+    e.preventDefault();
+    if(handleKey(e.key)) lastKd=Date.now();
+  }
+});
+catcher.addEventListener("input",()=>{
+  const v=catcher.value;catcher.value="";
+  if(Date.now()-lastKd<60) return;
+  for(const ch of v) handleKey(ch);
+});
+$("scr-play").addEventListener("click",()=>{ if(S.running){focusCatcher();$("tapHint").classList.add("hidden");} });
+catcher.addEventListener("blur",()=>{ if(S.running) $("tapHint").classList.remove("hidden"); });
+catcher.addEventListener("focus",()=>$("tapHint").classList.add("hidden"));
+
+/* =========================================================
+   9. 画面のつなぎ
+========================================================= */
+$("btnPass").onclick=function(){ this.blur(); passWord(); };
+$("btnHint").onclick=function(){ this.blur(); backToSee(); };
+$("btnSpeak").innerHTML=SPK_ICON;
+$("btnSpeak").onclick=function(){ this.blur(); if(S.cur&&S.cur.t==="e") speakEn(S.cur.w,true); };
+$("review").addEventListener("click",e=>{
+  const b=e.target.closest("[data-say]"); if(!b) return;
+  b.blur(); speakEn(b.dataset.say,true);
+});
+$("btnStart").onclick=()=>{primeSpeech();startGame();};
+$("btnAgain").onclick=()=>{primeSpeech();startGame();};
+$("btnQuit").onclick=function(){
+  this.blur();
+  if(S.running && S.qi>0 && !window.confirm(T("c_quit"))) { focusCatcher(); return; }
+  S.running=false;S.locked=false;stopLimit();stopSpeak();hintKey(null);
+  $("scr-play").classList.add("hidden");$("scr-start").classList.remove("hidden");
+};
+$("btnHome").onclick=()=>{$("scr-result").classList.add("hidden");$("scr-start").classList.remove("hidden");window.scrollTo(0,0);};
+
+$("btnHist").onclick=openHist;
+$("btnUsers").onclick=openUsers;
+$("btnImport").onclick=openImport;
+$("btnImportBack").onclick=()=>{
+  $("scr-import").classList.add("hidden");$("scr-start").classList.remove("hidden");
+  WORD_INDEX=null; buildStart(); window.scrollTo(0,0);
+};
+$("btnSaveSet").onclick=()=>{
+  const name=($("setName").value||"").trim();
+  const msg=$("importMsg");
+  if(!name){ msg.textContent=T("im_noname"); return; }
+  const {items,errs}=parseSet($("setData").value||"");
+  if(!items.length){ msg.textContent=T("im_none"); return; }
+  const id="s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  DB.sets[id]={name:name.slice(0,20),items:items,created:Date.now()};
+  saveDB(); WORD_INDEX=null;
+  $("setName").value=""; $("setData").value="";
+  msg.textContent = T("im_ok",{n:items.length})
+    + (errs.length? T("im_err",{n:errs.length,l:errs.slice(0,5).join(",")}) : "");
+  renderSetList();
+};
+$("setList").addEventListener("click",e=>{
+  const b=e.target.closest("[data-sid]"); if(!b) return;
+  const st=DB.sets[b.dataset.sid]; if(!st) return;
+  if(!window.confirm(T("c_delset",{n:st.name}))) return;
+  if(S.grade==="c:"+b.dataset.sid) S.grade=2;
+  delete DB.sets[b.dataset.sid];
+  saveDB(); WORD_INDEX=null; renderSetList();
+});
+$("btnUsersBack").onclick=()=>{
+  $("scr-users").classList.add("hidden");$("scr-start").classList.remove("hidden");
+  renderUserBar();refreshGrades();window.scrollTo(0,0);
+};
+$("btnAddUser").onclick=()=>{
+  const name=($("newUserName").value||"").trim();
+  if(!name) return;
+  const id=newId(); DB.users[id]=blankUser(name); DB.active=id;
+  $("newUserName").value="";
+  bindUser(); saveDB(); renderUserList(); renderUserBar();
+};
+$("userList").addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]"); if(!b) return;
+  const id=b.dataset.id, u=DB.users[id]; if(!u) return;
+  if(b.dataset.act==="sel"){ DB.active=id; bindUser(); }
+  else if(b.dataset.act==="ren"){
+    const nm=window.prompt(T("q_rename"),u.name);
+    if(nm===null) return;
+    const t=nm.trim(); if(t) u.name=t.slice(0,12);
+  }
+  else if(b.dataset.act==="del"){
+    if(!window.confirm(T("c_deluser",{n:u.name}))) return;
+    delete DB.users[id];
+    if(DB.active===id){ DB.active=Object.keys(DB.users)[0]||null; bindUser(); }
+  }
+  saveDB(); renderUserList(); renderUserBar();
+});
+$("btnHistBack").onclick=()=>{$("scr-hist").classList.add("hidden");$("scr-start").classList.remove("hidden");window.scrollTo(0,0);};
+$("btnHistClear").onclick=function(){
+  this.blur();
+  if(!window.confirm(T("c_clear"))) return;
+  hist.sessions=[];hist.words={};saveHist();renderScoreHist();renderWordHist();
+};
+$("histTabs").onclick=e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  [...$("histTabs").children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+  ["score","words","rank"].forEach(t=>$("tab-"+t).classList.toggle("hidden",b.dataset.tab!==t));
+};
+$("wordSort").onclick=e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  [...$("wordSort").children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+  wordSortKey=b.dataset.sort; renderWordHist();
+};
+
+buildStart();buildKb();applyTexts();
+loadDB().then(()=>{ renderUserBar(); refreshGrades(); });
+</script>
+</body>
+</html>
